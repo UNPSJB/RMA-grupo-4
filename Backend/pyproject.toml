@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "rma - grupo 4"
+version = "0.1.0"
+description = "Red de Monitoreo Ambiental"
+authors = ["Grupo 4"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.115.0"
+sqlalchemy = "^2.0.35"
+python-dotenv = "^1.0.1"
+pytest = "^8.3.3"
+httpx = "^0.27.2"
+ipdb = "^0.13.13"
+pendulum = "^3.0.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
