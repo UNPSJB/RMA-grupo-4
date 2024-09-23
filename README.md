@@ -22,14 +22,14 @@
 
 
 ### Dependencias Instaladas Backend :
-  python = "3.12"
-  fastapi = "0.115.0"
-  sqlalchemy = "2.0.35"
-  python-dotenv = "1.0.1"
-  pytest = "8.3.3"
-  httpx = "0.27.2"
-  ipdb = "0.13.13"
-  pendulum = "3.0.0"
+ python = "3.12"
+ fastapi = {extras = ["standard"], version = "0.112.0"}
+ sqlalchemy = "2.0.31"
+ python-dotenv = "1.0.1"
+ pytest = "8.3.2"
+ httpx = "0.27.0"
+ ipdb = "0.13.13"
+ pendulum = "3.0.0"
 
 
 ### Dependencias Instaladas Frontend :
