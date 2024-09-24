@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "rma - grupo 4"
+name = "rma_grupo_4"
 version = "0.1.0"
 description = "Red de Monitoreo Ambiental"
 authors = ["Grupo 4"]

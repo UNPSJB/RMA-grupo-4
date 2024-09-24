@@ -22,43 +22,43 @@
 
 
 ### Dependencias Instaladas Backend :
- python = "3.12"
- fastapi = {extras = ["standard"], version = "0.112.0"}
- sqlalchemy = "2.0.31"
- python-dotenv = "1.0.1"
- pytest = "8.3.2"
- httpx = "0.27.0"
- ipdb = "0.13.13"
- pendulum = "3.0.0"
+  - python = "^3.12"
+  - fastapi = "^0.115.0"
+  - sqlalchemy = "^2.0.35"
+  - python-dotenv = "^1.0.1"
+  - pytest = "^8.3.3"
+  - httpx = "^0.27.2"
+  - ipdb = "^0.13.13"
+  - pendulum = "^3.0.0"
 
 
 ### Dependencias Instaladas Frontend :
-  "@chakra-ui/react": "2.8.2",
-  "@emotion/react": "11.13.3",
-  "@emotion/styled": "11.13.0",
-  "chart.js": "4.4.4",
-  "framer-motion": "11.5.6",
-  "react": "18.3.1",
-  "react-chartjs-2": "5.2.0",
-  "react-dom": "18.3.1",
-  "react-icons": "5.3.0",
-  "react-router-dom": "6.26.2"
+ - "@chakra-ui/react": "2.8.2",
+ - "@emotion/react": "11.13.3",
+ - "@emotion/styled": "11.13.0",
+ - "chart.js": "4.4.4",
+ - "framer-motion": "11.5.6",
+ - "react": "18.3.1",
+ - "react-chartjs-2": "5.2.0",
+ - "react-dom": "18.3.1",
+ - "react-icons": "5.3.0",
+ - "react-router-dom": "6.26.2"
   
 
 
 ### Instalacion rapida :
 
-Backend:
-  Si ya tienes el proyecto configurado, y estas parado sobre la carpeta Backend, simplemente ejecuta:
-    poetry install
+* Backend:
+  - Si ya tienes el proyecto configurado, y estas parado sobre la carpeta Backend, simplemente ejecuta:
+    . poetry install
   
-  Esto instalará todas las dependencias y podrás correr el servidor con:
-    fastapi dev src/main.py
+  - Esto instalará todas las dependencias y podrás correr el servidor con:
+    . fastapi dev src/main.py
 
-Frontend: 
-  Si ya tienes el proyecto configurado, y estas parado sobre la carpeta Frontend, simplemente ejecuta:
-    npm install
+* Frontend: 
+  - Si ya tienes el proyecto configurado, y estas parado sobre la carpeta Frontend, simplemente ejecuta:
+    . npm install
   
-  Esto instalará todas las dependencias y podrás iniciar el servidor con:
-    npm run dev
+  - Esto instalará todas las dependencias y podrás iniciar el servidor con:
+    . npm run dev
   
