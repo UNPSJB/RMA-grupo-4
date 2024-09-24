@@ -33,19 +33,32 @@
 
 
 ### Dependencias Instaladas Frontend :
-    "@chakra-ui/react": "2.8.2",
-    "@emotion/react": "11.13.3",
-    "@emotion/styled": "11.13.0",
-    "chart.js": "4.4.4",
-    "framer-motion": "11.5.6",
-    "react": "18.3.1",
-    "react-chartjs-2": "5.2.0",
-    "react-dom": "18.3.1",
-    "react-icons": "5.3.0",
-    "react-router-dom": "6.26.2"
+  "@chakra-ui/react": "2.8.2",
+  "@emotion/react": "11.13.3",
+  "@emotion/styled": "11.13.0",
+  "chart.js": "4.4.4",
+  "framer-motion": "11.5.6",
+  "react": "18.3.1",
+  "react-chartjs-2": "5.2.0",
+  "react-dom": "18.3.1",
+  "react-icons": "5.3.0",
+  "react-router-dom": "6.26.2"
   
 
 
+### Instalacion rapida :
 
+Backend:
+  Si ya tienes el proyecto configurado, y estas parado sobre la carpeta Backend, simplemente ejecuta:
+    poetry install
+  
+  Esto instalará todas las dependencias y podrás correr el servidor con:
+    fastapi dev src/main.py
 
-   
+Frontend: 
+  Si ya tienes el proyecto configurado, y estas parado sobre la carpeta Frontend, simplemente ejecuta:
+    npm install
+  
+  Esto instalará todas las dependencias y podrás iniciar el servidor con:
+    npm run dev
+  
