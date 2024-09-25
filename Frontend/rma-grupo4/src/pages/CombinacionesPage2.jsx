@@ -3,6 +3,7 @@ import { Box, Heading, Checkbox, Stack, Text, Grid, GridItem, Button } from '@ch
 import { Chart as ChartJS, registerables, ArcElement } from 'chart.js';
 import { Bar, Line, PolarArea, Doughnut } from 'react-chartjs-2';
 import NavigationButtons from '../components/NavigationButtons';
+import Footer from '../components/Footer'; 
 
 ChartJS.register(...registerables, ArcElement);
 
@@ -162,6 +163,8 @@ function CombinacionesPage2() {
           </Stack>
         </GridItem>
       </Grid>
+      {/* Footer reutilizable */}
+      <Footer />
     </Box>
   );
 }

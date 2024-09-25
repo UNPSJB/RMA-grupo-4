@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Heading  } from '@chakra-ui/react';
 import NavigationButtons from '../components/NavigationButtons';
+import Footer from '../components/Footer'; 
 
 function GraficosPage() {
   return (
@@ -11,6 +12,8 @@ function GraficosPage() {
         Datos en Graficos
       </Heading>
       {/* Aquí irá la lógica de la tabla */}
+      {/* Footer reutilizable */}
+      <Footer />
     </Box>
   );
 }

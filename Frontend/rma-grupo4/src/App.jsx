@@ -2,6 +2,7 @@
 import React from 'react';
 import { Box } from "@chakra-ui/react";
 import NavigationButtons from './components/NavigationButtons';
+import Footer from './components/Footer'; 
 
 function App() {
   return (
@@ -27,6 +28,8 @@ function App() {
       >
         Pantalla principal aquí
       </Box>
+      {/* Footer reutilizable */}
+      <Footer />
     </Box>
   );
 }
