@@ -16,7 +16,7 @@
  . Sqlite.
  . Fastapi.
 
- ### Frontend
+### Frontend
   . ReactJS
   . Vite 
 
@@ -30,7 +30,7 @@
   - httpx = "^0.27.2"
   - ipdb = "^0.13.13"
   - pendulum = "^3.0.0"
-
+  - uvicorn = "^0.30.6"
 
 ### Dependencias Instaladas Frontend :
  - "@chakra-ui/react": "2.8.2",
@@ -50,15 +50,23 @@
 
 * Backend:
   - Si ya tienes el proyecto configurado, y estas parado sobre la carpeta Backend, simplemente ejecuta:
-    . poetry install
-  
+    
+    ```bash
+    poetry install
+    ```
   - Esto instalará todas las dependencias y podrás correr el servidor con:
-    . fastapi dev src/main.py
-
+    
+    ```bash
+    fastapi dev src/main.py
+    ```
 * Frontend: 
   - Si ya tienes el proyecto configurado, y estas parado sobre la carpeta Frontend, simplemente ejecuta:
-    . npm install
-  
+    
+    ```bash
+    npm install
+    ```
   - Esto instalará todas las dependencias y podrás iniciar el servidor con:
-    . npm run dev
-  
+    
+    ```bash
+    npm run dev
+    ```
