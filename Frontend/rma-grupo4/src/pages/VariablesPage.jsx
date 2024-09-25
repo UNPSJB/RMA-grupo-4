@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 import { FaArrowLeft, FaBars } from 'react-icons/fa';
 import { Chart as ChartJS, registerables, ArcElement } from 'chart.js';
 import { Bar, Line, Radar, Scatter } from 'react-chartjs-2';
+import Footer from '../components/Footer';
 import NavigationButtons from '../components/NavigationButtons';
-import Footer from '../components/Footer'; 
 
 ChartJS.register(...registerables, ArcElement);
 
@@ -118,6 +118,7 @@ return (
         </Button>
       </Stack>
 
+    
       {/* Condicional: Si es pantalla pequeña, muestra el menú hamburguesa, si no, el stack normal */}
       {isHamburger ? (
         <>
@@ -132,7 +133,7 @@ return (
             <DrawerContent>
               <DrawerHeader>Seleccionar Variable</DrawerHeader>
               <DrawerBody>
-                <Stack spacing={4}>
+                <Stack spacing={4} alignItems="center">
                   {variables.map(variable => (
                     <Button
                       key={variable.name}
@@ -148,24 +149,27 @@ return (
           </Drawer>
         </>
       ) : (
-        <Stack direction="row" spacing={4} mb={6}>
-          {variables.map(variable => (
-            <Button
-              key={variable.name}
-              onClick={() => handleVariableChange(variable.name)}
-              colorScheme={selectedVariable === variable.name ? "teal" : "gray"}
-            >
-              {variable.name}
-            </Button>
-          ))}
-        </Stack>
+        <Box display="flex" justifyContent="center">
+          <Stack direction="row" spacing={4} mb={6}>
+            {variables.map(variable => (
+              <Button
+                key={variable.name}
+                onClick={() => handleVariableChange(variable.name)}
+                colorScheme={selectedVariable === variable.name ? "teal" : "gray"}
+              >
+                {variable.name}
+              </Button>
+            ))}
+          </Stack>
+        </Box>
       )}
+
 
       <Grid templateColumns={{ base: '1fr', md: '2fr 1fr' }} gap={6}>
         <GridItem>
           <Box bg="white" p={4} borderRadius="md" color="black" height="600px">
             {renderCombinedChart() || (
-              <Text color="gray.500" textAlign="center">
+              <Text color="gray.500" textAlign="center">  
                 Selecciona una variable para visualizar los datos
               </Text>
             )}
@@ -191,7 +195,6 @@ return (
           </Stack>
         </GridItem>
       </Grid>
-      {/* Footer reutilizable */}
       <Footer />
     </Box>
   );
