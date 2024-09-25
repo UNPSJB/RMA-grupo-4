@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, Stack, Text, Grid, GridItem, Button } from '@chakra-ui/react';
+import { Box, Heading, IconButton, Stack, Text, Grid, GridItem, Button, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, useDisclosure, useBreakpointValue } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
+import { FaArrowLeft, FaBars } from 'react-icons/fa';
 import { Chart as ChartJS, registerables, ArcElement } from 'chart.js';
 import { Bar, Line, Radar, Scatter } from 'react-chartjs-2';
-import NavigationButtons from '../components/NavigationButtons';
 
 ChartJS.register(...registerables, ArcElement);
 
@@ -17,6 +18,9 @@ function VariablesPage() {
   const [selectedCharts, setSelectedCharts] = useState(['line']); // Inicia con gráfico de líneas
   const [selectedVariable, setSelectedVariable] = useState(null); // Solo una variable seleccionada
   const [chartData, setChartData] = useState(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();  // Hook para abrir/cerrar el Drawer
+  const isHamburger = useBreakpointValue({ base: true, md: false });  // Condicional para mostrar el menú en pantallas pequeñas
+
 
   useEffect(() => {
     if (selectedVariable) {
@@ -88,75 +92,112 @@ function VariablesPage() {
 
 
 return (
-  <Box bg="gray.800" color="white" minH="100vh" p={4}>
-    {/* Componente de botones de navegación */}
-    <NavigationButtons />
+    <Box bg="gray.800" color="white" minH="100vh" p={4}>
+      <IconButton
+        as={Link}
+        to="/"
+        icon={<FaArrowLeft />}
+        colorScheme="teal"
+        aria-label="Volver a la Página Principal"
+        mb={4}
+      />
       <Heading as="h1" size="xl" mb={6} textAlign="center">
-      Datos Variable
-    </Heading>
-    
-    <Stack spacing={4} direction="row" mb={6} justifyContent="center">
-      <Button 
-        isActive={selectedCharts.includes('line')}
-        onClick={() => handleChartTypeChange('line')}
-        colorScheme={selectedCharts.includes('line') ? "teal" : "gray"}
-      >
-        Líneas
-      </Button>
-      <Button 
-        isActive={selectedCharts.includes('bar')}
-        onClick={() => handleChartTypeChange('bar')}
-        colorScheme={selectedCharts.includes('bar') ? "teal" : "gray"}
+        Datos Variable
+      </Heading>
 
-      >
-        Barras
-      </Button>
-    </Stack>
-
-    <Stack direction="row" spacing={4} mb={6}>
-      {variables.map(variable => (
+      <Stack spacing={4} direction="row" mb={6} justifyContent="center">
         <Button
-          key={variable.name}
-          onClick={() => handleVariableChange(variable.name)}
-          colorScheme={selectedVariable === variable.name ? "teal" : "gray"}
+          isActive={selectedCharts.includes('line')}
+          onClick={() => handleChartTypeChange('line')}
+          colorScheme={selectedCharts.includes('line') ? "teal" : "gray"}
         >
-          {variable.name}
+          Líneas
         </Button>
-      ))}
-    </Stack>
+        <Button
+          isActive={selectedCharts.includes('bar')}
+          onClick={() => handleChartTypeChange('bar')}
+          colorScheme={selectedCharts.includes('bar') ? "teal" : "gray"}
+        >
+          Barras
+        </Button>
+      </Stack>
 
-    <Grid templateColumns="2fr 1fr" gap={6}>
-      <GridItem>
-        <Box bg="white" p={4} borderRadius="md" color="black" height="600px">
-          {renderCombinedChart() || (
-            <Text color="gray.500" textAlign="center">
-              Selecciona una variable para visualizar los datos
-            </Text>
-          )}
-        </Box>
-      </GridItem>
-      <GridItem>
-        <Stack spacing={6}>
-          <Box bg="white" p={4} borderRadius="md" color="black" height="290px">
-            {renderRadarChart() || (
-              <Text color="gray.500" textAlign="center">
-                Gráfico Radar
-              </Text>
-            )}
-          </Box>
-          <Box bg="white" p={4} borderRadius="md" color="black" height="290px">
-            {renderScatterChart() || (
-              <Text color="gray.500" textAlign="center">
-                Gráfico de Dispersión
-              </Text>
-            )}
-          </Box>
+      {/* Condicional: Si es pantalla pequeña, muestra el menú hamburguesa, si no, el stack normal */}
+      {isHamburger ? (
+        <>
+          <IconButton
+            icon={<FaBars />}
+            colorScheme="teal"
+            aria-label="Abrir menú"
+            onClick={onOpen}
+          />
+          <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
+            <DrawerOverlay />
+            <DrawerContent>
+              <DrawerHeader>Seleccionar Variable</DrawerHeader>
+              <DrawerBody>
+                <Stack spacing={4}>
+                  {variables.map(variable => (
+                    <Button
+                      key={variable.name}
+                      onClick={() => { handleVariableChange(variable.name); onClose(); }}
+                      colorScheme={selectedVariable === variable.name ? "teal" : "gray"}
+                    >
+                      {variable.name}
+                    </Button>
+                  ))}
+                </Stack>
+              </DrawerBody>
+            </DrawerContent>
+          </Drawer>
+        </>
+      ) : (
+        <Stack direction="row" spacing={4} mb={6}>
+          {variables.map(variable => (
+            <Button
+              key={variable.name}
+              onClick={() => handleVariableChange(variable.name)}
+              colorScheme={selectedVariable === variable.name ? "teal" : "gray"}
+            >
+              {variable.name}
+            </Button>
+          ))}
         </Stack>
-      </GridItem>
-    </Grid>
-  </Box>
-);
+      )}
 
+      <Grid templateColumns={{ base: '1fr', md: '2fr 1fr' }} gap={6}>
+        <GridItem>
+          <Box bg="white" p={4} borderRadius="md" color="black" height="600px">
+            {renderCombinedChart() || (
+              <Text color="gray.500" textAlign="center">
+                Selecciona una variable para visualizar los datos
+              </Text>
+            )}
+          </Box>
+        </GridItem>
+
+        <GridItem>
+          <Stack spacing={6}>
+            <Box bg="white" p={4} borderRadius="md" color="black" height="290px">
+              {renderRadarChart() || (
+                <Text color="gray.500" textAlign="center">
+                  Gráfico Radar
+                </Text>
+              )}
+            </Box>
+            <Box bg="white" p={4} borderRadius="md" color="black" height="290px">
+              {renderScatterChart() || (
+                <Text color="gray.500" textAlign="center">
+                  Gráfico de Dispersión
+                </Text>
+              )}
+            </Box>
+          </Stack>
+        </GridItem>
+      </Grid>
+    </Box>
+  );
 }
+
 
 export default VariablesPage;
