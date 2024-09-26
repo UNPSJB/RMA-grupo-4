@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, Checkbox, Stack, Select, Text, Grid, GridItem } from '@chakra-ui/react';
+import { Box, Heading, Checkbox, Stack, Select, Text, Grid, GridItem, Button } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables, ArcElement } from 'chart.js';
 import { Chart, PolarArea, Doughnut } from 'react-chartjs-2';
-import NavigationButtons from '../components/NavigationButtons';
-import Footer from '../components/Footer'; 
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 
 ChartJS.register(...registerables, ArcElement);
 
 function CombinacionesPage() {
+  const navigate = useNavigate(); // Inicializa useNavigate
   const [selectedCharts, setSelectedCharts] = useState([]);
   const [selectedVariable, setSelectedVariable] = useState('');
   const [chartData, setChartData] = useState(null);
@@ -128,10 +128,8 @@ function CombinacionesPage() {
 
   return (
     <Box bg="gray.800" color="white" minH="100vh" p={4}>
-      {/* Componente de botones de navegación */}
-      <NavigationButtons />
       <Heading as="h1" size="xl" mb={6} textAlign="center">
-        Combinaciones de graficos
+        Combinaciones de gráficos
       </Heading>
       
       <Stack spacing={4} direction="row" mb={6} justifyContent="center">
@@ -148,7 +146,13 @@ function CombinacionesPage() {
           Barras
         </Checkbox>
       </Stack>
-
+      <Button 
+        colorScheme="teal" 
+        mb={4} 
+        onClick={() => navigate('/inicio')} // Redirige a /inicio al hacer clic
+      >
+        Volver a Inicio
+      </Button>
       <Select 
         placeholder="Selecciona una variable" 
         colorScheme="teal" 
@@ -193,8 +197,6 @@ function CombinacionesPage() {
           </Stack>
         </GridItem>
       </Grid>
-      {/* Footer reutilizable */}
-      <Footer />
     </Box>
   );
 }

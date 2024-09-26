@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Heading, Checkbox, Stack, Text, Grid, GridItem, Button } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables, ArcElement } from 'chart.js';
 import { Bar, Line, PolarArea, Doughnut } from 'react-chartjs-2';
-import NavigationButtons from '../components/NavigationButtons';
-import Footer from '../components/Footer'; 
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 
 ChartJS.register(...registerables, ArcElement);
 
@@ -15,7 +14,8 @@ const variables = [
 ];
 
 function CombinacionesPage2() {
-  const [selectedCharts, setSelectedCharts] = useState(['line']); // Inicia solo con 'line'
+  const navigate = useNavigate(); // Inicializa useNavigate
+  const [selectedCharts, setSelectedCharts] = useState(['line']);
   const [selectedVariables, setSelectedVariables] = useState([]);
   const [chartData, setChartData] = useState(null);
 
@@ -40,7 +40,6 @@ function CombinacionesPage2() {
   }, [selectedVariables]);
 
   const handleChartTypeChange = (type) => {
-    // Solo permite seleccionar un tipo a la vez
     setSelectedCharts([type]);
   };
 
@@ -69,7 +68,6 @@ function CombinacionesPage2() {
       },
     };
 
-    // Solo renderiza el gráfico seleccionado (líneas o barras)
     if (selectedCharts.includes('bar')) {
       return <Bar data={chartData} options={chartOptions} />;
     } else {
@@ -99,10 +97,13 @@ function CombinacionesPage2() {
     return <Doughnut data={doughnutData} options={{ responsive: true, maintainAspectRatio: false }} />;
   };
 
+  // Función para manejar la navegación
+  const handleGoHome = () => {
+    navigate('/inicio'); // Redirige a /inicio
+  };
+
   return (
     <Box bg="gray.800" color="white" minH="100vh" p={4}>
-      {/* Componente de botones de navegación */}
-      <NavigationButtons />
       <Heading as="h1" size="xl" mb={6} textAlign="center">
         Combinaciones de variables
       </Heading>
@@ -121,7 +122,9 @@ function CombinacionesPage2() {
           Barras
         </Checkbox>
       </Stack>
-
+      <Button colorScheme="blue" onClick={handleGoHome} mb={6}>
+        Volver a Inicio
+      </Button>
       <Stack direction="row" spacing={4} mb={6}>
         {variables.map(variable => (
           <Button
@@ -164,7 +167,6 @@ function CombinacionesPage2() {
         </GridItem>
       </Grid>
       {/* Footer reutilizable */}
-      <Footer />
     </Box>
   );
 }

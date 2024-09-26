@@ -4,8 +4,6 @@ import { Link } from 'react-router-dom';
 import { FaArrowLeft, FaBars } from 'react-icons/fa';
 import { Chart as ChartJS, registerables, ArcElement } from 'chart.js';
 import { Bar, Line, Radar, Scatter } from 'react-chartjs-2';
-import Footer from '../components/Footer';
-import NavigationButtons from '../components/NavigationButtons';
 
 ChartJS.register(...registerables, ArcElement);
 
@@ -60,7 +58,6 @@ function VariablesPage() {
       plugins: {
         legend: { position: 'top' },
         title: { display: true, text: 'Datos Variable Seleccionada'  },
-      
       },
     };
 
@@ -93,13 +90,18 @@ function VariablesPage() {
   };
 
 
-return (
+  return (
     <Box bg="gray.800" color="white" minH="100vh" p={4}>
-      {/* Componente de botones de navegación */}
-      <NavigationButtons />
       <Heading as="h1" size="xl" mb={6} textAlign="center">
         Datos Variable
       </Heading>
+
+      {/* Botón para volver al inicio */}
+      <Link to="/inicio">
+        <Button colorScheme="teal" mb={6}>
+          Volver al Inicio
+        </Button>
+      </Link>
 
       <Stack spacing={4} direction="row" mb={6} justifyContent="center">
         <Button
@@ -164,7 +166,6 @@ return (
         </Box>
       )}
 
-
       <Grid templateColumns={{ base: '1fr', md: '2fr 1fr' }} gap={6}>
         <GridItem>
           <Box bg="white" p={4} borderRadius="md" color="black" height="600px">
@@ -195,10 +196,8 @@ return (
           </Stack>
         </GridItem>
       </Grid>
-      <Footer />
     </Box>
   );
 }
-
 
 export default VariablesPage;

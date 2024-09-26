@@ -1,37 +1,29 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from src.database import get_db
-from src.example import models, schemas, exceptions, services
+from src.example import models, exceptions
+from src.example.services import *
+from src.example.schemas import *
+import bcrypt
 
 router = APIRouter()
 
-# Rutas para Usuarios
+@router.post("/registrar", response_model= RespuestaUsuario)
+def registrar(usuario: CrearUsuario, db: Session = Depends(get_db)):
+    db_usuario = get_usuario(db, usuario=usuario.usuario)
+    if db_usuario:
+        raise HTTPException(status_code=400, detail="el usuario ya fue registrado")
+    return crear_usuario(db=db, usuario=usuario)
 
-@router.post("/usuarios", response_model=schemas.Usuario)
-def create_usuario(usuario: schemas.UsuarioCreate, db: Session = Depends(get_db)):
-    return services.crear_usuario(db, usuario)
+@router.post("/login")
+def login(request: LoginRequest, db: Session = Depends(get_db)):
+    db_usuario = get_usuario(db, request.usuario)
+    if db_usuario is None:
+        raise HTTPException(status_code=401, detail="Credenciales incorrectas")
 
+    if not bcrypt.checkpw(request.password.encode('utf-8'), db_usuario.password.encode('utf-8')):
+        raise HTTPException(status_code=401, detail="Credenciales incorrectas")
 
-@router.get("/usuarios", response_model=list[schemas.Usuario])
-def read_usuarios(db: Session = Depends(get_db)):
-    return services.listar_usuarios(db)
-
-
-@router.get("/usuarios/{usuario_id}", response_model=schemas.Usuario)
-def read_usuario(usuario_id: int, db: Session = Depends(get_db)):
-    return services.leer_usuario(db, usuario_id)
-
-
-@router.put("/usuarios/{usuario_id}", response_model=schemas.Usuario)
-def update_usuario(
-    usuario_id: int, usuario: schemas.UsuarioUpdate, db: Session = Depends(get_db)
-):
-    return services.modificar_usuario(db, usuario_id, usuario)
-
-
-@router.delete("/usuarios/{usuario_id}", response_model=schemas.Usuario)
-def delete_usuario(usuario_id: int, db: Session = Depends(get_db)):
-    return services.eliminar_usuario(db, usuario_id)
-
-
+    token = crear_token(request.usuario)  # Crear el token JWT
+    return {"token": token}  # Devuelve el token al frontend
 
