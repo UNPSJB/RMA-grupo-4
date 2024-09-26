@@ -1,7 +1,6 @@
-import React, {useState} from 'react';
-import { Box, Heading, Table, Thead, Tr, Th, Tbody, Td, Select } from '@chakra-ui/react';
-import NavigationButtons from '../components/NavigationButtons';
-import Footer from '../components/Footer';
+import React, { useState } from 'react';
+import { Box, Heading, Table, Thead, Tr, Th, Tbody, Td, Select, Button } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
 
 function TablaPage() {
   // Datos simulados
@@ -9,43 +8,50 @@ function TablaPage() {
     { Nodo: 1, Humedad: '4', Temperatura: '5', Presion: '6', value: 30.45 },
     { Nodo: 2, Humedad: '7', Temperatura: '8', Presion: '9', value: 22.34 },
     { Nodo: 3, Humedad: '10', Temperatura: '11', Presion: '12', value: 27.89 }
-   ];
-  
+  ];
+
   // Estado para almacenar el nodo seleccionado
-   const [selectedNodo, setSelectedNodo] = useState('');
-  
-   // Función para manejar el cambio del nodo
-   const handleSelectChange = (e) => {
+  const [selectedNodo, setSelectedNodo] = useState('');
+
+  // Función para manejar el cambio del nodo
+  const handleSelectChange = (e) => {
     const value = e.target.value;
     setSelectedNodo(value === '' ? '' : parseInt(value, 10)); // Si no se selecciona nada, asignar ''
   };
-  
+
   // Filtrar los datos: si no hay ningún nodo seleccionado, mostrar todos
   const filteredData = selectedNodo === ''
-    ? data : data.filter((row) => row.Nodo === selectedNodo);
-    
+    ? data
+    : data.filter((row) => row.Nodo === selectedNodo);
+
   return (
     <Box bg="gray.800" color="white" minH="100vh" p={4}>
-      {/* Componente de botones de navegación */}
-      <NavigationButtons />
+      {/* Título */}
       <Heading as="h1" size="xl" mb={6} textAlign="center">
         Datos en Tabla
       </Heading>
 
+      {/* Botón de Volver a Inicio */}
+      <Box textAlign="center" mb={6}>
+        <Button colorScheme="teal" as={Link} to="/inicio">
+          Volver a Inicio
+        </Button>
+      </Box>
+
       {/* Select para seleccionar el Nodo */}
       <Box mb={4} textAlign="center">
-          <Select
-            placeholder="Seleccione un nodo"
-            value={selectedNodo}
-            onChange={handleSelectChange}
-            width="200px"
-            mb={4}
-            color="black"
-            bg="white"
-            borderColor="gray.600" // Color del borde
-            _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px blue.500" }} // Efecto al enfocar
-            _hover={{ borderColor: "blue.400" }} // Efecto al pasar el mouse
-          >
+        <Select
+          placeholder="Seleccione un nodo"
+          value={selectedNodo}
+          onChange={handleSelectChange}
+          width="200px"
+          mb={4}
+          color="black"
+          bg="white"
+          borderColor="gray.600" // Color del borde
+          _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px blue.500" }} // Efecto al enfocar
+          _hover={{ borderColor: "blue.400" }} // Efecto al pasar el mouse
+        >
           {/* Opciones de nodos disponibles */}
           {data.map((row) => (
             <option key={row.Nodo} value={row.Nodo}>
@@ -78,7 +84,6 @@ function TablaPage() {
           ))}
         </Tbody>
       </Table>
-      <Footer />
     </Box>
   );
 }
