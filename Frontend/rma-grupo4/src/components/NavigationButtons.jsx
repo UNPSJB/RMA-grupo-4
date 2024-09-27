@@ -58,16 +58,6 @@ function NavigationButtons() {
       </Button>
       <Button
         as={Link}
-        to="/combinaciones"
-        colorScheme="teal"
-        size="lg"
-        _hover={{ bg: "teal.400" }}
-        boxShadow="md"
-      >
-        Combinaciones de Graficas
-      </Button>
-      <Button
-        as={Link}
         to="/combinaciones2"
         colorScheme="teal"
         size="lg"

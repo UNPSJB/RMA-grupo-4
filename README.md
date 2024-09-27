@@ -31,18 +31,23 @@
   - ipdb = "^0.13.13"
   - pendulum = "^3.0.0"
   - uvicorn = "^0.30.6"
+  - bcrypt = "^4.2.0"
+  - pyjwt = "^2.9.0"
 
 ### Dependencias Instaladas Frontend :
- - "@chakra-ui/react": "2.8.2",
- - "@emotion/react": "11.13.3",
- - "@emotion/styled": "11.13.0",
- - "chart.js": "4.4.4",
- - "framer-motion": "11.5.6",
- - "react": "18.3.1",
- - "react-chartjs-2": "5.2.0",
- - "react-dom": "18.3.1",
- - "react-icons": "5.3.0",
- - "react-router-dom": "6.26.2"
+ - "@chakra-ui/react": "^2.8.2",
+ - "@emotion/react": "^11.13.3",
+ - "@emotion/styled": "^11.13.0",
+ - "axios": "^1.7.7",
+ - "chart.js": "^4.4.4",
+ - "framer-motion": "^11.5.6",
+ - "jwt-decode": "^4.0.0",
+ - "prop-types": "^15.8.1",
+ - "react": "^18.3.1",
+ - "react-chartjs-2": "^5.2.0",
+ - "react-dom": "^18.3.1",
+ - "react-icons": "^5.3.0",
+ - "react-router-dom": "^6.26.2"
   
 
 

@@ -1,53 +1,58 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, Checkbox, Stack, Select, Text, Grid, GridItem, Button } from '@chakra-ui/react';
+import { Box, Heading, Checkbox, Stack, Text, Grid, GridItem, Button } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables, ArcElement } from 'chart.js';
-import { Chart, PolarArea, Doughnut } from 'react-chartjs-2';
+import { Bar, Line, PolarArea, Doughnut } from 'react-chartjs-2';
 import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 
 ChartJS.register(...registerables, ArcElement);
 
+const variables = [
+  { name: 'temperatura', color: 'rgba(255, 99, 132, 1)' },
+  { name: 'humedad', color: 'rgba(54, 162, 235, 1)' },
+  { name: 'presion', color: 'rgba(255, 206, 86, 1)' },
+  { name: 'viento', color: 'rgba(75, 192, 192, 1)' },
+];
+
 function CombinacionesPage() {
   const navigate = useNavigate(); // Inicializa useNavigate
-  const [selectedCharts, setSelectedCharts] = useState([]);
-  const [selectedVariable, setSelectedVariable] = useState('');
+  const [selectedCharts, setSelectedCharts] = useState(['line']);
+  const [selectedVariables, setSelectedVariables] = useState([]);
   const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
-    if (selectedVariable) {
-      // Aquí iría la lógica para traer los datos desde FastAPI
+    if (selectedVariables.length > 0) {
       const newData = {
         labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-        datasets: [{
-          type: 'line',
-          label: `${selectedVariable} (Línea)`,
-          data: [30, 25, 28, 35, 32, 31],
-          borderColor: 'rgba(75, 192, 192, 1)',
-          borderWidth: 2,
-          fill: false
-        },
-        {
-          type: 'bar',
-          label: `${selectedVariable} (Barra)`,
-          data: [30, 25, 28, 35, 32, 31],
-          backgroundColor: 'rgba(53, 162, 235, 0.5)',
-        }]
+        datasets: selectedVariables.map(variable => {
+          const variableInfo = variables.find(v => v.name === variable);
+          return {
+            label: variable,
+            data: Array(6).fill(0).map(() => Math.floor(Math.random() * 100)),
+            borderColor: variableInfo.color,
+            backgroundColor: variableInfo.color.replace('1)', '0.5)'),
+            borderWidth: 2,
+            fill: false
+          };
+        })
       };
       setChartData(newData);
     }
-  }, [selectedVariable]);
+  }, [selectedVariables]);
 
   const handleChartTypeChange = (type) => {
-    setSelectedCharts(prev => 
-      prev.includes(type)
-        ? prev.filter(t => t !== type)
-        : [...prev, type]
+    setSelectedCharts([type]);
+  };
+
+  const handleVariableChange = (variable) => {
+    setSelectedVariables(prev =>
+      prev.includes(variable)
+        ? prev.filter(v => v !== variable)
+        : [...prev, variable]
     );
   };
 
   const renderCombinedChart = () => {
     if (!chartData) return null;
-    
-    const visibleDatasets = chartData.datasets.filter(ds => selectedCharts.includes(ds.type));
 
     const chartOptions = {
       responsive: true,
@@ -63,62 +68,28 @@ function CombinacionesPage() {
       },
     };
 
-    return (
-      <Chart 
-        type="bar"
-        data={{...chartData, datasets: visibleDatasets}} 
-        options={chartOptions}
-      />
-    );
+    if (selectedCharts.includes('bar')) {
+      return <Bar data={chartData} options={chartOptions} />;
+    } else {
+      return <Line data={chartData} options={chartOptions} />;
+    }
   };
 
   const renderPolarChart = () => {
     if (!chartData) return null;
 
-    const polarData = {
-      labels: chartData.labels,
-      datasets: [{
-        label: selectedVariable,
-        data: chartData.datasets[0].data,
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.5)',
-          'rgba(54, 162, 235, 0.5)',
-          'rgba(255, 206, 86, 0.5)',
-          'rgba(75, 192, 192, 0.5)',
-          'rgba(153, 102, 255, 0.5)',
-          'rgba(255, 159, 64, 0.5)',
-        ],
-        borderWidth: 1
-      }]
-    };
-
-    return <PolarArea data={polarData} options={{ responsive: true, maintainAspectRatio: false }} />;
+    return <PolarArea data={chartData} options={{ responsive: true, maintainAspectRatio: false }} />;
   };
 
   const renderDoughnutChart = () => {
     if (!chartData) return null;
 
     const doughnutData = {
-      labels: chartData.labels,
+      labels: selectedVariables,
       datasets: [{
-        label: selectedVariable,
-        data: chartData.datasets[0].data,
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.5)',
-          'rgba(54, 162, 235, 0.5)',
-          'rgba(255, 206, 86, 0.5)',
-          'rgba(75, 192, 192, 0.5)',
-          'rgba(153, 102, 255, 0.5)',
-          'rgba(255, 159, 64, 0.5)',
-        ],
-        borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)',
-        ],
+        data: selectedVariables.map(() => Math.floor(Math.random() * 100)),
+        backgroundColor: selectedVariables.map(v => variables.find(variable => variable.name === v).color.replace('1)', '0.5)')),
+        borderColor: selectedVariables.map(v => variables.find(variable => variable.name === v).color),
         borderWidth: 1
       }]
     };
@@ -126,10 +97,15 @@ function CombinacionesPage() {
     return <Doughnut data={doughnutData} options={{ responsive: true, maintainAspectRatio: false }} />;
   };
 
+  // Función para manejar la navegación
+  const handleGoHome = () => {
+    navigate('/inicio'); // Redirige a /inicio
+  };
+
   return (
     <Box bg="gray.800" color="white" minH="100vh" p={4}>
       <Heading as="h1" size="xl" mb={6} textAlign="center">
-        Combinaciones de gráficos
+        Combinaciones de variables
       </Heading>
       
       <Stack spacing={4} direction="row" mb={6} justifyContent="center">
@@ -146,34 +122,27 @@ function CombinacionesPage() {
           Barras
         </Checkbox>
       </Stack>
-      <Button 
-        colorScheme="teal" 
-        mb={4} 
-        onClick={() => navigate('/inicio')} // Redirige a /inicio al hacer clic
-      >
+      <Button colorScheme="blue" onClick={handleGoHome} mb={6}>
         Volver a Inicio
       </Button>
-      <Select 
-        placeholder="Selecciona una variable" 
-        colorScheme="teal" 
-        value={selectedVariable}
-        onChange={(e) => setSelectedVariable(e.target.value)}
-        mb={6}
-        color="black"
-        bg="white"
-      >
-        <option value="temperatura">Temperatura</option>
-        <option value="humedad">Humedad</option>
-        <option value="presion">Presión</option>
-        <option value="viento">Velocidad del viento</option>
-      </Select>
+      <Stack direction="row" spacing={4} mb={6}>
+        {variables.map(variable => (
+          <Button
+            key={variable.name}
+            onClick={() => handleVariableChange(variable.name)}
+            colorScheme={selectedVariables.includes(variable.name) ? "teal" : "gray"}
+          >
+            {variable.name}
+          </Button>
+        ))}
+      </Stack>
 
       <Grid templateColumns="2fr 1fr" gap={6}>
         <GridItem>
           <Box bg="white" p={4} borderRadius="md" color="black" height="600px">
             {renderCombinedChart() || (
               <Text color="gray.500" textAlign="center">
-                Selecciona al menos un tipo de gráfico y una variable para visualizar los datos
+                Selecciona al menos una variable para visualizar los datos
               </Text>
             )}
           </Box>
@@ -197,6 +166,7 @@ function CombinacionesPage() {
           </Stack>
         </GridItem>
       </Grid>
+      {/* Footer reutilizable */}
     </Box>
   );
 }

@@ -81,20 +81,6 @@ function Sidebar() {
           isTruncated
           px={6}
           py={5}
-          leftIcon={<Icon as={HiRefresh} />} // Icono de combinaciones
-        >
-          Union de Graficos
-        </Button>
-        <Button
-          as={Link}
-          to="/combinaciones2"
-          colorScheme="teal"
-          size="lg"
-          _hover={{ bg: "teal.400" }}
-          boxShadow="md"
-          isTruncated
-          px={6}
-          py={5}
           leftIcon={<Icon as={HiCog} />} // Icono de configuraciones
         >
           Union de Variables

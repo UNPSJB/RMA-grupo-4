@@ -10,7 +10,6 @@ import GraficosPage from './pages/GraficosPage';
 import HistoricosPage from './pages/HistoricosPage'; 
 import VariablesPage from './pages/VariablesPage';  
 import CombinacionesPage from './pages/CombinacionesPage';  
-import CombinacionesPage2 from './pages/CombinacionesPage2';  
 
 function AppRoutes() {
   return (
@@ -80,16 +79,6 @@ function AppRoutes() {
             <App>
               <PrivateRoute>
                 <CombinacionesPage />
-              </PrivateRoute>
-            </App>
-          } 
-        />
-        <Route 
-          path="/combinaciones2" 
-          element={
-            <App>
-              <PrivateRoute>
-                <CombinacionesPage2 />
               </PrivateRoute>
             </App>
           } 
