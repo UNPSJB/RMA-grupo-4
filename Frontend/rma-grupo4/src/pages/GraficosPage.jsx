@@ -7,8 +7,8 @@ import NavigationButtons from '../components/NavigationButtons';
 ChartJS.register(...registerables, ArcElement);
 
 function GraficosPage() {
-  const [selectedCharts, setSelectedCharts] = useState([]);
-  const [selectedVariable, setSelectedVariable] = useState('');
+  const [selectedCharts, setSelectedCharts] = useState(['line']);
+  const [selectedVariable, setSelectedVariable] = useState('temperatura');
   const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
@@ -161,9 +161,9 @@ function GraficosPage() {
         <option value="viento">Velocidad del viento</option>
       </Select>
 
-      <Grid templateColumns="2fr 1fr" gap={6}>
+      <Grid templateColumns={{ base: '1fr', md: '2fr 1fr' }} gap={6}>
         <GridItem>
-          <Box bg="white" p={4} borderRadius="md" color="black" height="600px">
+          <Box bg="white" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="600px">
             {renderCombinedChart() || (
               <Text color="gray.500" textAlign="center">
                 Selecciona al menos un tipo de gráfico y una variable para visualizar los datos
@@ -173,14 +173,14 @@ function GraficosPage() {
         </GridItem>
         <GridItem>
           <Stack spacing={6}>
-            <Box bg="white" p={4} borderRadius="md" color="black" height="290px">
+            <Box bg="white" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="290px">
               {renderPolarChart() || (
                 <Text color="gray.500" textAlign="center">
                   Gráfico Polar
                 </Text>
               )}
             </Box>
-            <Box bg="white" p={4} borderRadius="md" color="black" height="290px">
+            <Box bg="white" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="290px">
               {renderDoughnutChart() || (
                 <Text color="gray.500" textAlign="center">
                   Gráfico de Dona

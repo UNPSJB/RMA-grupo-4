@@ -16,7 +16,7 @@ const variables = [
 
 function VariablesPage() {
   const [selectedCharts, setSelectedCharts] = useState(['line']); // Inicia con gráfico de líneas
-  const [selectedVariable, setSelectedVariable] = useState(null); // Solo una variable seleccionada
+  const [selectedVariable, setSelectedVariable] = useState('temperatura'); // Solo una variable seleccionada
   const [chartData, setChartData] = useState(null);
   const { isOpen, onOpen, onClose } = useDisclosure(); // Hook para abrir/cerrar el Drawer
   const isHamburger = useBreakpointValue({ base: true, md: false }); // Condicional para mostrar el menú en pantallas pequeñas

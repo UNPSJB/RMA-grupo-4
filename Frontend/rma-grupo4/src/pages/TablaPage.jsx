@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Heading, Table, Thead, Tr, Th, Tbody, Td, Select } from '@chakra-ui/react';
+import { Box, Heading, Table, Thead, Tr, Th, Tbody, Td, Select, Text } from '@chakra-ui/react';
 import NavigationButtons from '../components/NavigationButtons';
 
 function TablaPage() {
@@ -25,25 +25,27 @@ function TablaPage() {
     : data.filter((row) => row.Nodo === selectedNodo);
 
   return (
-    <Box bg="gray.800" color="white" minH="100vh" p={4}>
-      <NavigationButtons></NavigationButtons>
-      <Heading as="h1" size="xl" mb={6} textAlign="center">
+    <Box bg="gray.800" color="white" minH="100vh" p={{ base: 2, md: 4 }}>
+      <NavigationButtons />
+      
+      {/* Heading con tamaño responsivo */}
+      <Heading as="h1" size={{ base: 'lg', md: 'xl' }} mb={6} textAlign="center">
         Datos en Tabla
       </Heading>
 
-      {/* Select para seleccionar el Nodo */}
+      {/* Select para seleccionar el Nodo con ajustes responsivos */}
       <Box mb={4} textAlign="center">
         <Select
           placeholder="Seleccione un nodo"
           value={selectedNodo}
           onChange={handleSelectChange}
-          width="200px"
+          width={{ base: "100%", md: "200px" }} // Ocupa el 100% de la pantalla en móviles y 200px en pantallas medianas
           mb={4}
           color="black"
           bg="white"
-          borderColor="gray.600" // Color del borde
-          _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px blue.500" }} // Efecto al enfocar
-          _hover={{ borderColor: "blue.400" }} // Efecto al pasar el mouse
+          borderColor="gray.600"
+          _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px blue.500" }}
+          _hover={{ borderColor: "blue.400" }}
         >
           {/* Opciones de nodos disponibles */}
           {data.map((row) => (
@@ -54,31 +56,34 @@ function TablaPage() {
         </Select>
       </Box>
 
-      {/* Tabla */}
-      <Table variant="simple" colorScheme="whiteAlpha">
-        <Thead>
-          <Tr>
-            <Th>Nodo</Th>
-            <Th>Humedad</Th>
-            <Th>Temperatura</Th>
-            <Th>Presion</Th>
-            <Th isNumeric>Valor</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {filteredData.map((row) => (
-            <Tr key={row.Nodo}>
-              <Td>{row.Nodo}</Td>
-              <Td>{row.Humedad}</Td>
-              <Td>{row.Temperatura}</Td>
-              <Td>{row.Presion}</Td>
-              <Td isNumeric>{row.value}</Td>
+      {/* Contenedor para la tabla, con overflow automático para permitir scroll horizontal */}
+      <Box overflowX={{ base: "auto", md: "unset" }} >
+        <Table variant="simple" colorScheme="whiteAlpha" size={{ base: "sm", md: "md" }}>
+          <Thead>
+            <Tr>
+              <Th>Nodo</Th>
+              <Th>Humedad</Th>
+              <Th>Temperatura</Th>
+              <Th>Presion</Th>
+              <Th isNumeric>Valor</Th>
             </Tr>
-          ))}
-        </Tbody>
-      </Table>
+          </Thead>
+          <Tbody>
+            {filteredData.map((row) => (
+              <Tr key={row.Nodo}>
+                <Td>{row.Nodo}</Td>
+                <Td>{row.Humedad}</Td>
+                <Td>{row.Temperatura}</Td>
+                <Td>{row.Presion}</Td>
+                <Td isNumeric>{row.value}</Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </Box>
     </Box>
   );
 }
 
 export default TablaPage;
+

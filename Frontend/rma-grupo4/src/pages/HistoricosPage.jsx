@@ -30,9 +30,9 @@ const months = [
 
 function HistoricosPage() {
   const [selectedCharts, setSelectedCharts] = useState(['line']);
-  const [selectedVariable, setSelectedVariable] = useState(null);
+  const [selectedVariable, setSelectedVariable] = useState('temperatura');
   const [selectedYear, setSelectedYear] = useState('2024');
-  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState('01');
   const [selectedDay, setSelectedDay] = useState(null);
   const [chartData, setChartData] = useState(null);
   const [days, setDays] = useState([]);
