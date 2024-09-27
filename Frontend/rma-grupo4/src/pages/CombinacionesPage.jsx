@@ -15,7 +15,7 @@ const variables = [
 
 function CombinacionesPage() {
   const [selectedCharts, setSelectedCharts] = useState(['line']);
-  const [selectedVariables, setSelectedVariables] = useState([]);
+  const [selectedVariables, setSelectedVariables] = useState(['temperatura']);
   const [chartData, setChartData] = useState(null);
 
   useEffect(() => {

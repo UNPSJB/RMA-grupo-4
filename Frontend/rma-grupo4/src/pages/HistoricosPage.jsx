@@ -137,7 +137,7 @@ function HistoricosPage() {
         Datos Historicos
       </Heading>
 
-      <Stack direction="row" spacing={4} mb={6} justifyContent="center" bg="black">
+      <Stack direction="row" spacing={4} mb={6} justifyContent="center">
         <Select
           placeholder="Año"
           value={selectedYear}
@@ -211,6 +211,7 @@ function HistoricosPage() {
         placeholder="Selecciona una variable"
         value={selectedVariable}
         onChange={(e) => setSelectedVariable(e.target.value)}
+        mb={4}
         sx={{
           'option': {
             bg: 'black',
@@ -240,13 +241,12 @@ function HistoricosPage() {
         </GridItem>
 
         <GridItem>
-          <Box bg="black" p={4} borderRadius="md" color="white">
+          <Box p={4} borderRadius="md" color="white">
             <Heading as="h2" size="lg" mb={4}>
               Datos Históricos
             </Heading>
             <Stack spacing={4}>
               <Select
-                bg = "black"
                 placeholder="Año"
                 value={filterYear}
                 onChange={(e) => setFilterYear(e.target.value)}
@@ -265,7 +265,6 @@ function HistoricosPage() {
                 <option value="2022">2022</option>
               </Select>
               <Select
-                bg = "black"
                 placeholder="Mes"
                 value={filterMonth}
                 onChange={(e) => setFilterMonth(e.target.value)}
