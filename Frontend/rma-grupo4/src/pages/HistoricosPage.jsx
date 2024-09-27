@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, Checkbox, Stack, Select, Text, Grid, GridItem, Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react';
+import { Box, Heading, Checkbox, Stack, Select, Text, Grid, GridItem, Table, Thead, Tbody, Tr, Th, Td, Button } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
-import NavigationButtons from '../components/NavigationButtons';
+import { useNavigate } from 'react-router-dom';
+//import NavigationButtons from '../components/NavigationButtons';
 import Footer from '../components/Footer';
 
 ChartJS.register(...registerables);
@@ -30,6 +31,7 @@ const months = [
 ];
 
 function HistoricosPage() {
+  const navigate = useNavigate(); // Inicializa useNavigate
   const [selectedCharts, setSelectedCharts] = useState(['line']);
   const [selectedVariable, setSelectedVariable] = useState(null);
   const [selectedYear, setSelectedYear] = useState('2024');
@@ -125,7 +127,7 @@ function HistoricosPage() {
     );
   };
 
-  // Filter historical data based on selected year and month
+  // Filtro al seleccionar año y mes
   const filteredHistoricalData = historicalData.filter(data => 
     (filterYear ? data.year === filterYear : true) &&
     (filterMonth ? data.month === filterMonth : true)
@@ -133,9 +135,15 @@ function HistoricosPage() {
 
   return (
     <Box bg="gray.800" color="white" minH="100vh" p={4}>
-      <NavigationButtons />
+      <Button 
+        colorScheme="teal" 
+        mb={4} 
+        onClick={() => navigate('/inicio')} // Redirige a /inicio al hacer clic
+      >
+        Volver a Inicio
+      </Button>
       <Heading as="h1" size="xl" mb={6} textAlign="center">
-        Combinaciones de gráficos
+        Datos Historicos
       </Heading>
 
       <Stack direction="row" spacing={4} mb={6} justifyContent="center" bg="black">
@@ -198,7 +206,7 @@ function HistoricosPage() {
           ))}
         </Select>
       </Stack>
-
+      
       <Stack spacing={4} direction="row" mb={6} justifyContent="center">
         <Checkbox isChecked={selectedCharts.includes('line')} onChange={() => handleChartTypeChange('line')}>
           Líneas
