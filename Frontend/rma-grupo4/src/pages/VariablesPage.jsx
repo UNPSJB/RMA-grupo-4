@@ -18,30 +18,30 @@ function VariablesPage() {
   const [selectedCharts, setSelectedCharts] = useState(['line']); // Inicia con gráfico de líneas
   const [selectedVariable, setSelectedVariable] = useState(null); // Solo una variable seleccionada
   const [chartData, setChartData] = useState(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();  // Hook para abrir/cerrar el Drawer
-  const isHamburger = useBreakpointValue({ base: true, md: false });  // Condicional para mostrar el menú en pantallas pequeñas
-
+  const { isOpen, onOpen, onClose } = useDisclosure(); // Hook para abrir/cerrar el Drawer
+  const isHamburger = useBreakpointValue({ base: true, md: false }); // Condicional para mostrar el menú en pantallas pequeñas
 
   useEffect(() => {
     if (selectedVariable) {
-      const variableInfo = variables.find(v => v.name === selectedVariable);
+      const variableInfo = variables.find((v) => v.name === selectedVariable);
       const newData = {
         labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-        datasets: [{
-          label: selectedVariable,
-          data: Array(6).fill(0).map(() => Math.floor(Math.random() * 100)),
-          borderColor: variableInfo.color,
-          backgroundColor: variableInfo.color.replace('1)', '0.5)'),
-          borderWidth: 2,
-          fill: false,
-        }]
+        datasets: [
+          {
+            label: selectedVariable,
+            data: Array(6).fill(0).map(() => Math.floor(Math.random() * 100)),
+            borderColor: variableInfo.color,
+            backgroundColor: variableInfo.color.replace('1)', '0.5)'),
+            borderWidth: 2,
+            fill: false,
+          },
+        ],
       };
       setChartData(newData);
     }
   }, [selectedVariable]);
 
   const handleChartTypeChange = (type) => {
-    // Solo permite seleccionar un tipo de gráfico a la vez
     setSelectedCharts([type]);
   };
 
@@ -51,13 +51,13 @@ function VariablesPage() {
 
   const renderCombinedChart = () => {
     if (!chartData) return null;
- 
+
     const chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
         legend: { position: 'top' },
-        title: { display: true, text: 'Datos Variable Seleccionada'  },
+        title: { display: true, text: 'Datos Variable Seleccionada' },
       },
     };
 
@@ -79,63 +79,47 @@ function VariablesPage() {
     if (!chartData) return null;
 
     const scatterData = {
-      datasets: [{
-        label: selectedVariable,
-        data: Array(6).fill(0).map(() => ({ x: Math.random() * 100, y: Math.random() * 100 })),
-        backgroundColor: variables.find(v => v.name === selectedVariable).color.replace('1)', '0.5)'),
-      }]
+      datasets: [
+        {
+          label: selectedVariable,
+          data: Array(6)
+            .fill(0)
+            .map(() => ({ x: Math.random() * 100, y: Math.random() * 100 })),
+          backgroundColor: variables.find((v) => v.name === selectedVariable).color.replace('1)', '0.5)'),
+        },
+      ],
     };
 
     return <Scatter data={scatterData} options={{ responsive: true, maintainAspectRatio: false }} />;
   };
 
-
   return (
     <Box bg="gray.800" color="white" minH="100vh" p={4}>
-      <NavigationButtons></NavigationButtons>
+      <NavigationButtons />
       <Heading as="h1" size="xl" mb={6} textAlign="center">
         Datos Variable
       </Heading>
 
       <Stack spacing={4} direction="row" mb={6} justifyContent="center">
-        <Button
-          isActive={selectedCharts.includes('line')}
-          onClick={() => handleChartTypeChange('line')}
-          colorScheme={selectedCharts.includes('line') ? "teal" : "gray"}
-        >
+        <Button isActive={selectedCharts.includes('line')} onClick={() => handleChartTypeChange('line')} colorScheme={selectedCharts.includes('line') ? 'teal' : 'gray'}>
           Líneas
         </Button>
-        <Button
-          isActive={selectedCharts.includes('bar')}
-          onClick={() => handleChartTypeChange('bar')}
-          colorScheme={selectedCharts.includes('bar') ? "teal" : "gray"}
-        >
+        <Button isActive={selectedCharts.includes('bar')} onClick={() => handleChartTypeChange('bar')} colorScheme={selectedCharts.includes('bar') ? 'teal' : 'gray'}>
           Barras
         </Button>
       </Stack>
 
-    
-      {/* Condicional: Si es pantalla pequeña, muestra el menú hamburguesa, si no, el stack normal */}
       {isHamburger ? (
         <>
-          <IconButton
-            icon={<FaBars />}
-            colorScheme="teal"
-            aria-label="Abrir menú"
-            onClick={onOpen}
-          />
+          <IconButton icon={<FaBars />} colorScheme="teal" aria-label="Abrir menú" onClick={onOpen} mb="3" />
           <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
             <DrawerOverlay />
-            <DrawerContent>
+            <DrawerContent   _active={{ bg: "gray.600" }} mb={3} fontSize="lg" >
               <DrawerHeader>Seleccionar Variable</DrawerHeader>
               <DrawerBody>
                 <Stack spacing={4} alignItems="center">
-                  {variables.map(variable => (
-                    <Button
-                      key={variable.name}
-                      onClick={() => { handleVariableChange(variable.name); onClose(); }}
-                      colorScheme={selectedVariable === variable.name ? "teal" : "gray"}
-                    >
+                  {variables.map((variable) => (
+                    <Button key={variable.name} onClick={() => { handleVariableChange(variable.name); onClose(); }} colorScheme={selectedVariable === variable.name ? 'teal' : 'gray'}>
                       {variable.name}
                     </Button>
                   ))}
@@ -147,12 +131,8 @@ function VariablesPage() {
       ) : (
         <Box display="flex" justifyContent="center">
           <Stack direction="row" spacing={4} mb={6}>
-            {variables.map(variable => (
-              <Button
-                key={variable.name}
-                onClick={() => handleVariableChange(variable.name)}
-                colorScheme={selectedVariable === variable.name ? "teal" : "gray"}
-              >
+            {variables.map((variable) => (
+              <Button key={variable.name} onClick={() => handleVariableChange(variable.name)} colorScheme={selectedVariable === variable.name ? 'teal' : 'gray'}>
                 {variable.name}
               </Button>
             ))}
@@ -162,9 +142,10 @@ function VariablesPage() {
 
       <Grid templateColumns={{ base: '1fr', md: '2fr 1fr' }} gap={6}>
         <GridItem>
-          <Box bg="white" p={4} borderRadius="md" color="black" height="600px">
+          {/*propiedades p (para responsivo)*/}
+          <Box bg="white" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height={{ base: '300px', md: '600px' }}>
             {renderCombinedChart() || (
-              <Text color="gray.500" textAlign="center">  
+              <Text color="gray.500" textAlign="center">
                 Selecciona una variable para visualizar los datos
               </Text>
             )}
@@ -173,14 +154,14 @@ function VariablesPage() {
 
         <GridItem>
           <Stack spacing={6}>
-            <Box bg="white" p={4} borderRadius="md" color="black" height="290px">
+            <Box bg="white" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height={{ base: '200px', md: '290px' }}>
               {renderRadarChart() || (
                 <Text color="gray.500" textAlign="center">
                   Gráfico Radar
                 </Text>
               )}
             </Box>
-            <Box bg="white" p={4} borderRadius="md" color="black" height="290px">
+            <Box bg="white" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height={{ base: '200px', md: '290px' }}>
               {renderScatterChart() || (
                 <Text color="gray.500" textAlign="center">
                   Gráfico de Dispersión

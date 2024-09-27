@@ -18,7 +18,7 @@ function App({ children }) { // Cambia para aceptar children
       <AuthProvider>
         <Flex direction="column" minH="100vh" bg="gray.800" color="white" flexDirection="column">
           <NavBar />
-          <Box flex="1" paddingBottom="60px">
+          <Box flex="1" paddingBottom="100px">
             {children} {/* Renderiza los children pasados por las rutas */}
           </Box>
         </Flex>
