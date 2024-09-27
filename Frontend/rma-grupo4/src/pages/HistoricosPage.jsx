@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Heading, Checkbox, Stack, Select, Text, Grid, GridItem, Table, Thead, Tbody, Tr, Th, Td, Button } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
-import { useNavigate } from 'react-router-dom';
-//import NavigationButtons from '../components/NavigationButtons';
-import Footer from '../components/Footer';
+import NavigationButtons from '../components/NavigationButtons';
 
 ChartJS.register(...registerables);
 
@@ -31,7 +29,6 @@ const months = [
 ];
 
 function HistoricosPage() {
-  const navigate = useNavigate(); // Inicializa useNavigate
   const [selectedCharts, setSelectedCharts] = useState(['line']);
   const [selectedVariable, setSelectedVariable] = useState(null);
   const [selectedYear, setSelectedYear] = useState('2024');
@@ -134,14 +131,8 @@ function HistoricosPage() {
   );
 
   return (
-    <Box bg="gray.800" color="white" minH="100vh" p={4}>
-      <Button 
-        colorScheme="teal" 
-        mb={4} 
-        onClick={() => navigate('/inicio')} // Redirige a /inicio al hacer clic
-      >
-        Volver a Inicio
-      </Button>
+    <Box bg="gray.800" color="white" p={4}>
+      <NavigationButtons></NavigationButtons>
       <Heading as="h1" size="xl" mb={6} textAlign="center">
         Datos Historicos
       </Heading>
@@ -323,8 +314,6 @@ function HistoricosPage() {
           </Box>
         </GridItem>
       </Grid>
-
-      <Footer />
     </Box>
   );
 }

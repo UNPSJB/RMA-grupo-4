@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Heading, IconButton, Stack, Text, Grid, GridItem, Button, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, useDisclosure, useBreakpointValue } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
-import { FaArrowLeft, FaBars } from 'react-icons/fa';
+import { FaBars } from 'react-icons/fa';
 import { Chart as ChartJS, registerables, ArcElement } from 'chart.js';
 import { Bar, Line, Radar, Scatter } from 'react-chartjs-2';
+import NavigationButtons from '../components/NavigationButtons';
 
 ChartJS.register(...registerables, ArcElement);
 
@@ -92,16 +92,10 @@ function VariablesPage() {
 
   return (
     <Box bg="gray.800" color="white" minH="100vh" p={4}>
+      <NavigationButtons></NavigationButtons>
       <Heading as="h1" size="xl" mb={6} textAlign="center">
         Datos Variable
       </Heading>
-
-      {/* Botón para volver al inicio */}
-      <Link to="/inicio">
-        <Button colorScheme="teal" mb={6}>
-          Volver al Inicio
-        </Button>
-      </Link>
 
       <Stack spacing={4} direction="row" mb={6} justifyContent="center">
         <Button

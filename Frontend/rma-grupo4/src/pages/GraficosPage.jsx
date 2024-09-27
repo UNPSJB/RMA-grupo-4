@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Box, Heading, Checkbox, Stack, Select, Text, Grid, GridItem, Button } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables, ArcElement } from 'chart.js';
 import { Chart, PolarArea, Doughnut } from 'react-chartjs-2';
-import { useNavigate } from 'react-router-dom'; // Importa useNavigate
+import NavigationButtons from '../components/NavigationButtons';
 
 ChartJS.register(...registerables, ArcElement);
 
 function GraficosPage() {
-  const navigate = useNavigate(); // Inicializa useNavigate
   const [selectedCharts, setSelectedCharts] = useState([]);
   const [selectedVariable, setSelectedVariable] = useState('');
   const [chartData, setChartData] = useState(null);
@@ -128,6 +127,7 @@ function GraficosPage() {
 
   return (
     <Box bg="gray.800" color="white" minH="100vh" p={4}>
+      <NavigationButtons></NavigationButtons>
       <Heading as="h1" size="xl" mb={6} textAlign="center">
         Datos en gráficos
       </Heading>
@@ -146,13 +146,6 @@ function GraficosPage() {
           Barras
         </Checkbox>
       </Stack>
-      <Button 
-        colorScheme="teal" 
-        mb={4} 
-        onClick={() => navigate('/inicio')} // Redirige a /inicio al hacer clic
-      >
-        Volver a Inicio
-      </Button>
       <Select 
         placeholder="Selecciona una variable" 
         colorScheme="teal" 

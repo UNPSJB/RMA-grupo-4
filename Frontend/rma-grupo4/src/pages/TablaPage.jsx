@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Box, Heading, Table, Thead, Tr, Th, Tbody, Td, Select, Button } from '@chakra-ui/react';
-import { Link } from 'react-router-dom';
+import { Box, Heading, Table, Thead, Tr, Th, Tbody, Td, Select } from '@chakra-ui/react';
+import NavigationButtons from '../components/NavigationButtons';
 
 function TablaPage() {
   // Datos simulados
@@ -26,17 +26,10 @@ function TablaPage() {
 
   return (
     <Box bg="gray.800" color="white" minH="100vh" p={4}>
-      {/* Título */}
+      <NavigationButtons></NavigationButtons>
       <Heading as="h1" size="xl" mb={6} textAlign="center">
         Datos en Tabla
       </Heading>
-
-      {/* Botón de Volver a Inicio */}
-      <Box textAlign="center" mb={6}>
-        <Button colorScheme="teal" as={Link} to="/inicio">
-          Volver a Inicio
-        </Button>
-      </Box>
 
       {/* Select para seleccionar el Nodo */}
       <Box mb={4} textAlign="center">
