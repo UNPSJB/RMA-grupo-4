@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, Checkbox, Stack, Select, Text, Grid, GridItem, Table, Thead, Tbody, Tr, Th, Td, Button } from '@chakra-ui/react';
+import { Box, Heading, Checkbox, Stack, Select, Text, Grid, GridItem, Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
 import NavigationButtons from '../components/NavigationButtons';
@@ -13,7 +13,7 @@ const variables = [
   { name: 'viento', color: 'rgba(75, 192, 192, 1)' },
 ];
 
-const months = [
+const meses = [
   { name: 'Enero', value: '01' },
   { name: 'Febrero', value: '02' },
   { name: 'Marzo', value: '03' },
@@ -37,34 +37,41 @@ function HistoricosPage() {
   const [chartData, setChartData] = useState(null);
   const [days, setDays] = useState([]);
   const [historicalData, setHistoricalData] = useState([]);
-  
-  // State variables for filtering
-  const [filterYear, setFilterYear] = useState('2024');
-  const [filterMonth, setFilterMonth] = useState(null);
+
+  const getDias = (year, month) => Array.from({ length: new Date(year, month, 0).getDate() }, (_, i) => i + 1);
+  const getHoras = () => Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`);
 
   useEffect(() => {
-    const getDaysInMonth = (year, month) => {
-      return new Date(year, month, 0).getDate();
-    };
-
     if (selectedYear && selectedMonth) {
       const monthIndex = parseInt(selectedMonth);
-      const numberOfDays = getDaysInMonth(selectedYear, monthIndex);
-      const daysArray = Array.from({ length: numberOfDays }, (_, i) => i + 1);
+      const daysArray = getDias(selectedYear, monthIndex);
       setDays(daysArray);
-      setSelectedDay(daysArray[0]);
+      setSelectedDay(daysArray[0]); 
     }
   }, [selectedYear, selectedMonth]);
 
   useEffect(() => {
+    let labels = [];
+    let newData = [];
+
+    if (selectedYear && !selectedMonth && !selectedDay) {
+      labels = meses.map(m => m.name);
+    } else if (selectedYear && selectedMonth && !selectedDay) {
+      labels = getDias(selectedYear, parseInt(selectedMonth));
+    } else if (selectedYear && selectedMonth && selectedDay) {
+      labels = getHoras();
+    }
+
+    newData = labels.map(() => Math.floor(Math.random() * 100));
+
     if (selectedVariable && selectedYear && selectedMonth && selectedDay) {
-      const newData = {
-        labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+      const data = {
+        labels: labels,
         datasets: [
           {
             type: 'line',
             label: `${selectedVariable} (Línea) - ${selectedYear}/${selectedMonth}/${selectedDay}`,
-            data: Array(6).fill(0).map(() => Math.floor(Math.random() * 100)),
+            data: newData,
             borderColor: 'rgba(75, 192, 192, 1)',
             borderWidth: 2,
             fill: false,
@@ -72,22 +79,25 @@ function HistoricosPage() {
           {
             type: 'bar',
             label: `${selectedVariable} (Barra) - ${selectedYear}/${selectedMonth}/${selectedDay}`,
-            data: Array(6).fill(0).map(() => Math.floor(Math.random() * 100)),
+            data: newData,
             backgroundColor: 'rgba(53, 162, 235, 0.5)',
           },
         ],
       };
-      setChartData(newData);
+      setChartData(data);
 
-      // Simulando datos históricos
-      const historicalValues = [
-        { year:'2024', month: 'Enero', value: 30 },
-        { year:'2024', month: 'Febrero', value: 25 },
-        { year:'2024', month: 'Marzo', value: 28 },
-        { year:'2024', month: 'Abril', value: 35 },
-        { year:'2024', month: 'Mayo', value: 32 },
-        { year:'2023', month: 'Junio', value: 31 },
-      ];
+      // datos tabla datos históricos
+      const historicalValues = labels.map((label, index) => ({
+        year: selectedYear,
+        month: selectedMonth,
+        day: selectedMonth,
+        hora: selectedDay ? getHoras()[index % 24] : '-', 
+        [selectedVariable]: newData[index], 
+        humedad: selectedVariable === 'humedad' ? newData[index] : '-',
+        presion: selectedVariable === 'presion' ? newData[index] : '-',
+        viento: selectedVariable === 'viento' ? newData[index] : '-',
+      }));
+
       setHistoricalData(historicalValues);
     }
   }, [selectedVariable, selectedYear, selectedMonth, selectedDay]);
@@ -124,17 +134,11 @@ function HistoricosPage() {
     );
   };
 
-  // Filtro al seleccionar año y mes
-  const filteredHistoricalData = historicalData.filter(data => 
-    (filterYear ? data.year === filterYear : true) &&
-    (filterMonth ? data.month === filterMonth : true)
-  );
-
   return (
     <Box bg="gray.800" color="white" p={4}>
-      <NavigationButtons></NavigationButtons>
+      <NavigationButtons />
       <Heading as="h1" size="xl" mb={6} textAlign="center">
-        Datos Historicos
+        Datos Históricos
       </Heading>
 
       <Stack direction="row" spacing={4} mb={6} justifyContent="center">
@@ -142,15 +146,6 @@ function HistoricosPage() {
           placeholder="Año"
           value={selectedYear}
           onChange={(e) => setSelectedYear(e.target.value)}
-          sx={{
-            'option': {
-              bg: 'black',
-              color: 'white',
-              _hover: {
-                bg: 'blue.600',
-              },
-            },
-          }}
         >
           <option value="2022">2022</option>
           <option value="2023">2023</option>
@@ -160,17 +155,8 @@ function HistoricosPage() {
           placeholder="Mes"
           value={selectedMonth}
           onChange={(e) => setSelectedMonth(e.target.value)}
-          sx={{
-            'option': {
-              bg: 'black',
-              color: 'white',
-              _hover: {
-                bg: 'blue.600',
-              },
-            },
-          }}
         >
-          {months.map((month) => (
+          {meses.map((month) => (
             <option key={month.value} value={month.value}>
               {month.name}
             </option>
@@ -180,15 +166,6 @@ function HistoricosPage() {
           placeholder="Día"
           value={selectedDay}
           onChange={(e) => setSelectedDay(e.target.value)}
-          sx={{
-            'option': {
-              bg: 'black',
-              color: 'white',
-              _hover: {
-                bg: 'blue.600',
-              },
-            },
-          }}
         >
           {days.map((day) => (
             <option key={day} value={String(day).padStart(2, '0')}>
@@ -197,7 +174,7 @@ function HistoricosPage() {
           ))}
         </Select>
       </Stack>
-      
+
       <Stack spacing={4} direction="row" mb={6} justifyContent="center">
         <Checkbox isChecked={selectedCharts.includes('line')} onChange={() => handleChartTypeChange('line')}>
           Líneas
@@ -212,15 +189,6 @@ function HistoricosPage() {
         value={selectedVariable}
         onChange={(e) => setSelectedVariable(e.target.value)}
         mb={4}
-        sx={{
-          'option': {
-            bg: 'black',
-            color: 'white',
-            _hover: {
-              bg: 'blue.600',
-            },
-          },
-        }}
       >
         {variables.map((variable) => (
           <option key={variable.name} value={variable.name}>
@@ -241,73 +209,36 @@ function HistoricosPage() {
         </GridItem>
 
         <GridItem>
-          <Box p={4} borderRadius="md" color="white">
+          <Box bg="white" p={4} borderRadius="md" color="black">
             <Heading as="h2" size="lg" mb={4}>
               Datos Históricos
             </Heading>
-            <Stack spacing={4}>
-              <Select
-                placeholder="Año"
-                value={filterYear}
-                onChange={(e) => setFilterYear(e.target.value)}
-                sx={{
-                  'option': {
-                    bg: 'black',
-                    color: 'white',
-                    _hover: {
-                      bg: 'blue.600',
-                    },
-                  },
-                }}
-              >
-                <option value="2024">2024</option>
-                <option value="2023">2023</option>
-                <option value="2022">2022</option>
-              </Select>
-              <Select
-                placeholder="Mes"
-                value={filterMonth}
-                onChange={(e) => setFilterMonth(e.target.value)}
-                sx={{
-                  'option': {
-                    bg: 'black',
-                    color: 'white',
-                    _hover: {
-                      bg: 'blue.600',
-                    },
-                  },
-                }}
-              >
-                {months.map((month) => (
-                  <option key={month.value} value={month.value}>
-                    {month.name}
-                  </option>
-                ))}
-              </Select>
-            </Stack>
-
-            <Table variant="simple">
+            <Table variant="simple" size="sm">
               <Thead>
                 <Tr>
                   <Th>Año</Th>
                   <Th>Mes</Th>
-                  <Th>Valor</Th>
+                  <Th>Día</Th>
+                  <Th>Hora</Th>
+                  <Th>{selectedVariable}</Th>
+                  <Th>Humedad</Th>
+                  <Th>Presión</Th>
+                  <Th>Viento</Th>
                 </Tr>
               </Thead>
               <Tbody>
-                {filteredHistoricalData.length > 0 ? (
-                  filteredHistoricalData.map((data, index) => (
-                    <Tr key={index}>
-                      <Td>{data.year}</Td>
-                      <Td>{data.month}</Td>
-                      <Td>{data.value}</Td>
-                    </Tr>
-                  ))
-                ) : (
-                  <Tr>
-                    <Td colSpan="3" textAlign="center">No hay datos para mostrar</Td>
+                {historicalData.map((data, index) => (
+                  <Tr key={index}>
+                    <Td>{data.year}</Td>
+                    <Td>{data.month}</Td>
+                    <Td>{data.day}</Td>
+                    <Td>{data.hora}</Td>
+                    <Td>{data[selectedVariable]}</Td>
+                    <Td>{data.humedad}</Td>
+                    <Td>{data.presion}</Td>
+                    <Td>{data.viento}</Td>
                   </Tr>
-                )}
+                ))}
               </Tbody>
             </Table>
           </Box>
