@@ -28,7 +28,7 @@ function CombinacionesPage() {
             label: variable,
             data: Array(6).fill(0).map(() => Math.floor(Math.random() * 100)),
             borderColor: variableInfo.color,
-            backgroundColor: variableInfo.color.replace('1)', '0.5)'),
+            backgroundColor: variableInfo.color.replace('1)', '0.2)'),
             borderWidth: 2,
             fill: false
           };
@@ -52,7 +52,7 @@ function CombinacionesPage() {
 
   const renderCombinedChart = () => {
     if (!chartData) return null;
-
+  
     const chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
@@ -62,7 +62,40 @@ function CombinacionesPage() {
         },
         title: {
           display: true,
-          text: 'Gráfico Combinado',
+          text: 'Gráfico Combinando Variables',
+          color: 'white',
+          font: {
+            size: 16,
+            weight: 'bold'
+          },
+          padding: {
+            top: 10,
+            bottom: 20
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: {
+            color: 'rgba(255, 255, 255, 0.2)', 
+          },
+          ticks: {
+            color: 'white', 
+          },
+          border: {
+            color: 'white',
+          },
+        },
+        y: {
+          grid: {
+            color: 'rgba(255, 255, 255, 0.2)', 
+          },
+          ticks: {
+            color: 'white', 
+          },
+          border: {
+            color: 'white', 
+          },
         },
       },
     };
@@ -74,26 +107,121 @@ function CombinacionesPage() {
     }
   };
 
-  const renderPolarChart = () => {
+  const renderPolarChart = (customTitle = 'Gráfico Polar') => {
     if (!chartData) return null;
-
-    return <PolarArea data={chartData} options={{ responsive: true, maintainAspectRatio: false }} />;
+  
+    const polarOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            color: 'white',
+            font: {
+              size: 12
+            }
+          }
+        },
+        title: {
+          display: true,
+          text: customTitle,
+          color: 'white',
+          font: {
+            size: 16,
+            weight: 'bold'
+          },
+          padding: {
+            top: 10,
+            bottom: 20
+          }
+        }
+      },
+      scales: {
+        r: {
+          ticks: {
+            color: 'white',
+            backdropColor: 'rgba(224, 255, 255, 0.4)'
+          },
+          grid: {
+            color: 'rgba(176, 224, 230, 0.5)'
+          },
+          angleLines: {
+            color: 'rgba(176, 224, 230, 0.5)'
+          },
+          pointLabels: {
+            color: 'rgba(0, 0, 0, 0.7)',
+            font: {
+              size: 12,
+              weight: 'bold'
+            }
+          }
+        }
+      },
+      elements: {
+        arc: {
+          borderWidth: 2,
+          borderColor: 'rgba(255, 255, 255, 0.8)'
+        }
+      }
+    };
+  
+    return <PolarArea data={chartData} options={polarOptions} />;
   };
 
   const renderDoughnutChart = () => {
     if (!chartData) return null;
-
+  
     const doughnutData = {
       labels: selectedVariables,
       datasets: [{
         data: selectedVariables.map(() => Math.floor(Math.random() * 100)),
         backgroundColor: selectedVariables.map(v => variables.find(variable => variable.name === v).color.replace('1)', '0.5)')),
-        borderColor: selectedVariables.map(v => variables.find(variable => variable.name === v).color),
-        borderWidth: 1
+        borderColor: 'rgba(255, 255, 255, 0.2)',
+        borderWidth: 2,
+        hoverBackgroundColor: selectedVariables.map(v => variables.find(variable => variable.name === v).color.replace('0.9)', '0.3)')),
+        hoverBorderColor: 'rgba(255, 255, 255, 5)',
+        hoverBorderWidth: 3
       }]
     };
-
-    return <Doughnut data={doughnutData} options={{ responsive: true, maintainAspectRatio: false }} />;
+  
+    const doughnutOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'right',
+          labels: {
+            color: 'white',
+            font: {
+              size: 12
+            },
+            padding: 20
+          }
+        },
+        title: {
+          display: true,
+          text: 'Gráfico de Dona',
+          color: 'white',
+          font: {
+            size: 16,
+            weight: 'bold'
+          },
+          padding: {
+            top: 10,
+            bottom: 30
+          }
+        },
+      },
+      cutout: '60%',
+      rotation: -0.5 * Math.PI,
+      animation: {
+        animateScale: true,
+        animateRotate: true
+      }
+    };
+  
+    return <Doughnut data={doughnutData} options={doughnutOptions} />;
   };
 
   return (
@@ -129,9 +257,9 @@ function CombinacionesPage() {
         ))}
       </Stack>
 
-      <Grid templateColumns="2fr 1fr" gap={6}>
+      <Grid templateColumns={{ base: '1fr', md: '2fr 1fr' }} gap={6}>
         <GridItem>
-          <Box bg="white" p={4} borderRadius="md" color="black" height="600px">
+          <Box bg="gray.900"  p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="600px" boxShadow="dark-lg">
             {renderCombinedChart() || (
               <Text color="gray.500" textAlign="center">
                 Selecciona al menos una variable para visualizar los datos
@@ -141,14 +269,14 @@ function CombinacionesPage() {
         </GridItem>
         <GridItem>
           <Stack spacing={6}>
-            <Box bg="white" p={4} borderRadius="md" color="black" height="290px">
+            <Box bg="gray.900" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="290px" boxShadow="dark-lg">
               {renderPolarChart() || (
                 <Text color="gray.500" textAlign="center">
                   Gráfico Polar
                 </Text>
               )}
             </Box>
-            <Box bg="white" p={4} borderRadius="md" color="black" height="290px">
+            <Box bg="gray.900" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="290px" boxShadow="dark-lg">
               {renderDoughnutChart() || (
                 <Text color="gray.500" textAlign="center">
                   Gráfico de Dona
