@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, IconButton, Stack, Text, Grid, GridItem, Button, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, useDisclosure, useBreakpointValue } from '@chakra-ui/react';
-import { FaBars } from 'react-icons/fa';
+import {
+  Box, Heading, IconButton, Stack, Text, Grid, GridItem, Button, Drawer, DrawerBody,
+  DrawerContent, DrawerHeader, DrawerOverlay, useDisclosure, useBreakpointValue,
+} from '@chakra-ui/react';
+import { FaBars, FaTimes } from 'react-icons/fa';
 import { Chart as ChartJS, registerables, ArcElement } from 'chart.js';
 import { Bar, Line, Radar, Scatter } from 'react-chartjs-2';
 import NavigationButtons from '../components/NavigationButtons';
@@ -15,11 +18,11 @@ const variables = [
 ];
 
 function VariablesPage() {
-  const [selectedCharts, setSelectedCharts] = useState(['line']); // Inicia con gráfico de líneas
-  const [selectedVariable, setSelectedVariable] = useState(null); // Solo una variable seleccionada
+  const [selectedCharts, setSelectedCharts] = useState(['line']);
+  const [selectedVariable, setSelectedVariable] = useState('temperatura');
   const [chartData, setChartData] = useState(null);
-  const { isOpen, onOpen, onClose } = useDisclosure(); // Hook para abrir/cerrar el Drawer
-  const isHamburger = useBreakpointValue({ base: true, md: false }); // Condicional para mostrar el menú en pantallas pequeñas
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const isHamburger = useBreakpointValue({ base: true, md: false });
 
   useEffect(() => {
     if (selectedVariable) {
@@ -47,6 +50,7 @@ function VariablesPage() {
 
   const handleVariableChange = (variable) => {
     setSelectedVariable(variable);
+    if (isHamburger) onClose(); // Cierra el Drawer si estamos en modo "hamburguesa"
   };
 
   const renderCombinedChart = () => {
@@ -111,23 +115,57 @@ function VariablesPage() {
 
       {isHamburger ? (
         <>
-          <IconButton icon={<FaBars />} colorScheme="teal" aria-label="Abrir menú" onClick={onOpen} mb="3" />
+             {/* IconButton con mejores estilos */}
+          <IconButton
+            icon={isOpen ? <FaTimes/> : <FaBars />}
+            aria-label="Abrir menú"
+            onClick={onOpen}
+            mb="3"
+            color="white"
+            bg="teal.500"
+            borderRadius="md"
+            shadow="md"
+            size="lg"
+          />
           <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
             <DrawerOverlay />
-            <DrawerContent   _active={{ bg: "gray.600" }} mb={3} fontSize="lg" >
-              <DrawerHeader>Seleccionar Variable</DrawerHeader>
-              <DrawerBody>
-                <Stack spacing={4} alignItems="center">
-                  {variables.map((variable) => (
-                    <Button key={variable.name} onClick={() => { handleVariableChange(variable.name); onClose(); }} colorScheme={selectedVariable === variable.name ? 'teal' : 'gray'}>
-                      {variable.name}
-                    </Button>
-                  ))}
-                </Stack>
-              </DrawerBody>
-            </DrawerContent>
-          </Drawer>
-        </>
+            <DrawerContent bg="gray.900" color="white" borderRight="1px solid rgba(255,255,255,0.1)" shadow="lg" backdropFilter="blur(10px)">
+              {/* Encabezado del Drawer con fondo personalizado */}
+            <DrawerHeader bg="teal.600" fontSize="lg" fontWeight="bold" color="white" mb="3">
+              Seleccionar Variable
+            </DrawerHeader>
+          <DrawerBody>
+          {/* Stack para organizar los botones con espaciado */}
+          <Stack spacing={4} alignItems="center">
+            {variables.map((variable) => (
+              <Button
+                key={variable.name}
+                onClick={() => { 
+                  handleVariableChange(variable.name); 
+                  onClose(); 
+                }}
+                colorScheme={selectedVariable === variable.name ? 'teal' : 'gray'}
+                variant="outline"
+                color= "white"
+                borderColor={selectedVariable === variable.name ? 'teal.400' : 'gray.500'}
+                _hover={{
+                  bg: selectedVariable === variable.name ? 'teal.500' : 'gray.700',
+                  color: 'white',
+                  transform: 'scale(0.2)'
+                }}
+                width="100%"
+                size="md"
+                transition="all 0.2s ease-in-out"
+               
+              >
+                {variable.name}
+              </Button>
+            ))}
+          </Stack>
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
+    </>
       ) : (
         <Box display="flex" justifyContent="center">
           <Stack direction="row" spacing={4} mb={6}>
@@ -142,31 +180,18 @@ function VariablesPage() {
 
       <Grid templateColumns={{ base: '1fr', md: '2fr 1fr' }} gap={6}>
         <GridItem>
-          {/*propiedades p (para responsivo)*/}
           <Box bg="white" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height={{ base: '300px', md: '600px' }}>
-            {renderCombinedChart() || (
-              <Text color="gray.500" textAlign="center">
-                Selecciona una variable para visualizar los datos
-              </Text>
-            )}
+            {renderCombinedChart() || <Text color="gray.500" textAlign="center">Selecciona una variable para visualizar los datos</Text>}
           </Box>
         </GridItem>
 
         <GridItem>
           <Stack spacing={6}>
             <Box bg="white" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height={{ base: '200px', md: '290px' }}>
-              {renderRadarChart() || (
-                <Text color="gray.500" textAlign="center">
-                  Gráfico Radar
-                </Text>
-              )}
+              {renderRadarChart() || <Text color="gray.500" textAlign="center">Gráfico Radar</Text>}
             </Box>
             <Box bg="white" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height={{ base: '200px', md: '290px' }}>
-              {renderScatterChart() || (
-                <Text color="gray.500" textAlign="center">
-                  Gráfico de Dispersión
-                </Text>
-              )}
+              {renderScatterChart() || <Text color="gray.500" textAlign="center">Gráfico de Dispersión</Text>}
             </Box>
           </Stack>
         </GridItem>
