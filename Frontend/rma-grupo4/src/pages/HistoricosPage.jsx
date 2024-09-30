@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, Checkbox, Stack, Select, Text, Grid, GridItem, Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react';
+import { Box, Heading, Checkbox, Stack, Select, Text, Grid, GridItem, Table, Thead, Tbody, Tr, Th, Td, background } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
 import NavigationButtons from '../components/NavigationButtons';
@@ -13,7 +13,7 @@ const variables = [
   { name: 'viento', color: 'rgba(75, 192, 192, 1)' },
 ];
 
-const meses = [
+const months = [
   { name: 'Enero', value: '01' },
   { name: 'Febrero', value: '02' },
   { name: 'Marzo', value: '03' },
@@ -28,13 +28,14 @@ const meses = [
   { name: 'Diciembre', value: '12' },
 ];
 
+
 function HistoricosPage() {
   const [selectedCharts, setSelectedCharts] = useState(['line']);
   const [selectedVariable, setSelectedVariable] = useState('temperatura');
   const [selectedYear, setSelectedYear] = useState('2024');
   const [selectedMonth, setSelectedMonth] = useState('01');
-  const [selectedDay, setSelectedDay] = useState(null);
-  const [chartData, setChartData] = useState(null);
+  const [selectedDay, setSelectedDay] = useState('');
+  const [chartData, setChartData] = useState('');
   const [days, setDays] = useState([]);
   const [historicalData, setHistoricalData] = useState([]);
 
@@ -46,7 +47,7 @@ function HistoricosPage() {
       const monthIndex = parseInt(selectedMonth);
       const daysArray = getDias(selectedYear, monthIndex);
       setDays(daysArray);
-      setSelectedDay(daysArray[0]); 
+      setSelectedDay(daysArray['']); 
     }
   }, [selectedYear, selectedMonth]);
 
@@ -55,16 +56,19 @@ function HistoricosPage() {
     let newData = [];
 
     if (selectedYear && !selectedMonth && !selectedDay) {
-      labels = meses.map(m => m.name);
+      labels = months.map(m => m.name);
+      newData = labels.map(() => Math.floor(Math.random() * 100));
     } else if (selectedYear && selectedMonth && !selectedDay) {
-      labels = getDias(selectedYear, parseInt(selectedMonth));
+      labels = getDias(selectedYear, selectedMonth);
+      newData = labels.map(() => Math.floor(Math.random() * 100));
     } else if (selectedYear && selectedMonth && selectedDay) {
       labels = getHoras();
+      newData = labels.map(() => Math.floor(Math.random() * 100));
     }
 
-    newData = labels.map(() => Math.floor(Math.random() * 100));
+    
 
-    if (selectedVariable && selectedYear && selectedMonth && selectedDay) {
+    if (selectedVariable) {
       const data = {
         labels: labels,
         datasets: [
@@ -73,6 +77,7 @@ function HistoricosPage() {
             label: `${selectedVariable} (Línea) - ${selectedYear}/${selectedMonth}/${selectedDay}`,
             data: newData,
             borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'black',
             borderWidth: 2,
             fill: false,
           },
@@ -146,6 +151,12 @@ function HistoricosPage() {
           placeholder="Año"
           value={selectedYear}
           onChange={(e) => setSelectedYear(e.target.value)}
+          sx={{
+            option:{
+              bg: 'black'
+            }
+
+          }}
         >
           <option value="2022">2022</option>
           <option value="2023">2023</option>
@@ -155,8 +166,15 @@ function HistoricosPage() {
           placeholder="Mes"
           value={selectedMonth}
           onChange={(e) => setSelectedMonth(e.target.value)}
+          
+          sx={{
+            option:{
+              bg: 'black'
+            }
+
+          }}
         >
-          {meses.map((month) => (
+          {months.map((month) => (
             <option key={month.value} value={month.value}>
               {month.name}
             </option>
@@ -166,9 +184,15 @@ function HistoricosPage() {
           placeholder="Día"
           value={selectedDay}
           onChange={(e) => setSelectedDay(e.target.value)}
+          sx={{
+            option:{
+              bg: 'black'
+            }
+
+          }}
         >
           {days.map((day) => (
-            <option key={day} value={String(day).padStart(2, '0')}>
+            <option key={day} value={String(day).padStart(2, '0')} background = "black" >
               {day}
             </option>
           ))}
@@ -199,7 +223,7 @@ function HistoricosPage() {
 
       <Grid templateColumns="1fr" gap={6}>
         <GridItem>
-          <Box bg="white" p={4} borderRadius="md" color="black" height="600px">
+          <Box bg="black" p={4} borderRadius="md" color="black" height="600px">
             {renderCombinedChart() || (
               <Text color="gray.500" textAlign="center">
                 Selecciona al menos un tipo de gráfico y una variable
