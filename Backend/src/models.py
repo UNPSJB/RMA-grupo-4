@@ -1,5 +1,6 @@
-from sqlalchemy import update
+from sqlalchemy import Column, Integer, String, DateTime, update
 from sqlalchemy.orm import Session, declarative_base
+from datetime import datetime
 
 Base = declarative_base()
 
@@ -68,3 +69,13 @@ class BaseModel(Base):
         # Define un formato de representacion como cadena para el modelo base.
         params = ", ".join(f"{k}={v}" for k, v in keyvalgen(self))
         return f"{self.__class__.__name__}({params})"
+    
+# configuracion del modelo de mensaje que recibimos
+class Mensaje(Base):
+    __tablename__ = 'mensajes'
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True) #creamos un id para cada mensaje
+    id_nodo = Column(Integer, index=True)
+    type = Column(String)
+    data = Column(String)
+    time = Column(DateTime)

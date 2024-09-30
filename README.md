@@ -33,6 +33,9 @@
   - uvicorn = "^0.30.6"
   - bcrypt = "^4.2.0"
   - pyjwt = "^2.9.0"
+  - paho-mqtt = "^2.1.0"
+  - pydantic = "^2.9.2"
+  - asyncio-mqtt = "^0.16.2"
 
 ### Dependencias Instaladas Frontend :
  - "@chakra-ui/react": "^2.8.2",

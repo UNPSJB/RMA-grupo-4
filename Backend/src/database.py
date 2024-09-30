@@ -16,3 +16,8 @@ def get_db():
         yield db
     finally:
         db.close()
+
+# para creacion de tablas de mensajes recibidos 
+def create_tables():
+    from src.models import Base
+    Base.metadata.create_all(bind=engine)

@@ -1,277 +1,269 @@
-
-
-
 import React, { useState, useEffect } from 'react';
-import { Checkbox, Box, useDisclosure, Heading, IconButton, Stack, Text, Grid, GridItem, Button, Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerOverlay, useBreakpointValue } from '@chakra-ui/react';
-import { Chart as ChartJS, registerables, ArcElement } from 'chart.js';
-import { Chart, PolarArea, Doughnut } from 'react-chartjs-2';
-import { FaBars, FaTimes } from 'react-icons/fa';
+import axios from 'axios';
+import {
+  Icon,
+  Box,
+  Grid,
+  GridItem,
+  Heading,
+  Select,
+  Text,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
+  StatArrow,
+  SimpleGrid,
+  Center,
+} from '@chakra-ui/react';
+import { Line, Bar, Doughnut ,Radar} from 'react-chartjs-2';
+import { Chart as ChartJS, registerables } from 'chart.js';
+import { HiChartBar } from "react-icons/hi";
 import NavigationButtons from '../components/NavigationButtons';
 
-ChartJS.register(...registerables, ArcElement);
+ChartJS.register(...registerables);
 
-const variables = [
-  { name: 'temperatura', color: 'rgba(255, 99, 132, 1)' },
-  { name: 'humedad', color: 'rgba(54, 162, 235, 1)' },
-  { name: 'presion', color: 'rgba(255, 206, 86, 1)' },
-  { name: 'viento', color: 'rgba(75, 192, 192, 1)' },
-];
+const variables = ['temp_t']; //,'temperatura', 'humedad', 'presion', 'viento' 
 
-function GraficosPage() {
-  const [selectedCharts, setSelectedCharts] = useState(['line']);
-  const [selectedVariable, setSelectedVariable] = useState('temperatura');
-  const [chartData, setChartData] = useState(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const isHamburger = useBreakpointValue({ base: true, md: false });
+const GraficosPage = () => {
+  const [data, setData] = useState({});
+  const [timeRange, setTimeRange] = useState('1h');
 
   useEffect(() => {
-    if (selectedVariable) {
-      const newData = {
-        labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-        datasets: [
-          {
-            type: 'line',
-            label: `${selectedVariable} (Línea)`,
-            data: [30, 25, 28, 35, 32, 31],
-            borderColor: variables.find(v => v.name === selectedVariable).color,
-            borderWidth: 2,
-            fill: false,
-          },
-          {
-            type: 'bar',
-            label: `${selectedVariable} (Barra)`,
-            data: [30, 25, 28, 35, 32, 31],
-            backgroundColor: variables.find(v => v.name === selectedVariable).color.replace('1)', '0.5)'),
-          },
-        ],
-      };
-      setChartData(newData);
+    fetchData();
+  }, [timeRange]);
+  
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/v1/mensajes`, {
+        params: {
+          time_range: timeRange
+        }
+      });
+      console.log("Datos recibidos:", response.data); // Testeando datos recibidos
+      const newData = {};
+      response.data.forEach(item => {
+        if (!newData[item.type]) {
+          newData[item.type] = [];
+        }
+        newData[item.type].push({
+          id_nodo: item.id_nodo,
+          time: item.time,
+          data: item.data
+        });
+      });
+      
+      setData(newData);
+    } catch (error) {
+      console.error("Error fetching data: ", error);
     }
-  }, [selectedVariable]);
-
-  const handleVariableChange = (variable) => {
-    setSelectedVariable(variable);
   };
 
-  const handleChartTypeChange = (type) => {
-    setSelectedCharts((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+  const formatChartData = (variableData) => {
+    const labels = variableData.map(item => new Date(item.time).toLocaleTimeString());
+    const values = variableData.map(item => parseFloat(item.data));
+
+    return {
+      labels,
+      datasets: [{
+        label: 'Valor',
+        data: values,
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      }]
+    };
+  };
+
+  const renderLineChart = (variable) => {
+    console.log(`Datos para ${variable}:`, data[variable]); // Log para verificar datos
+    if (!data[variable] || data[variable].length === 0) return <Text>No hay datos disponibles.</Text>;
+  
+    return (
+      <Line
+        data={formatChartData(data[variable])}
+        options={{
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: variable.charAt(0).toUpperCase() + variable.slice(1),
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        }}
+      />
     );
   };
 
-  const renderCombinedChart = () => {
-    if (!chartData) return null;
+  const renderBarChart = (variable) => {
+    if (!data[variable] || data[variable].length === 0) return <Text>Cargando datos...</Text>;
 
-    const visibleDatasets = chartData.datasets.filter((ds) => selectedCharts.includes(ds.type));
-    const chartOptions = {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'top', labels: { color: 'white' } },
-        title: {
-          display: true,
-          text: 'Gráfico Combinado',
-          color: 'white',
-          font: { size: 16, weight: 'bold' },
-          padding: { top: 10, bottom: 20 },
-        },
-      },
-      scales: {
-        x: { grid: { color: 'rgba(255, 255, 255, 0.2)' }, ticks: { color: 'white' }, border: { color: 'white' } },
-        y: { grid: { color: 'rgba(255, 255, 255, 0.2)' }, ticks: { color: 'white' }, border: { color: 'white' } },
-      },
+    const chartData = {
+      labels: variables,
+      datasets: [{
+        label: 'Promedio',
+        data: variables.map(variable => {
+          const values = data[variable].map(item => parseFloat(item.data));
+          return values.reduce((a, b) => a + b, 0) / values.length;
+        }),
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.5)',
+          'rgba(54, 162, 235, 0.5)',
+          'rgba(255, 206, 86, 0.5)',
+          'rgba(75, 192, 192, 0.5)',
+        ],
+      }],
     };
 
-    return <Chart type="bar" data={{ ...chartData, datasets: visibleDatasets }} options={chartOptions} />;
-  };
-  const renderPolarChart = () => {
-    if (!chartData) return null;
-
-    const polarData = {
-      labels: chartData.labels,
-      datasets: [
-        {
-          label: selectedVariable,
-          data: chartData.datasets[0].data,
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.5)',
-            'rgba(54, 162, 235, 0.5)',
-            'rgba(255, 206, 86, 0.5)',
-            'rgba(75, 192, 192, 0.5)',
-            'rgba(153, 102, 255, 0.5)',
-            'rgba(255, 159, 64, 0.5)',
-          ],
-          borderWidth: 1,
-        },
-      ],
-    };
-
-    const polarOptions = {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'right', labels: { color: 'white' } },
-        title: { display: true, text: 'Gráfico Polar', color: 'white' },
-        font: {
-          size: 16,
-          weight: 'bold'
-        },
-        padding: {
-          top: 10,
-          bottom: 20
-        }
-      },
-    };
-
-    return <PolarArea data={polarData} options={polarOptions} />;
+    return (
+      <Bar
+        data={chartData}
+        options={{
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Promedios por Variable',
+            },
+          },
+        }}
+      />
+    );
   };
 
-  const renderDoughnutChart = () => {
-    if (!chartData) return null;
+  const renderDoughnutChart = (variable) => {
+    if (!data[variable] || data[variable].length === 0) return <Text>Cargando datos...</Text>;
 
-    const doughnutData = {
-      labels: chartData.labels,
-      datasets: [
-        {
-          label: selectedVariable,
-          data: chartData.datasets[0].data,
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.5)',
-            'rgba(54, 162, 235, 0.5)',
-            'rgba(255, 206, 86, 0.5)',
-            'rgba(75, 192, 192, 0.5)',
-            'rgba(153, 102, 255, 0.5)',
-            'rgba(255, 159, 64, 0.5)',
-          ],
-          borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)',
-            'rgba(255, 159, 64, 1)',
-          ],
-          borderWidth: 1,
-        },
-      ],
+    const chartData = {
+      labels: variables,
+      datasets: [{
+        data: variables.map(variable => {
+          const values = data[variable].map(item => parseFloat(item.data));
+          return values.reduce((a, b) => a + b, 0);
+        }),
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.5)',
+          'rgba(54, 162, 235, 0.5)',
+          'rgba(255, 206, 86, 0.5)',
+          'rgba(75, 192, 192, 0.5)',
+        ],
+      }],
     };
 
-    const doughnutOptions = {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position: 'right', labels: { color: 'white' } },
-        title: { display: true, text: 'Gráfico de Dona', color: 'white' },
-        font: {
-          size: 16,
-          weight: 'bold'
-        },
-        padding: {
-          top: 10,
-          bottom: 20
-        }
-      },
-    };
-
-    return <Doughnut data={doughnutData} options={doughnutOptions} />;
+    return (
+      <Doughnut
+        data={chartData}
+        options={{
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Distribución de Variables',
+            },
+          },
+        }}
+      />
+    );
   };
+  const renderRadarChart =(variable)=>{
+    if (!data[variable] || data[variable].length === 0) return <Text>Cargando datos...</Text>;
+    return (
+      <Radar
+        data={formatChartData(data[variable])}
+        options={{
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: variable.charAt(0).toUpperCase() + variable.slice(1),
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        }}
+      />
+    );
+  }
+  const renderStatCards = () => {
+    return variables.map(variable => {
+      if (!data[variable]) return null;
+      const values = data[variable].map(item => parseFloat(item.data));
+      const currentValue = values[values.length - 1];
+      const previousValue = values[values.length - 2] || currentValue;
+      const change = ((currentValue - previousValue) / previousValue) * 100;
+
+      return (
+        <Stat key={variable} bg="transparent" p={4} borderRadius="md" boxShadow="sm" color="white">
+          <StatLabel>{variable.charAt(0).toUpperCase() + variable.slice(1)}</StatLabel>
+          <StatNumber>{currentValue.toFixed(2)}</StatNumber>
+          <StatHelpText>
+            <StatArrow type={change > 0 ? 'increase' : 'decrease'} />
+            {Math.abs(change).toFixed(2)}%
+          </StatHelpText>
+        </Stat>
+      );
+    });
+  };
+
   return (
-    <Box bg="gray.800" color="white" minH="100vh" p={4}>
-      <NavigationButtons />
+    <Box p={5}>
+      <NavigationButtons></NavigationButtons>
       <Heading as="h1" size="xl" mb={6} textAlign="center">
-        Datos en gráficos
+      <Icon as={HiChartBar} p={0} verticalAlign="middle" marginRight={2} marginBottom={2}/>
+        Datos en Gráficos
       </Heading>
-
-      <Stack spacing={4} direction="row" mb={6} justifyContent="center">
-        <Checkbox isChecked={selectedCharts.includes('line')} onChange={() => handleChartTypeChange('line')}>
-          Líneas
-        </Checkbox>
-        <Checkbox isChecked={selectedCharts.includes('bar')} onChange={() => handleChartTypeChange('bar')}>
-          Barras
-        </Checkbox>
-      </Stack>
-
-      {isHamburger ? (
-        <>
-          <IconButton
-            icon={isOpen ? <FaTimes /> : <FaBars />}
-            colorScheme="teal"
-            aria-label="Abrir menú"
-            onClick={onOpen}
-            mb={3}
-          />
-          <Drawer placement="left" onClose={onClose} isOpen={isOpen}>
-            <DrawerOverlay />
-            <DrawerContent marginTop="200px" borderRadius="md" bgGradient="linear(to-r, gray.900, gray.800)" color="white" fontSize="lg" boxShadow="dark-lg">
-              <DrawerHeader borderBottomWidth="1px" textAlign="center">
-                Seleccionar Variable
-              </DrawerHeader>
-              <DrawerBody>
-                <Stack spacing={3} alignItems="center">
-                  {variables.map((variable) => (
-                    <Button
-                      key={variable.name}
-                      onClick={() => {
-                        handleVariableChange(variable.name);
-                        onClose();
-                      }}
-                      colorScheme={selectedVariable === variable.name ? 'teal' : 'gray'}
-                      size="lg"
-                      width="100%"
-                    >
-                      {variable.name}
-                    </Button>
-                  ))}
-                </Stack>
-              </DrawerBody>
-            </DrawerContent>
-          </Drawer>
-        </>
-      ) : (
-        <Box display="flex" justifyContent="center">
-          <Stack direction="row" spacing={4} mb={6}>
-            {variables.map((variable) => (
-              <Button
-                key={variable.name}
-                onClick={() => handleVariableChange(variable.name)}
-                colorScheme={selectedVariable === variable.name ? 'teal' : 'gray'}
-                size="md"
-                _hover={{ transform: 'scale(1.05)' }}
-                _active={{ transform: 'scale(0.95)' }}
-              >
-                {variable.name}
-              </Button>
-            ))}
-          </Stack>
-        </Box>
-      )}
+      <Select value={timeRange} onChange={(e) => setTimeRange(e.target.value)} mb={5} bg="gray.900" color="gray">
+        <option value="1h" >Última hora</option>
+        <option value="24h">Últimas 24 horas</option>
+        <option value="7d">Últimos 7 días</option>
+      </Select>
+      
+      {variables.map(variable => (
+          <SimpleGrid key={variable} columns={4} spacing={5} mb={5}>
+            <Box bg="gray.900" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="130px" width="140px" boxShadow="dark-lg">
+              {renderStatCards(variable)}
+            </Box>
+          </SimpleGrid>
+        ))}
       <Grid templateColumns={{ base: '1fr', md: '2fr 1fr' }} gap={6}>
-        <GridItem>
-          <Box bg="gray.900" p={4} borderRadius="md" height="600px" boxShadow="dark-lg">
-            {renderCombinedChart() || <Text color="gray.500" textAlign="center">Selecciona una variable y un tipo de gráfico para visualizar los datos.</Text>}
-          </Box>
-        </GridItem>
-        <GridItem>
-          <Stack spacing={6}>
-            <Box bg="gray.900" p={4} borderRadius="md" height="290px" boxShadow="dark-lg">
-              {renderPolarChart() || (
-                <Text color="gray.500" textAlign="center">
-                  Gráfico Polar
-                </Text>
-              )}
+        {variables.map(variable => (
+          <GridItem key={variable}>
+            <Box bg="gray.900" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="280px" boxShadow="dark-lg">
+              {renderLineChart(variable)}
             </Box>
-            <Box bg="gray.900" p={4} borderRadius="md" height="290px" boxShadow="dark-lg">
-              {renderDoughnutChart() || (
-                <Text color="gray.500" textAlign="center">
-                  Gráfico de Dona
-                </Text>
-              )}
+          </GridItem>
+        ))}
+        {variables.map(variable => (
+          <GridItem key={variable}>
+            <Box bg="gray.900" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="290px" boxShadow="dark-lg">
+              {renderRadarChart(variable)}
             </Box>
-          </Stack>
-        </GridItem>
+          </GridItem>
+        ))}
+        {variables.map(variable => (
+          <GridItem key={variable}>
+            <Box bg="gray.900" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="290px" boxShadow="dark-lg">
+              {renderBarChart(variable)}
+            </Box>
+          </GridItem>
+        ))}
+        {variables.map(variable => (
+          <GridItem key={variable}>
+            <Box bg="gray.900" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="290px" boxShadow="dark-lg">
+              {renderDoughnutChart(variable)}
+            </Box>
+          </GridItem>
+        ))}
       </Grid>
     </Box>
   );
-}
+};
 
 export default GraficosPage;
