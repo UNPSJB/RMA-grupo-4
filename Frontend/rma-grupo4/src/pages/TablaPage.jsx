@@ -12,7 +12,6 @@ import {
   Text,
   Button,
 } from "@chakra-ui/react";
-import NavigationButtons from "../components/NavigationButtons";
 
 function TablaPage() {
   // Datos simulados
@@ -109,7 +108,6 @@ function TablaPage() {
 
   return (
     <Box bg="gray.800" color="white" minH="100vh" p={{ base: 2, md: 4 }}>
-      <NavigationButtons />
       <Heading
         as="h1"
         size={{ base: "lg", md: "xl" }}

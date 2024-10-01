@@ -3,6 +3,7 @@ from typing import List
 from datetime import datetime
 from src.example.constants import ErrorCode
 from src.example import exceptions
+from typing import Optional
 
 # Los siguientes schemas contienen atributos sin muchas restricciones de tipo.
 # Podemos crear atributos con ciertas reglas mediante el uso de un "Field" adecuado.
@@ -23,6 +24,14 @@ class RespuestaUsuario(BaseModel):
 class LoginRequest(BaseModel):
     usuario: str
     password: str
+
+class ModificarUsuario(BaseModel):
+    email: Optional[EmailStr] = None
+    edad: Optional[int] = None
+
+class ModificarContrasena(BaseModel):
+    password: str
+    repetir_password: str
 
 class Config: 
     orm_mode= True

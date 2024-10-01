@@ -6,7 +6,6 @@ import {
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { Chart as ChartJS, registerables, ArcElement } from 'chart.js';
 import { Bar, Line, Radar, Scatter } from 'react-chartjs-2';
-import NavigationButtons from '../components/NavigationButtons';
 
 ChartJS.register(...registerables, ArcElement);
 
@@ -99,7 +98,6 @@ function VariablesPage() {
 
   return (
     <Box bg="gray.800" color="white" minH="100vh" p={4}>
-      <NavigationButtons />
       <Heading as="h1" size="xl" mb={6} textAlign="center">
         Datos Variable
       </Heading>

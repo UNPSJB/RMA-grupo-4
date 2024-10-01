@@ -19,7 +19,6 @@ import {
 import { Line, Bar, Doughnut ,Radar} from 'react-chartjs-2';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { HiChartBar } from "react-icons/hi";
-import NavigationButtons from '../components/NavigationButtons';
 
 ChartJS.register(...registerables);
 
@@ -214,7 +213,6 @@ const GraficosPage = () => {
 
   return (
     <Box p={5}>
-      <NavigationButtons></NavigationButtons>
       <Heading as="h1" size="xl" mb={6} textAlign="center">
       <Icon as={HiChartBar} p={0} verticalAlign="middle" marginRight={2} marginBottom={2}/>
         Datos en Gráficos

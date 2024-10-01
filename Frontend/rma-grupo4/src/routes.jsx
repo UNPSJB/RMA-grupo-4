@@ -9,7 +9,10 @@ import TablaPage from './pages/TablaPage';
 import GraficosPage from './pages/GraficosPage';  
 import HistoricosPage from './pages/HistoricosPage'; 
 import VariablesPage from './pages/VariablesPage';  
-import CombinacionesPage from './pages/CombinacionesPage';  
+import CombinacionesPage from './pages/CombinacionesPage';   
+import ModificarDatos from './components/ModificarDatos';
+import ModificarPassword from './components/ModificarPassword';
+import EliminarUsuario from './components/EliminarUsuario';
 
 function AppRoutes() {
   return (
@@ -79,6 +82,36 @@ function AppRoutes() {
             <App>
               <PrivateRoute>
                 <CombinacionesPage />
+              </PrivateRoute>
+            </App>
+          } 
+        />
+        <Route 
+          path="/modificar_datos" 
+          element={
+            <App>
+              <PrivateRoute>
+                <ModificarDatos />
+              </PrivateRoute>
+            </App>
+          } 
+        />
+        <Route 
+          path="/modificar_password" 
+          element={
+            <App>
+              <PrivateRoute>
+                <ModificarPassword />
+              </PrivateRoute>
+            </App>
+          } 
+        />
+         <Route 
+          path="/eliminar_usuario" 
+          element={
+            <App>
+              <PrivateRoute>
+                <EliminarUsuario />
               </PrivateRoute>
             </App>
           } 

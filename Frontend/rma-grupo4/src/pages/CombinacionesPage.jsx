@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Box, Heading, Checkbox, Stack, Text, Grid, GridItem, Button } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables, ArcElement } from 'chart.js';
 import { Bar, Line, PolarArea, Doughnut } from 'react-chartjs-2';
-import NavigationButtons from '../components/NavigationButtons';
 
 ChartJS.register(...registerables, ArcElement);
 
@@ -226,7 +225,6 @@ function CombinacionesPage() {
 
   return (
     <Box bg="gray.800" color="white" minH="100vh" p={4}>
-      <NavigationButtons></NavigationButtons>
       <Heading as="h1" size="xl" mb={6} textAlign="center">
         Combinaciones de variables
       </Heading>

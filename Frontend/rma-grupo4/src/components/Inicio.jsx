@@ -5,7 +5,6 @@ import Sidebar from './Sidebar';
 export default function Inicio() {
   return (
     <Box textAlign="center" mt={10} p={6}>
-        <Sidebar/>
         <Text fontSize="xl">
             Bienvenido a tu página de inicio.
         </Text>

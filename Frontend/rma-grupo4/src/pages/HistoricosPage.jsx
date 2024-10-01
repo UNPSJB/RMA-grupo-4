@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Box, Heading, Checkbox, Stack, Select, Text, Grid, GridItem, Table, Thead, Tbody, Tr, Th, Td, background } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
-import NavigationButtons from '../components/NavigationButtons';
 
 ChartJS.register(...registerables);
 
@@ -141,7 +140,6 @@ function HistoricosPage() {
 
   return (
     <Box bg="gray.800" color="white" p={4}>
-      <NavigationButtons />
       <Heading as="h1" size="xl" mb={6} textAlign="center">
         Datos Históricos
       </Heading>

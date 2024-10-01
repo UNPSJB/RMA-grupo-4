@@ -27,3 +27,38 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     token = crear_token(request.usuario)  # Crear el token JWT
     return {"token": token}  # Devuelve el token al frontend
 
+@router.get("/usuarios/{usuario}", response_model=RespuestaUsuario)
+def obtener_usuario(usuario: str, db: Session = Depends(get_db)):
+    db_usuario = get_usuario(db, usuario)
+    if db_usuario is None:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return db_usuario
+
+@router.put("/modificar_datos_usuario/{usuario}", response_model=RespuestaUsuario)
+def modificar_datos_usuario(usuario: str, datos: ModificarUsuario, db: Session = Depends(get_db)):
+    db_usuario = get_usuario(db, usuario)
+    if db_usuario is None:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    # Llamamos a la función de servicio para modificar el usuario
+    usuario_modificado = modificar_usuario(db, db_usuario, datos)
+    
+    return usuario_modificado
+
+@router.put("/modificar_password/{usuario}", response_model=RespuestaUsuario)
+def modificar_password(usuario: str, datos: ModificarContrasena, db: Session = Depends(get_db)):
+    return modificar_password_service(usuario, datos, db)  
+
+@router.delete("/eliminar_usuario/{usuario}", response_model=RespuestaUsuario)
+def eliminar_usuario(usuario: str, db: Session = Depends(get_db)):
+    db_usuario = get_usuario(db, usuario)
+    if db_usuario is None:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    # Eliminar el usuario de la base de datos
+    db.delete(db_usuario)
+    db.commit()
+    
+    return db_usuario  # Devuelve el usuario eliminado (opcional)
+
+
