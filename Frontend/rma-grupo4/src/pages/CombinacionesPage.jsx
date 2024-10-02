@@ -257,7 +257,7 @@ function CombinacionesPage() {
 
       <Grid templateColumns={{ base: '1fr', md: '2fr 1fr' }} gap={6}>
         <GridItem>
-          <Box bg="gray.900"  p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="600px" boxShadow="dark-lg">
+          <Box bg="gray.700"  p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="600px" boxShadow="dark-lg">
             {renderCombinedChart() || (
               <Text color="gray.500" textAlign="center">
                 Selecciona al menos una variable para visualizar los datos
@@ -267,14 +267,14 @@ function CombinacionesPage() {
         </GridItem>
         <GridItem>
           <Stack spacing={6}>
-            <Box bg="gray.900" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="290px" boxShadow="dark-lg">
+            <Box bg="gray.700" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="290px" boxShadow="dark-lg">
               {renderPolarChart() || (
                 <Text color="gray.500" textAlign="center">
                   Gráfico Polar
                 </Text>
               )}
             </Box>
-            <Box bg="gray.900" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="290px" boxShadow="dark-lg">
+            <Box bg="gray.700" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="290px" boxShadow="dark-lg">
               {renderDoughnutChart() || (
                 <Text color="gray.500" textAlign="center">
                   Gráfico de Dona

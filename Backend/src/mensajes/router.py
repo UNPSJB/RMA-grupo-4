@@ -83,3 +83,41 @@ def get_messages(
     ]
 
     return result
+
+#------------------------------------------------------------
+@router.get("/clima/temperatura")
+def get_temperatura(
+    db: Session = Depends(get_db),
+    id_nodo: Optional[int] = Query(None, description="ID del nodo"),
+    time_range: str = Query("1h", description="Rango de tiempo (1h, 24h, 7d)")
+):
+    """
+    Obtiene las lecturas de temperatura agrupadas en intervalos de 10 minutos.
+    """
+    # Se reutiliza la lógica para obtener el rango de tiempo y la consulta base.
+    now = datetime.utcnow().replace(tzinfo=timezone.utc)
+    start_time = now - timedelta(hours=1) if time_range == "1h" else (
+        now - timedelta(days=1) if time_range == "24h" else now - timedelta(days=7)
+    )
+    utc_offset = timedelta(hours=-3)  # Ajuste de zona horaria, cambiar según sea necesario
+    adjusted_start_time = start_time + utc_offset
+    adjusted_now = now + utc_offset
+
+    query = db.query(
+        Mensaje.id_nodo,
+        func.strftime('%Y-%m-%d %H:%M', Mensaje.time).label('time_interval'),
+        func.avg(cast(Mensaje.data, Float)).label('avg_temperatura')
+    ).filter(Mensaje.time >= adjusted_start_time, Mensaje.type == "temp_t")#temperatura
+
+    if id_nodo is not None:
+        query = query.filter(Mensaje.id_nodo == id_nodo)
+
+    mensajes = query.group_by(
+        Mensaje.id_nodo,
+        func.strftime('%Y-%m-%d %H:%M', Mensaje.time)
+    ).order_by(Mensaje.time).all()
+
+    return [
+        {"id_nodo": m.id_nodo, "time": m.time_interval, "temperatura": float(m.avg_temperatura)}
+        for m in mensajes
+    ]
