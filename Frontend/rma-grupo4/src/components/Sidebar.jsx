@@ -13,6 +13,7 @@ function Sidebar() {
       p={4}
       boxShadow="lg"
       position="fixed"
+     
     >
       <VStack spacing={4} align="stretch">
         <Button

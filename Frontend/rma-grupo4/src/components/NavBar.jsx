@@ -42,7 +42,7 @@ function NavBar() {
 
     return (
         <Box bg="gray.900" p={4} boxShadow="md" position="sticky" top="0" zIndex="1000">
-            <Flex as="nav" justify="space-between" align="center" maxW="1200px" mx="auto">
+            <Flex as="nav" justify={{ base: 'space-around', md: 'space-between' }} justifyContent={{ base:"center" ,md: 'space-between' }} align="center" maxW="1200px" mx="auto">
                 {/* Botón para ir a la página de inicio */}
                 <Button
                     colorScheme="whiteAlpha"
@@ -65,12 +65,15 @@ function NavBar() {
                                         </Text>
                                     </Flex>
                                 </MenuButton>
-                                <MenuList bg="gray.800" borderColor="gray.700">
+                                <MenuList bg="gray.900" borderColor="black.500" color="black" p={1.5}  borderRadius="md" mt="2"  >
                                     <MenuItem 
                                         _hover={{ bg: 'gray.700' }} 
                                         _focus={{ bg: 'gray.600' }} 
                                         color="white"
                                         onClick={() => navigate('/modificar_datos')}
+                                        bg="gray.800"
+                                        borderRadius="md"
+                                        mb="2"
                                     >
                                         Modificar datos de usuario
                                     </MenuItem>
@@ -79,19 +82,40 @@ function NavBar() {
                                         _focus={{ bg: 'gray.600' }} 
                                         color="white"
                                         onClick={() => navigate('/modificar_password')}
+                                        bg="gray.800"
+                                        borderRadius="md"
+                                        mb="2"
                                     >
                                         Modificar password
                                     </MenuItem>
                                     <MenuItem 
-                                        _hover={{ bg: 'red.600' }} 
+                                        _hover={{ bg: 'red.700' }} 
                                         _focus={{ bg: 'red.500' }} 
                                         color="white"
                                         onClick={() => setModalOpen(true)}
+                                        bg="gray.800"
+                                        borderRadius="md"
+                                        mb="2"
                                     >
                                         Eliminar usuario
                                     </MenuItem>
+
+                                    <MenuItem 
+                                            _hover={{ bg: 'green.600' }} 
+                                            _focus={{ bg: 'green.500' }} 
+                                            color="white"
+                                            onClick={handleLogout}
+                                            bg="gray.800"
+                                            borderRadius="md"
+                                            mb="2"
+                                            leftIcon={<Icon as={FaSignOutAlt} boxSize={5} />}
+                                        
+                                    >
+                                        Cerrar Sesion
+                                    </MenuItem>
                                 </MenuList>
                             </Menu>
+                        {/*}
                             <Button
                                 colorScheme="whiteAlpha"
                                 variant="ghost"
@@ -102,6 +126,7 @@ function NavBar() {
                             >
                                 Cerrar sesión
                             </Button>
+                        */}
                             {/* Mostrar NavigationButtons solo si el usuario está autenticado */}
                             <NavigationButtons isVisible={isNavVisible} setIsVisible={setNavVisible} />
                         </>

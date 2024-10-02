@@ -57,7 +57,7 @@ const ModificarPassword = () => {
                 </Alert>
             )}
             {success && (
-                <Alert status="success" mb={4}>
+                <Alert status="success" mb={4} bg="gray.700">
                     <AlertIcon />
                     <AlertTitle>Éxito: </AlertTitle>
                     <AlertDescription>Contraseña modificada exitosamente.</AlertDescription>
