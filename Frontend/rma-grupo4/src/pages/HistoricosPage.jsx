@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, Checkbox, Stack, Select, Text, Grid, GridItem, Table, Thead, Tbody, Tr, Th, Td, background } from '@chakra-ui/react';
+import { Box, Heading, Checkbox, Stack, Select, Grid, GridItem, Table, Thead, Tbody, Tr, Th, Td, useMediaQuery } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
 
@@ -27,8 +27,8 @@ const months = [
   { name: 'Diciembre', value: '12' },
 ];
 
-
 function HistoricosPage() {
+  const [isMobile] = useMediaQuery("(max-width: 48em)");
   const [selectedCharts, setSelectedCharts] = useState(['line']);
   const [selectedVariable, setSelectedVariable] = useState('temperatura');
   const [selectedYear, setSelectedYear] = useState('2024');
@@ -46,7 +46,7 @@ function HistoricosPage() {
       const monthIndex = parseInt(selectedMonth);
       const daysArray = getDias(selectedYear, monthIndex);
       setDays(daysArray);
-      setSelectedDay(daysArray['']); 
+      setSelectedDay('');
     }
   }, [selectedYear, selectedMonth]);
 
@@ -65,9 +65,8 @@ function HistoricosPage() {
       newData = labels.map(() => Math.floor(Math.random() * 100));
     }
 
-    
-
     if (selectedVariable) {
+      const variableColor = variables.find(v => v.name === selectedVariable)?.color || 'rgba(75, 192, 192, 1)';
       const data = {
         labels: labels,
         datasets: [
@@ -75,10 +74,10 @@ function HistoricosPage() {
             type: 'line',
             label: `${selectedVariable} (Línea) - ${selectedYear}/${selectedMonth}/${selectedDay}`,
             data: newData,
-            borderColor: 'rgba(75, 192, 192, 1)',
-            backgroundColor: 'black',
+            borderColor: variableColor,
+            backgroundColor: variableColor.replace('1)', '0.2)'),
             borderWidth: 2,
-            fill: false,
+            fill: true,
           },
           {
             type: 'bar',
@@ -94,9 +93,9 @@ function HistoricosPage() {
       const historicalValues = labels.map((label, index) => ({
         year: selectedYear,
         month: selectedMonth,
-        day: selectedMonth,
-        hora: selectedDay ? getHoras()[index % 24] : '-', 
-        [selectedVariable]: newData[index], 
+        day: selectedDay || '-',
+        hora: selectedDay ? getHoras()[index % 24] : '-',
+        [selectedVariable]: newData[index],
         humedad: selectedVariable === 'humedad' ? newData[index] : '-',
         presion: selectedVariable === 'presion' ? newData[index] : '-',
         viento: selectedVariable === 'viento' ? newData[index] : '-',
@@ -115,89 +114,73 @@ function HistoricosPage() {
   const renderCombinedChart = () => {
     if (!chartData) return null;
 
-    const visibleDatasets = chartData.datasets.filter((ds) =>
-      selectedCharts.includes(ds.type)
-    );
+    const visibleDatasets = chartData.datasets.filter((ds) => selectedCharts.includes(ds.type));
 
     const chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
+      animation: {
+        duration: 1000,
+        easing: 'easeInOutQuad',
+      },
       plugins: {
-        legend: {
-          position: 'top',
+        legend: { 
+          position: isMobile ? 'bottom' : 'top', 
+          labels: { color: 'white', boxWidth: isMobile ? 10 : 40 } 
         },
         title: {
           display: true,
           text: 'Gráfico Combinado',
+          font: { size: isMobile ? 16 : 20, weight: 'bold' },
+          color: 'gray',
+          padding: { top: 10, bottom: isMobile ? 10 : 20 },
         },
+      },
+      scales: {
+        x: { 
+          ticks: { color: 'white', maxRotation: 90, minRotation: 90 }, 
+          grid: { color: 'rgba(255, 255, 255, 0.2)' } 
+        },
+        y: { ticks: { color: 'white' }, grid: { color: 'rgba(255, 255, 255, 0.2)' } },
       },
     };
 
     return (
-      <Chart type="bar" data={{ ...chartData, datasets: visibleDatasets }} options={chartOptions} />
+      <Box bg="gray.700" p={isMobile ? 2 : 4} borderRadius="md" boxShadow="md" height={isMobile ? "300px" : "400px"}>
+        <Chart type="bar" data={{ ...chartData, datasets: visibleDatasets }} options={chartOptions} />
+      </Box>
     );
   };
 
   return (
-    <Box bg="gray.800" color="white" p={4}>
-      <Heading as="h1" size="xl" mb={6} textAlign="center">
+    <Box bg="gray.800" color="white" p={isMobile ? 3 : 6} borderRadius="md">
+      <Heading as="h1" size={isMobile ? "lg" : "xl"} mb={isMobile ? 3 : 6} textAlign="center" color="white">
         Datos Históricos
       </Heading>
 
-      <Stack direction="row" spacing={4} mb={6} justifyContent="center">
-        <Select
-          placeholder="Año"
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(e.target.value)}
-          sx={{
-            option:{
-              bg: 'black'
-            }
-
-          }}
-        >
+      <Stack direction={isMobile ? "column" : "row"} spacing={isMobile ? 2 : 4} mb={isMobile ? 3 : 6} justifyContent="center">
+        <Select placeholder="Año" value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)}>
           <option value="2022">2022</option>
           <option value="2023">2023</option>
           <option value="2024">2024</option>
         </Select>
-        <Select
-          placeholder="Mes"
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
-          
-          sx={{
-            option:{
-              bg: 'black'
-            }
-
-          }}
-        >
+        <Select placeholder="Mes" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
           {months.map((month) => (
             <option key={month.value} value={month.value}>
               {month.name}
             </option>
           ))}
         </Select>
-        <Select
-          placeholder="Día"
-          value={selectedDay}
-          onChange={(e) => setSelectedDay(e.target.value)}
-          sx={{
-            option:{
-              bg: 'black'
-            }
-
-          }}
-        >
+        <Select placeholder="Día" value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)}>
           {days.map((day) => (
-            <option key={day} value={String(day).padStart(2, '0')} background = "black" >
+            <option key={day} value={String(day).padStart(2, '0')}>
               {day}
             </option>
           ))}
         </Select>
       </Stack>
 
-      <Stack spacing={4} direction="row" mb={6} justifyContent="center">
+      <Stack spacing={4} direction={isMobile ? "column" : "row"} mb={isMobile ? 3 : 6} justifyContent="center">
         <Checkbox isChecked={selectedCharts.includes('line')} onChange={() => handleChartTypeChange('line')}>
           Líneas
         </Checkbox>
@@ -206,66 +189,53 @@ function HistoricosPage() {
         </Checkbox>
       </Stack>
 
-      <Select
-        placeholder="Selecciona una variable"
-        value={selectedVariable}
-        onChange={(e) => setSelectedVariable(e.target.value)}
-        mb={4}
-      >
-        {variables.map((variable) => (
-          <option key={variable.name} value={variable.name}>
-            {variable.name}
-          </option>
-        ))}
-      </Select>
-
-      <Grid templateColumns="1fr" gap={6}>
-        <GridItem>
-          <Box bg="black" p={4} borderRadius="md" color="black" height="600px">
-            {renderCombinedChart() || (
-              <Text color="gray.500" textAlign="center">
-                Selecciona al menos un tipo de gráfico y una variable
-              </Text>
-            )}
-          </Box>
-        </GridItem>
-
-        <GridItem>
-          <Box bg="white" p={4} borderRadius="md" color="black">
-            <Heading as="h2" size="lg" mb={4}>
-              Datos Históricos
-            </Heading>
-            <Table variant="simple" size="sm">
-              <Thead>
-                <Tr>
-                  <Th>Año</Th>
-                  <Th>Mes</Th>
-                  <Th>Día</Th>
-                  <Th>Hora</Th>
-                  <Th>{selectedVariable}</Th>
-                  <Th>Humedad</Th>
-                  <Th>Presión</Th>
-                  <Th>Viento</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {historicalData.map((data, index) => (
-                  <Tr key={index}>
-                    <Td>{data.year}</Td>
-                    <Td>{data.month}</Td>
-                    <Td>{data.day}</Td>
-                    <Td>{data.hora}</Td>
-                    <Td>{data[selectedVariable]}</Td>
-                    <Td>{data.humedad}</Td>
-                    <Td>{data.presion}</Td>
-                    <Td>{data.viento}</Td>
-                  </Tr>
-                ))}
-              </Tbody>
-            </Table>
-          </Box>
+      <Grid templateColumns={isMobile ? "1fr" : "repeat(2, 1fr)"} gap={isMobile ? 3 : 6} mb={isMobile ? 3 : 6}>
+        <GridItem colSpan={1}>
+          <Select value={selectedVariable} onChange={(e) => setSelectedVariable(e.target.value)} placeholder="Seleccione una variable">
+            {variables.map((variable) => (
+              <option key={variable.name} value={variable.name}>
+                {variable.name}
+              </option>
+            ))}
+          </Select>
         </GridItem>
       </Grid>
+
+      {renderCombinedChart()}
+
+      <Box mt={isMobile ? 3 : 6} bg="gray.700" p={isMobile ? 2 : 4} borderRadius="md" boxShadow="md" overflowX="auto">
+        <Heading as="h3" size={isMobile ? "md" : "lg"} mb={isMobile ? 2 : 4}>
+          Tabla de datos históricos
+        </Heading>
+        <Table variant="striped" colorScheme="gray.500" size={isMobile ? "sm" : "md"}>
+        <Thead>
+          <Tr>
+            <Th bg="gray.700" color="gray.300">Año</Th>
+            <Th bg="gray.700" color="gray.300">Mes</Th>
+            <Th bg="gray.700" color="gray.300">Día</Th>
+            <Th bg="gray.700" color="gray.300">Hora</Th>
+            <Th bg="gray.700" color="gray.300">Variable</Th>
+            <Th bg="gray.700" color="gray.300">Humedad</Th>
+            <Th bg="gray.700" color="gray.300">Presión</Th>
+            <Th bg="gray.700" color="gray.300">Viento</Th>
+          </Tr>
+        </Thead>
+          <Tbody>
+            {historicalData.map((data, index) => (
+              <Tr key={index} _hover={{ bg: "gray.600" }} bg={index % 2 === 0 ? "gray.700" : "gray.800"}>
+                <Td>{data.year}</Td>
+                <Td>{data.month}</Td>
+                <Td>{data.day}</Td>
+                <Td>{data.hora}</Td>
+                <Td>{data[selectedVariable]}</Td>
+                <Td>{data.humedad}</Td>
+                <Td>{data.presion}</Td>
+                <Td>{data.viento}</Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </Box>
     </Box>
   );
 }

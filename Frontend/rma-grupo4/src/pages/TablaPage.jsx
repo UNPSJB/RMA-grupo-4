@@ -1,53 +1,22 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Heading,
-  Table,
-  Thead,
-  Tr,
-  Th,
-  Tbody,
-  Td,
-  Select,
-  Text,
-  Button,
-} from "@chakra-ui/react";
+import { Box, Table, Thead, Tr, Th, Tbody, Td, Select, Button, Flex, useMediaQuery, Text, Center } from "@chakra-ui/react";
 
-function TablaPage() {
-  // Datos simulados
-  const data = [
-    { Nodo: 1, Humedad: "4", Temperatura: "5", Presion: "6", value: 30.45 },
-    { Nodo: 2, Humedad: "7", Temperatura: "8", Presion: "9", value: 22.34 },
-    { Nodo: 3, Humedad: "10", Temperatura: "11", Presion: "12", value: 27.89 },
-    { Nodo: 3, Humedad: "10", Temperatura: "11", Presion: "12", value: 27.89 },
-    { Nodo: 3, Humedad: "10", Temperatura: "11", Presion: "12", value: 27.89 },
-    { Nodo: 1, Humedad: "10", Temperatura: "11", Presion: "12", value: 27.89 },
-    { Nodo: 3, Humedad: "10", Temperatura: "11", Presion: "12", value: 27.89 },
-    { Nodo: 2, Humedad: "10", Temperatura: "11", Presion: "12", value: 27.89 },
-  ];
-
-  // Estado para almacenar el nodo seleccionado
+function TablaPage({ data, onRowSelection }) {
   const [selectedNodo, setSelectedNodo] = useState("");
-  // Estado para la columna seleccionada y el orden de la tabla
-  const [sortConfig, setSortConfig] = useState({
-    key: "value",
-    direction: "asc",
-  });
-  // Estado para la página actual (paginación)
+  const [sortConfig, setSortConfig] = useState({ key: "value", direction: "asc" });
   const [page, setPage] = useState(1);
-  const rowsPerPage = 5; // Número de filas por página
-  // Estado para las filas seleccionadas
   const [selectedRows, setSelectedRows] = useState([]);
+  const [isMobile] = useMediaQuery("(max-width: 48em)");
 
-  // Función para manejar el cambio del nodo
+  const rowsPerPage = isMobile ? 5 : 8;
+
   const handleSelectChange = (e) => {
     const value = e.target.value;
     setSelectedNodo(value === "" ? "" : parseInt(value, 10));
-    setPage(1); // Reiniciar a la página 1 cuando se selecciona un nuevo nodo
-    setSelectedRows([]); // Limpiar selección al cambiar nodo
+    setPage(1);
+    setSelectedRows([]);
   };
 
-  // Función para ordenar por cualquier columna
   const handleSort = (columnKey) => {
     let direction = "asc";
     if (sortConfig.key === columnKey && sortConfig.direction === "asc") {
@@ -56,124 +25,93 @@ function TablaPage() {
     setSortConfig({ key: columnKey, direction });
   };
 
-  // Filtrar los datos: si no hay ningún nodo seleccionado, mostrar todos
-  const filteredData =
-    selectedNodo === ""
-      ? data
-      : data.filter((row) => row.Nodo === selectedNodo);
-
-  // Ordenar los datos dinámicamente según la columna seleccionada
+  // Filtrar y ordenar datos según la selección del nodo y el orden
+  const filteredData = selectedNodo === "" ? data : data.filter((row) => row.Nodo === selectedNodo);
   const sortedData = [...filteredData].sort((a, b) => {
     const aValue = a[sortConfig.key];
     const bValue = b[sortConfig.key];
 
     if (typeof aValue === "string" && typeof bValue === "string") {
-      return sortConfig.direction === "asc"
-        ? aValue.localeCompare(bValue)
-        : bValue.localeCompare(aValue);
+      return sortConfig.direction === "asc" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
     }
     return sortConfig.direction === "asc" ? aValue - bValue : bValue - aValue;
   });
 
-  // Paginación: Obtener los datos de la página actual
-  const paginatedData = sortedData.slice(
-    (page - 1) * rowsPerPage,
-    page * rowsPerPage
-  );
-
-  // Número total de páginas
+  // Paginación de datos
+  const paginatedData = sortedData.slice((page - 1) * rowsPerPage, page * rowsPerPage);
   const totalPages = Math.ceil(sortedData.length / rowsPerPage);
 
-  // Funciones para avanzar o retroceder páginas, con control de límites
   const handlePreviousPage = () => {
-    if (page > 1) {
-      setPage(page - 1);
-    }
+    if (page > 1) setPage(page - 1);
   };
 
   const handleNextPage = () => {
-    if (page < totalPages) {
-      setPage(page + 1);
-    }
+    if (page < totalPages) setPage(page + 1);
   };
 
-  // Manejar la selección de fila
   const handleRowClick = (index) => {
-    if (selectedRows.includes(index)) {
-      setSelectedRows(selectedRows.filter((i) => i !== index)); // Desseleccionar si ya está seleccionado
-    } else {
-      setSelectedRows([...selectedRows, index]); // Seleccionar fila
+    const newSelectedRows = selectedRows.includes(index)
+      ? selectedRows.filter((i) => i !== index)
+      : [...selectedRows, index];
+    setSelectedRows(newSelectedRows);
+    onRowSelection(newSelectedRows); // Llamar a la función de callback con las filas seleccionadas
+  };
+
+  const formatNumber = (number) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: 2 }).format(number);
+  const uniqueNodos = [...new Set(data.map(item => item.Nodo))];
+  const formatTime = (time) => {
+    if (!time || typeof time !== "string") return "N/A"; 
+  
+    try {
+      const datePart = time.split(".")[0]; 
+      const dateObject = new Date(datePart.replace(" ", "T"));
+      return dateObject.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    } catch (error) {
+      console.error("Error formateando el tiempo:", error, "Valor de time:", time);
+      return "N/A"; // Si ocurre un error, retornar un valor por defecto
     }
   };
 
   return (
-    <Box bg="gray.800" color="white" minH="100vh" p={{ base: 2, md: 4 }}>
-      <Heading
-        as="h1"
-        size={{ base: "lg", md: "xl" }}
-        mb={6}
-        textAlign="center"
-      >
-        Datos en Tabla
-      </Heading>
-
+    <Box bg="gray.700" color="white" p={isMobile ? 2 : 4} borderRadius="md" boxShadow="md">
       <Box mb={4} textAlign="center">
         <Select
-          placeholder="Seleccione un nodo"
           value={selectedNodo}
           onChange={handleSelectChange}
-          width={{ base: "100%", md: "200px" }}
-          mb={4}
-          color="black"
-          bg="white"
+          mb={3}
+          bg="gray.800"
+          color="gray.200"
           borderColor="gray.600"
-          _focus={{ borderColor: "blue.500", boxShadow: "0 0 0 1px blue.500" }}
-          _hover={{ borderColor: "blue.400" }}
+          _hover={{ bg: "gray.700" }}
+          _focus={{ borderColor: "gray.500" }}
         >
-          {[...new Set(data.map((row) => row.Nodo))].map((nodo) => (
-            <option key={nodo} value={nodo}>
+          <option style={{ backgroundColor: "#2D3748", color: "white" }} value="">Seleccionar Nodo</option>
+          {uniqueNodos.map(nodo => (
+            <option key={nodo} style={{ backgroundColor: "#2D3748", color: "white" }} value={nodo}>
               Nodo {nodo}
             </option>
           ))}
         </Select>
       </Box>
 
-      <Box overflowX={{ base: "auto", md: "unset" }}>
-        <Table
-          variant="simple"
-          colorScheme="whiteAlpha"
-          size={{ base: "sm", md: "md" }}
-        >
+      <Box overflowX="auto">
+        <Table variant="simple" colorScheme="whiteAlpha" size={isMobile ? "sm" : "md"}>
           <Thead>
             <Tr>
               <Th onClick={() => handleSort("Nodo")} cursor="pointer">
-                Nodo{" "}
-                {sortConfig.key === "Nodo" &&
-                  (sortConfig.direction === "asc" ? "↑" : "↓")}
+                Nodo {sortConfig.key === "Nodo" && (sortConfig.direction === "asc" ? "↑" : "↓")}
               </Th>
               <Th onClick={() => handleSort("Humedad")} cursor="pointer">
-                Humedad{" "}
-                {sortConfig.key === "Humedad" &&
-                  (sortConfig.direction === "asc" ? "↑" : "↓")}
+                Humedad {sortConfig.key === "Humedad" && (sortConfig.direction === "asc" ? "↑" : "↓")}
               </Th>
               <Th onClick={() => handleSort("Temperatura")} cursor="pointer">
-                Temperatura{" "}
-                {sortConfig.key === "Temperatura" &&
-                  (sortConfig.direction === "asc" ? "↑" : "↓")}
+                Temp. {sortConfig.key === "Temperatura" && (sortConfig.direction === "asc" ? "↑" : "↓")}
               </Th>
-              <Th onClick={() => handleSort("Presion")} cursor="pointer">
-                Presion{" "}
-                {sortConfig.key === "Presion" &&
-                  (sortConfig.direction === "asc" ? "↑" : "↓")}
+              <Th display={{ base: "none", md: "table-cell" }} onClick={() => handleSort("Presion")} cursor="pointer">
+                Presión {sortConfig.key === "Presion" && (sortConfig.direction === "asc" ? "↑" : "↓")}
               </Th>
-              <Th
-                onClick={() => handleSort("value")}
-                isNumeric
-                cursor="pointer"
-              >
-                Valor{" "}
-                {sortConfig.key === "value" &&
-                  (sortConfig.direction === "asc" ? "↑" : "↓")}
+              <Th onClick={() => handleSort("value")} isNumeric cursor="pointer">
+                Time {sortConfig.key === "value" && (sortConfig.direction === "asc" ? "↑" : "↓")}
               </Th>
             </Tr>
           </Thead>
@@ -186,28 +124,28 @@ function TablaPage() {
                 color={selectedRows.includes(index) ? "white" : "inherit"}
                 cursor="pointer"
               >
-                <Td>{row.Nodo}</Td>
-                <Td>{row.Humedad}</Td>
-                <Td>{row.Temperatura}</Td>
-                <Td>{row.Presion}</Td>
-                <Td isNumeric>{row.value}</Td>
+                <Td textAlign="center">{row.Nodo}</Td>
+                <Td textAlign="center">{formatNumber(row.Humedad)}</Td>
+                <Td textAlign="center">{formatNumber(row.Temperatura)}</Td>
+                <Td textAlign="center" display={{ base: "none", md: "table-cell" }}>{formatNumber(row.Presion)}</Td>
+                <Td textAlign="center">{formatTime(row.time)}</Td> {/* Ajustado para usar el campo 'time' */}
               </Tr>
             ))}
           </Tbody>
         </Table>
       </Box>
 
-      <Box textAlign="center" mt={4}>
-        <Button onClick={handlePreviousPage} mr={2} isDisabled={page <= 1}>
+      <Flex justifyContent="center" alignItems="center" mt={4} flexWrap="wrap" gap={2}>
+        <Button onClick={handlePreviousPage} isDisabled={page <= 1} size={isMobile ? "sm" : "md"}>
           Anterior
         </Button>
-        <Text as="span" mx={4}>
+        <Text as="span" mx={isMobile ? 2 : 4}>
           Página {page} de {totalPages}
         </Text>
-        <Button onClick={handleNextPage} isDisabled={page >= totalPages}>
+        <Button onClick={handleNextPage} isDisabled={page >= totalPages} size={isMobile ? "sm" : "md"}>
           Siguiente
         </Button>
-      </Box>
+      </Flex>
     </Box>
   );
 }

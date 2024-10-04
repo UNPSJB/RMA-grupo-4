@@ -9,7 +9,7 @@ function Footer() {
       color="white"
       p={4}
       textAlign="center"
-      position="fixed" // Asegúrate de que esté fijo en la parte inferior
+      position="absolute" // Asegúrate de que esté fijo en la parte inferior
       bottom="0"
       left="0"
       right="0"

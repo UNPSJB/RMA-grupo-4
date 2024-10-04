@@ -11,11 +11,7 @@ function NavigationButtons() {
   };
 
   const navItems = [
-    { text: "Datos en Tabla", route: "/tabla" },
-    { text: "Datos en Gráficos", route: "/graficos" },
     { text: "Datos Históricos", route: "/historicos" },
-    { text: "Datos por Variable", route: "/variables" },
-    { text: "Combinaciones de Variables", route: "/combinaciones" }
   ];
 
   return (

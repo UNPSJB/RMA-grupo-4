@@ -8,11 +8,12 @@ import PrivateRoute from './components/PrivateRoute';
 import TablaPage from './pages/TablaPage';  
 import GraficosPage from './pages/GraficosPage';  
 import HistoricosPage from './pages/HistoricosPage'; 
-import VariablesPage from './pages/VariablesPage';  
-import CombinacionesPage from './pages/CombinacionesPage';   
+import GraficoLinea from './pages/GraficoLinea';   
+import GraficoBarra from './pages/GraficoBarra';  
 import ModificarDatos from './components/ModificarDatos';
 import ModificarPassword from './components/ModificarPassword';
 import EliminarUsuario from './components/EliminarUsuario';
+import HelpModal from './components/HelpModal';
 
 function AppRoutes() {
   return (
@@ -67,21 +68,21 @@ function AppRoutes() {
           } 
         />
         <Route 
-          path="/variables" 
+          path="/graficoLinea" 
           element={
             <App>
               <PrivateRoute>
-                <VariablesPage />
+                <GraficoLinea />
               </PrivateRoute>
             </App>
           } 
         />
         <Route 
-          path="/combinaciones" 
+          path="/graficoBarra" 
           element={
             <App>
               <PrivateRoute>
-                <CombinacionesPage />
+                <GraficoBarra />
               </PrivateRoute>
             </App>
           } 
@@ -112,6 +113,16 @@ function AppRoutes() {
             <App>
               <PrivateRoute>
                 <EliminarUsuario />
+              </PrivateRoute>
+            </App>
+          } 
+        />
+        <Route 
+          path="/help" 
+          element={
+            <App>
+              <PrivateRoute>
+                <HelpModal />
               </PrivateRoute>
             </App>
           } 

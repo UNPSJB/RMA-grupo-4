@@ -1,27 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-    Box,
-    Flex,
-    Button,
-    Icon,
-    Menu,
-    MenuButton,
-    MenuList,
-    MenuItem,
-    Text,
-} from '@chakra-ui/react';
+import { Box, Flex, Button, Icon, Menu, MenuButton, MenuList, MenuItem, Text,} from '@chakra-ui/react';
 import { useAuth } from './AuthContext';
-import { FaHome, FaUserCircle, FaSignInAlt, FaSignOutAlt } from 'react-icons/fa';
+import { FaHome, FaUserCircle, FaSignInAlt, FaSignOutAlt, FaQuestionCircle } from 'react-icons/fa';
 import EliminarUsuarioModal from './EliminarUsuario';
 import NavigationButtons from './NavigationButtons';
+import HelpModal from './HelpModal';
 import axios from 'axios';
 
 function NavBar() {
     const navigate = useNavigate();
     const { isAuthenticated, user, logout } = useAuth();
     const [isModalOpen, setModalOpen] = useState(false);
-
+    const [isHelpOpen, setHelpOpen] = useState(false); // Estado para el modal de ayuda
+  
     const handleLogout = () => {
         logout();
         navigate('/');
@@ -32,6 +24,19 @@ function NavBar() {
             navigate('/inicio');
         } else {
             navigate('/');
+        }
+    };
+
+    const handleEliminarUsuario = async () => {
+        try {
+            await axios.delete(`http://localhost:8000/eliminar_usuario/${user}`); // Asumiendo que el nombre de usuario es único
+            logout(); // Cierra sesión después de eliminar
+            navigate('/'); // Redirige a la página de inicio
+        } catch (error) {
+            console.error('Error al eliminar el usuario:', error);
+            // Acá se puede mostrar un mensaje de error al usuario si lo desea
+        } finally {
+            setModalOpen(false); // Cierra el modal
         }
     };
 
@@ -117,6 +122,7 @@ function NavBar() {
                                     bg="gray.900"
                                     color="white"
                                     _hover={{ bg: 'orange.500' }}
+                                    borderRadius="full"
                                 >
                                     Modificar datos de usuario
                                 </MenuItem>
@@ -126,6 +132,7 @@ function NavBar() {
                                     bg="gray.900"
                                     color="white"
                                     _hover={{ bg: 'orange.500' }}
+                                    borderRadius="full"
                                 >
                                     Modificar password
                                 </MenuItem>
@@ -135,8 +142,20 @@ function NavBar() {
                                     bg="gray.900"
                                     color="white"
                                     _hover={{ bg: 'orange.500' }}
+                                    borderRadius="full"
                                 >
                                     Eliminar usuario
+                                </MenuItem>
+
+                                <MenuItem 
+                                    onClick={() => setHelpOpen(true)} // Cambiado aquí
+                                    bg="gray.900"
+                                    color="white"
+                                    _hover={{ bg: 'orange.500' }}
+                                    leftIcon={<Icon as={FaQuestionCircle} boxSize={5} />}
+                                    borderRadius="full"
+                                >
+                                    Ayuda
                                 </MenuItem>
 
                                 <MenuItem
@@ -145,6 +164,7 @@ function NavBar() {
                                     color="white"
                                     _hover={{ bg: 'orange.500' }}
                                     leftIcon={<Icon as={FaSignOutAlt} />}
+                                    borderRadius="full"
                                 >
                                     Cerrar sesión
                                 </MenuItem>
@@ -170,8 +190,9 @@ function NavBar() {
             <EliminarUsuarioModal
                 isOpen={isModalOpen}
                 onClose={() => setModalOpen(false)}
-                onConfirm={handleLogout} // Cambiar a `handleEliminarUsuario` si lo deseas
+                onConfirm={handleEliminarUsuario} 
             />
+            <HelpModal isOpen={isHelpOpen} onClose={() => setHelpOpen(false)} />
         </Box>
     );
 }

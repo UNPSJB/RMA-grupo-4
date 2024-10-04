@@ -1,121 +1,226 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {
-  Icon,
-  Box,
-  Heading,
-  Select,
-  Text,
-} from '@chakra-ui/react';
-import { Line, } from 'react-chartjs-2';
+import { Box, Select, Grid, GridItem, Stat, StatLabel, StatNumber, StatHelpText, StatArrow, Card, CardBody, Text } from '@chakra-ui/react';
+import { Doughnut, Radar, Scatter } from 'react-chartjs-2';
 import { Chart as ChartJS, registerables } from 'chart.js';
-import { HiChartBar } from "react-icons/hi";
 
 ChartJS.register(...registerables);
 
 const GraficosPage = () => {
-  const [temperatureData, setTemperatureData] = useState([]);  // Cambiar a un solo estado para temperatura
-  const [timeRange, setTimeRange] = useState('1h');  // Mantener el rango de tiempo seleccionado
-
-  //const [data, setData] = useState({});
+  const [timeRange, setTimeRange] = useState('1h');
+  const [temperatureData, setTemperatureData] = useState(null);
 
   useEffect(() => {
     fetchData();
   }, [timeRange]);
-  
+
   const fetchData = async () => {
     try {
       const response = await axios.get('http://localhost:8000/api/v1/clima/temperatura', {
-        params: {
-          time_range: timeRange,  // Enviar el rango de tiempo como parámetro
-        },
+        params: { time_range: timeRange },
       });
-      console.log("Datos de temperatura recibidos:", response.data);
-      
-      const processedData = response.data.map((item, index) => {
-        // Validar que `temperatura` tenga un valor correcto
-        let dataValue = item.temperatura;
-  
-        // Si `temperatura` es undefined, null o cualquier tipo que no sea un número válido, avisamos
-        if (dataValue == null || isNaN(parseFloat(dataValue))) {
-          console.warn(`Elemento en la posición ${index} tiene un valor inválido para 'temperatura':`, dataValue);
-          dataValue = item.temperatura;  // Mantener el valor original para debug (puede ser `undefined`, `null`, etc.)
-        } else {
-          // Convertir `temperatura` a número si es posible (si ya es número, se queda igual)
-          dataValue = parseFloat(dataValue);
-        }
-  
-        return {
-          id_nodo: item.id_nodo ?? "Desconocido",  // Verificar si `id_nodo` existe
-          time: item.time ?? "Sin timestamp",  // Verificar si `time` está presente
-          data: dataValue,  // Cambiar `data` a `temperatura`
-        };
-      });
-  
+
+      const processedData = response.data.map((item) => ({
+        id_nodo: item.id_nodo ?? 'Desconocido',
+        time: item.time ?? 'Sin timestamp',
+        data: parseFloat(item.temperatura) || 0,
+      }));
+
       setTemperatureData(processedData);
     } catch (error) {
-      console.error("Error fetching temperature data: ", error);
+      console.error('Error fetching temperature data: ', error);
     }
   };
-  
-  
-  
-  
 
-  const formatChartData = (data) => {
-    const labels = data.map(item => new Date(item.time).toLocaleTimeString());  // Convertir el timestamp a una hora legible
-    const values = data.map(item => parseFloat(item.data));
-    return {
-      labels,
-      datasets: [{
-        label: 'Temperatura (°C)',  // Etiqueta del gráfico
-        data: values,
-        borderColor: 'rgba(75, 192, 192, 1)',
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-      }],
-    };
+  // Datos de ejemplo para gráficos
+  const doughnutData = {
+    labels: ['Valor', 'Restante'],
+    datasets: [
+      {
+        data: [60, 40],
+        backgroundColor: ['#FF6384', '#E2E2E2'],
+        hoverBackgroundColor: ['#FF6384', '#E2E2E2'],
+      },
+    ],
   };
-  
 
-  const renderTemperatureChart = () => {
-    if (!temperatureData || temperatureData.length === 0) return <Text>No hay datos disponibles para mostrar.</Text>;
-    
-    return (
-      <Line
-        data={formatChartData(temperatureData)}  // Formatear y pasar los datos de temperatura
-        options={{
-          responsive: true,
-          plugins: {
-            title: {
-              display: true,
-              text: 'Temperatura a lo largo del tiempo',
-            },
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-            },
-          },
-        }}
-      />
-    );
+  const radarData = {
+    labels: ['A', 'B', 'C', 'D', 'E', 'F'],
+    datasets: [
+      {
+        label: 'Valores de Radar',
+        data: [65, 59, 90, 81, 56, 55],
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 2,
+      },
+    ],
   };
-  
+
+  const scatterData = {
+    labels: ['X', 'Y'],
+    datasets: [
+      {
+        label: 'Gráfico de Dispersión',
+        data: [
+          { x: -10, y: 0 },
+          { x: 0, y: 10 },
+          { x: 10, y: 5 },
+          { x: 0.5, y: 5.5 },
+        ],
+        backgroundColor: '#36A2EB',
+      },
+    ],
+  };
+
+  // Datos de ejemplo para la tarjeta de información
+  const temperatureChange = {
+    value: -2.3, // Valor de cambio en la temperatura
+    description: 'Cambio de temperatura',
+    unit: '°C',
+  };
+
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        labels: { color: 'white', font: { size: 12 } },
+      },
+      title: {
+        display: true,
+        text: 'Gráficos Meteorológicos',
+        font: { size: 16, weight: 'bold' },
+        color: 'white',
+      },
+    },
+    scales: {
+      x: {
+        ticks: { color: 'white', font: { size: 12 } },
+        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+      },
+      y: {
+        ticks: { color: 'white', font: { size: 12 } },
+        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+      },
+    },
+  };
+
   return (
-    <Box p={5}>
-      <Heading as="h1" size="xl" mb={6} textAlign="center">
-        <Icon as={HiChartBar} p={0} verticalAlign="middle" marginRight={2} marginBottom={2} />
-        Datos de Temperatura
-      </Heading>
-      <Select value={timeRange} onChange={(e) => setTimeRange(e.target.value)} mb={5} bg="gray.900" color="gray">
-        <option value="1h">Última hora</option>
-        <option value="24h">Últimas 24 horas</option>
-        <option value="7d">Últimos 7 días</option>
+    <Box bg="gray.700" color="white" p={4} borderRadius="md" boxShadow="lg">
+      <Select
+        value={timeRange}
+        onChange={(e) => setTimeRange(e.target.value)}
+        mb={3}
+        bg="gray.800"
+        color="gray.200"
+        borderColor="gray.600"
+        _hover={{ bg: 'gray.600' }}
+        _focus={{ borderColor: 'gray.500' }}
+      >
+        <option style={{ backgroundColor: '#2D3748', color: 'white' }} value="1h">
+          Última hora
+        </option>
+        <option style={{ backgroundColor: '#2D3748', color: 'white' }} value="24h">
+          Últimas 24 horas
+        </option>
+        <option style={{ backgroundColor: '#2D3748', color: 'white' }} value="7d">
+          Últimos 7 días
+        </option>
       </Select>
 
-      <Box bg="white" p={{ base: 2, md: 4 }} borderRadius="md" color="black" height="400px" boxShadow="dark-lg">
-        {renderTemperatureChart()}
-      </Box>
+      <Grid templateColumns={{ base: '1fr', md: 'repeat(2, 1fr)' }} gap={6} mb={2}>
+          {/* Primer gráfico - Gráfico de dona */}
+          <GridItem
+            bg="gray.600"
+            p={2}
+            borderRadius="md"
+            boxShadow="md"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Box height={{ base: '200px', md: '250px' }} width="100%">
+              <Doughnut 
+                data={doughnutData} 
+                options={{
+                  ...chartOptions,
+                  responsive: true, // Asegura que el gráfico sea responsivo
+                  maintainAspectRatio: false, // Permite ajustar las dimensiones
+                }}
+              />
+            </Box>
+          </GridItem>
+
+          {/* Segundo gráfico - Gráfico radar */}
+          <GridItem
+            bg="gray.600"
+            p={2}
+            borderRadius="md"
+            boxShadow="md"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Box height={{ base: '200px', md: '250px' }} width="100%">
+              <Radar 
+                data={radarData} 
+                options={{
+                  ...chartOptions,
+                  responsive: true,
+                  maintainAspectRatio: false,
+                }} 
+              />
+            </Box>
+          </GridItem>
+
+          {/* Tercer gráfico - Gráfico de dispersión */}
+          <GridItem
+            bg="gray.600"
+            p={2}
+            borderRadius="md"
+            boxShadow="md"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Box height={{ base: '200px', md: '250px' }} width="100%">
+              <Scatter 
+                data={scatterData} 
+                options={{
+                  ...chartOptions,
+                  responsive: true,
+                  maintainAspectRatio: false,
+                
+                }} 
+              />
+            </Box>
+          </GridItem>
+
+          {/* Cuarto componente - Tarjeta de información sobre el cambio de temperatura */}
+          <GridItem
+            bg="gray.600"
+            p={2}
+            borderRadius="md"
+            boxShadow="md"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Card bg="gray.600" color="white" p={4} width="100%">
+              <CardBody>
+                <Stat>
+                  <StatLabel>{temperatureChange.description}</StatLabel>
+                  <StatNumber>{temperatureChange.value} {temperatureChange.unit}</StatNumber>
+                  <StatHelpText>
+                    <StatArrow type={temperatureChange.value > 0 ? 'increase' : 'decrease'} />
+                    {Math.abs(temperatureChange.value)}% desde el último período
+                  </StatHelpText>
+                </Stat>
+              </CardBody>
+            </Card>
+          </GridItem>
+        </Grid>
     </Box>
   );
 };
