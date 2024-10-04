@@ -7,10 +7,7 @@ import {
     Input,
     Text,
     Spinner,
-    Alert,
-    AlertIcon,
-    AlertTitle,
-    AlertDescription,
+    useToast, // Importar useToast
 } from '@chakra-ui/react';
 import { useAuth } from './AuthContext'; // Importa el contexto
 
@@ -22,7 +19,7 @@ const ModificarDatos = () => {
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(false);
+    const toast = useToast(); // Inicializa el hook useToast
 
     // Función para obtener los datos del usuario
     const fetchUserData = async () => {
@@ -55,18 +52,28 @@ const ModificarDatos = () => {
 
             if (!response.ok) throw new Error('Error al modificar los datos');
 
-            setSuccess(true);
-            setError(null);
+            toast({ // Mostrar el toast de éxito
+                title: "Modificación de datos exitosa.",
+                status: "success",
+                duration: 2000,
+                isClosable: true,
+            });
+            setError(null); // Limpiar el error
         } catch (error) {
-            setError(error.message);
-            setSuccess(false);
+            toast({ // Mostrar el toast de error
+                title: "Error.",
+                description: error.message, // Usar el mensaje de error
+                status: "error",
+                duration: 2000,
+                isClosable: true,
+            });
         }
     };
 
     // Cargar los datos del usuario al montar el componente
     useEffect(() => {
         fetchUserData();
-    }, [user]); // Cambié [username] por [user] para usar el usuario del contexto
+    }, [user]);
 
     if (loading) {
         return (
@@ -77,43 +84,94 @@ const ModificarDatos = () => {
     }
 
     return (
-        <Box p={5}>
-            <Text fontSize="2xl" mb={4}>Modificar Datos del Usuario</Text>
-            {error && (
-                <Alert status="error" mb={4}>
-                    <AlertIcon />
-                    <AlertTitle>Error: </AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                </Alert>
-            )}
-            {success && (
-                <Alert status="success" mb={4} bg="gray.700">
-                    <AlertIcon />
-                    <AlertTitle>Éxito: </AlertTitle>
-                    <AlertDescription>Datos modificados exitosamente.</AlertDescription>
-                </Alert>
-            )}
-            <form onSubmit={handleSubmit}>
-                <FormControl mb={4} isRequired>
-                    <FormLabel>Email</FormLabel>
-                    <Input
-                        type="email"
-                        value={userData.email}
-                        onChange={(e) => setUserData({ ...userData, email: e.target.value })}
-                        placeholder="Introduce tu nuevo email"
-                    />
-                </FormControl>
-                <FormControl mb={4} isRequired>
-                    <FormLabel>Edad</FormLabel>
-                    <Input
-                        type="number"
-                        value={userData.edad}
-                        onChange={(e) => setUserData({ ...userData, edad: parseInt(e.target.value) || '' })}
-                        placeholder="Introduce tu edad"
-                    />
-                </FormControl>
-                <Button colorScheme="teal" type="submit">Guardar Cambios</Button>
-            </form>
+        <Box
+            bgGradient="linear(to-r, gray.900, gray.800)" 
+            color="white" 
+            minH="100vh" 
+            px={4}
+            pt={10}
+            display="flex"
+            justifyContent="center"
+            alignItems="flex-start"
+        >
+            <Box
+                bg="gray.800"
+                p={8}
+                rounded="2xl"
+                maxW="400px"
+                w="full"
+                position="relative"
+                overflow="hidden"
+                boxShadow="inset 10px 10px 20px rgba(0, 0, 0, 0.2), inset -10px -10px 20px rgba(255, 255, 255, 0.1)" // Ajustado para quitar sombra exterior
+                mt={10}
+                ml={2} // Mover el componente más a la izquierda
+            >
+                <Text fontSize="2xl" mb={4} textAlign="center">Modificar Datos del Usuario</Text>
+                <form onSubmit={handleSubmit}>
+                    <FormControl mb={4} isRequired>
+                        <FormLabel>Email</FormLabel>
+                        <Input
+                            type="email"
+                            value={userData.email}
+                            onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+                            placeholder="Introduce tu nuevo email"
+                            bg="gray.900"
+                            color="white"
+                            borderRadius="xl"
+                            border="none"
+                            boxShadow="inset 8px 8px 15px rgba(0,0,0,0.2), inset -8px -8px 15px rgba(255,255,255,0.1)"
+                            _placeholder={{ color: 'gray.500' }}
+                            _focus={{
+                                boxShadow: 'inset 4px 4px 10px rgba(0,0,0,0.3), inset -4px -4px 10px rgba(255,255,255,0.1)',
+                                outline: 'none',
+                            }}
+                        />
+                    </FormControl>
+                    <FormControl mb={4} isRequired>
+                        <FormLabel>Edad</FormLabel>
+                        <Input
+                            type="number"
+                            value={userData.edad}
+                            onChange={(e) => setUserData({ ...userData, edad: parseInt(e.target.value) || '' })}
+                            placeholder="Introduce tu edad"
+                            bg="gray.900"
+                            color="white"
+                            borderRadius="xl"
+                            border="none"
+                            boxShadow="inset 8px 8px 15px rgba(0,0,0,0.2), inset -8px -8px 15px rgba(255,255,255,0.1)"
+                            _placeholder={{ color: 'gray.500' }}
+                            _focus={{
+                                boxShadow: 'inset 4px 4px 10px rgba(0,0,0,0.3), inset -4px -4px 10px rgba(255,255,255,0.1)',
+                                outline: 'none',
+                            }}
+                        />
+                    </FormControl>
+                    <Button 
+                        type="submit" 
+                        colorScheme="orange" 
+                        size="lg" 
+                        w="full"
+                        bg="orange.500"
+                        borderRadius="30px"
+                        border="none"
+                        zIndex="10"
+                        position="relative"
+                        boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), inset 4px 4px 10px rgba(0,0,0,0.3)" // Sombra ajustada
+                        _hover={{
+                            bg: 'orange.600',
+                            boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), inset 6px 6px 12px rgba(0,0,0,0.3)',
+                            transform: 'scale(1.05)',
+                        }}
+                        _active={{
+                            bg: 'orange.700',
+                            transform: 'translateY(2px)',
+                            boxShadow: 'inset 6px 6px 12px rgba(0,0,0,0.2)',
+                        }}
+                    >
+                        Guardar Cambios
+                    </Button>
+                </form>
+            </Box>
         </Box>
     );
 };

@@ -1,18 +1,26 @@
-// NavBar.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Flex, Button, Box, Icon, Text, Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
-import { useAuth } from './AuthContext'; // Importa el contexto
+import {
+    Box,
+    Flex,
+    Button,
+    Icon,
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    Text,
+} from '@chakra-ui/react';
+import { useAuth } from './AuthContext';
 import { FaHome, FaUserCircle, FaSignInAlt, FaSignOutAlt } from 'react-icons/fa';
-import EliminarUsuarioModal from './EliminarUsuario'; 
-import NavigationButtons from './NavigationButtons'; // Importa el componente de navegación
-import axios from 'axios'; 
+import EliminarUsuarioModal from './EliminarUsuario';
+import NavigationButtons from './NavigationButtons';
+import axios from 'axios';
 
 function NavBar() {
     const navigate = useNavigate();
     const { isAuthenticated, user, logout } = useAuth();
-    const [isModalOpen, setModalOpen] = useState(false); // Estado del modal
-    const [isNavVisible, setNavVisible] = useState(false); // Estado para el submenú
+    const [isModalOpen, setModalOpen] = useState(false);
 
     const handleLogout = () => {
         logout();
@@ -27,117 +35,130 @@ function NavBar() {
         }
     };
 
-    const handleEliminarUsuario = async () => {
-        try {
-            await axios.delete(`http://localhost:8000/eliminar_usuario/${user}`); // Asumiendo que el nombre de usuario es único
-            logout(); // Cierra sesión después de eliminar
-            navigate('/'); // Redirige a la página de inicio
-        } catch (error) {
-            console.error('Error al eliminar el usuario:', error);
-            // Acá se puede mostrar un mensaje de error al usuario si lo desea
-        } finally {
-            setModalOpen(false); // Cierra el modal
-        }
+    // Estilo con animación de subrayado para otros botones
+    const buttonStyle = {
+        position: 'relative',
+        _after: {
+            content: '""',
+            position: 'absolute',
+            width: '0',
+            height: '2px',
+            background: 'linear-gradient(90deg, #ff7600, #ffa500)', // Degradado en naranja
+            bottom: '-4px', // Posición debajo del botón
+            left: '50%', // Punto de inicio
+            transform: 'translateX(-50%)',
+            transition: 'width 0.3s ease-in-out',
+        },
+        _hover: {
+            _after: {
+                width: '100%', // La línea se extiende por completo
+            },
+        },
     };
 
     return (
-        <Box bg="gray.900" p={4} boxShadow="md" position="sticky" top="0" zIndex="1000">
-            <Flex as="nav" justify={{ base: 'space-around', md: 'space-between' }} justifyContent={{ base:"center" ,md: 'space-between' }} align="center" maxW="1200px" mx="auto">
-                {/* Botón para ir a la página de inicio */}
+        <Box
+            bg="gray.900"
+            px={6}
+            py={4}
+            boxShadow="10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1)"
+            position="sticky"
+            top="0"
+            zIndex="1000"
+        >
+            <Flex
+                as="nav"
+                justify={{ base: 'space-around', md: 'space-between' }}
+                align="center"
+                maxW="1200px"
+                mx="auto"
+            >
+                {/* Botón de Inicio con efecto de animación */}
                 <Button
-                    colorScheme="whiteAlpha"
-                    variant="ghost"
-                    leftIcon={<Icon as={FaHome} boxSize={6} />}
                     onClick={handleHomeClick}
+                    bg="transparent"
                     color="white"
+                    _hover={{ bg: 'gray.800' }}
+                    _focus={{ boxShadow: 'none' }}
+                    {...buttonStyle} // Aplica el estilo con la animación
+                    leftIcon={<Icon as={FaHome} />}
                 >
+                    Inicio
                 </Button>
+
+                {isAuthenticated && <NavigationButtons />} {/* Mostrar NavigationButtons solo si está autenticado */}
+
                 <Flex align="center">
                     {isAuthenticated ? (
-                        <>
-                            {/* Menú del usuario autenticado */}
-                            <Menu>
-                                <MenuButton>
-                                    <Flex align="center" bg="gray.700" px={4} py={2} borderRadius="md" boxShadow="sm" mr={4}>
-                                        <Icon as={FaUserCircle} color="teal.300" boxSize={6} mr={2} />
-                                        <Text fontSize="lg" fontWeight="bold" color="teal.100">
-                                            Hola, {user}
-                                        </Text>
-                                    </Flex>
-                                </MenuButton>
-                                <MenuList bg="gray.900" borderColor="black.500" color="black" p={1.5}  borderRadius="md" mt="2"  >
-                                    <MenuItem 
-                                        _hover={{ bg: 'gray.700' }} 
-                                        _focus={{ bg: 'gray.600' }} 
-                                        color="white"
-                                        onClick={() => navigate('/modificar_datos')}
-                                        bg="gray.800"
-                                        borderRadius="md"
-                                        mb="2"
-                                    >
-                                        Modificar datos de usuario
-                                    </MenuItem>
-                                    <MenuItem 
-                                        _hover={{ bg: 'gray.700' }} 
-                                        _focus={{ bg: 'gray.600' }} 
-                                        color="white"
-                                        onClick={() => navigate('/modificar_password')}
-                                        bg="gray.800"
-                                        borderRadius="md"
-                                        mb="2"
-                                    >
-                                        Modificar password
-                                    </MenuItem>
-                                    <MenuItem 
-                                        _hover={{ bg: 'red.700' }} 
-                                        _focus={{ bg: 'red.500' }} 
-                                        color="white"
-                                        onClick={() => setModalOpen(true)}
-                                        bg="gray.800"
-                                        borderRadius="md"
-                                        mb="2"
-                                    >
-                                        Eliminar usuario
-                                    </MenuItem>
+                        <Menu>
+                            <MenuButton>
+                                <Flex
+                                    align="center"
+                                    bg="gray.800"
+                                    px={4}
+                                    py={2}
+                                    borderRadius="full"
+                                    boxShadow="inset 8px 8px 16px rgba(0, 0, 0, 0.4), inset -8px -8px 16px rgba(255, 255, 255, 0.1)"
+                                    mr={4}
+                                    _hover={{
+                                        boxShadow: 'inset 6px 6px 12px rgba(0, 0, 0, 0.3), inset -6px -6px 12px rgba(255, 255, 255, 0.1)',
+                                    }}
+                                >
+                                    <Icon as={FaUserCircle} color="orange.400" boxSize={6} mr={2} />
+                                    <Text fontSize="lg" fontWeight="bold" color="orange.100">
+                                        Hola, {user}
+                                    </Text>
+                                </Flex>
+                            </MenuButton>
 
-                                    <MenuItem 
-                                            _hover={{ bg: 'green.600' }} 
-                                            _focus={{ bg: 'green.500' }} 
-                                            color="white"
-                                            onClick={handleLogout}
-                                            bg="gray.800"
-                                            borderRadius="md"
-                                            mb="2"
-                                            leftIcon={<Icon as={FaSignOutAlt} boxSize={5} />}
-                                        
-                                    >
-                                        Cerrar Sesion
-                                    </MenuItem>
-                                </MenuList>
-                            </Menu>
-                        {/*}
-                            <Button
-                                colorScheme="whiteAlpha"
-                                variant="ghost"
-                                leftIcon={<Icon as={FaSignOutAlt} boxSize={5} />}
-                                onClick={handleLogout}
-                                color="white"
-                                mx={2}
-                            >
-                                Cerrar sesión
-                            </Button>
-                        */}
-                            {/* Mostrar NavigationButtons solo si el usuario está autenticado */}
-                            <NavigationButtons isVisible={isNavVisible} setIsVisible={setNavVisible} />
-                        </>
+                            <MenuList bg="gray.800" borderColor="transparent">
+                                <MenuItem
+                                    onClick={() => navigate('/modificar_datos')}
+                                    bg="gray.900"
+                                    color="white"
+                                    _hover={{ bg: 'orange.500' }}
+                                >
+                                    Modificar datos de usuario
+                                </MenuItem>
+
+                                <MenuItem
+                                    onClick={() => navigate('/modificar_password')}
+                                    bg="gray.900"
+                                    color="white"
+                                    _hover={{ bg: 'orange.500' }}
+                                >
+                                    Modificar password
+                                </MenuItem>
+
+                                <MenuItem
+                                    onClick={() => setModalOpen(true)}
+                                    bg="gray.900"
+                                    color="white"
+                                    _hover={{ bg: 'orange.500' }}
+                                >
+                                    Eliminar usuario
+                                </MenuItem>
+
+                                <MenuItem
+                                    onClick={handleLogout}
+                                    bg="gray.900"
+                                    color="white"
+                                    _hover={{ bg: 'orange.500' }}
+                                    leftIcon={<Icon as={FaSignOutAlt} />}
+                                >
+                                    Cerrar sesión
+                                </MenuItem>
+                            </MenuList>
+                        </Menu>
                     ) : (
                         <Button
-                            colorScheme="whiteAlpha"
-                            variant="ghost"
-                            leftIcon={<Icon as={FaSignInAlt} boxSize={5} />}
                             onClick={() => navigate('/login')}
+                            bg="transparent"
                             color="white"
-                            mx={2}
+                            _hover={{ bg: 'gray.800' }}
+                            _focus={{ boxShadow: 'none' }}
+                            {...buttonStyle} // Aplica el estilo con la animación
+                            leftIcon={<Icon as={FaSignInAlt} />}
                         >
                             Iniciar sesión
                         </Button>
@@ -149,7 +170,7 @@ function NavBar() {
             <EliminarUsuarioModal
                 isOpen={isModalOpen}
                 onClose={() => setModalOpen(false)}
-                onConfirm={handleEliminarUsuario}
+                onConfirm={handleLogout} // Cambiar a `handleEliminarUsuario` si lo deseas
             />
         </Box>
     );
