@@ -2,7 +2,27 @@ import json
 import paho.mqtt.client as mqtt
 from datetime import datetime
 from src.database import SessionLocal
-from src.models import Mensaje
+from src.models import Mensaje, MensajeIncorrecto
+
+def validar_mensaje(mensaje_json):
+    """Valida el mensaje basado en el 'type' y los datos 'data'."""
+    tipo = mensaje_json.get('type')
+    data =  float(mensaje_json.get('data'))
+        
+    if tipo == 'temp_t':
+        # Definir rango de temperatura (por ejemplo, 0 a 50 grados Celsius)
+        temperatura_minima = 0
+        temperatura_maxima = 45
+        
+        # Verificar si el valor de la temperatura está dentro del rango
+        if temperatura_minima <= data <= temperatura_maxima:
+            return True  # Mensaje válido
+        else:
+            return False  # Mensaje inválido (fuera del rango)
+    
+    # Puedes agregar más validaciones para otros tipos de mensajes aquí
+    return True  # Si el 'type' no es temperatura, asumimos que es válido
+    
 
 def mensaje_recibido(client, userdata, msg):
     """Callback para procesar los mensajes recibidos en los tópicos suscritos."""
@@ -17,18 +37,23 @@ def mensaje_recibido(client, userdata, msg):
         # Crear una sesión de base de datos
         db = SessionLocal()
         try:
+            if validar_mensaje(mensaje_json):
             # Crear un nuevo objeto Mensaje
-            nuevo_mensaje = Mensaje(
-                id_nodo=mensaje_json['id'],
-                type=mensaje_json['type'],
-                data=mensaje_json['data'],
-                time=datetime.strptime(mensaje_json['time'], "%Y-%m-%d %H:%M:%S.%f")
-            )
-            
-            # Añadir y confirmar el nuevo mensaje en la base de datos
+                nuevo_mensaje = Mensaje(
+                    id_nodo=mensaje_json['id'],
+                    type=mensaje_json['type'],
+                    data=mensaje_json['data'],
+                    time=datetime.strptime(mensaje_json['time'], "%Y-%m-%d %H:%M:%S.%f")
+                )
+            else:
+                nuevo_mensaje = MensajeIncorrecto(
+                    id_nodo=mensaje_json['id'],
+                    type=mensaje_json['type'],
+                    data=mensaje_json['data'],
+                    time=datetime.strptime(mensaje_json['time'], "%Y-%m-%d %H:%M:%S.%f")
+                )                           
             db.add(nuevo_mensaje)
             db.commit()
-            print(f"Mensaje guardado en la base de datos con ID: {nuevo_mensaje.id}")
         finally:
             db.close()
 

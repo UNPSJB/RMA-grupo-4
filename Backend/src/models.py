@@ -79,3 +79,12 @@ class Mensaje(Base):
     type = Column(String)
     data = Column(String)
     time = Column(DateTime)
+    
+class MensajeIncorrecto(Base):
+    __tablename__ = 'mensajesIncorretos'
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True) #creamos un id para cada mensaje
+    id_nodo = Column(Integer, index=True)
+    type = Column(String)
+    data = Column(String)
+    time = Column(DateTime)

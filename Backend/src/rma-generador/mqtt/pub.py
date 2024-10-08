@@ -100,7 +100,7 @@ class Nodo:
         """Genera un valor aleatorio según el tipo de mensaje."""
         if tipo == TipoMensaje.TEMP_T:
             # Genera un valor de temperatura entre 15 y 30°C
-            return str(random.uniform(15.0, 30.0))
+            return str(random.uniform(-30.0, 60.0))
         elif tipo == TipoMensaje.HUMIDITY_T:
             # Genera un valor de humedad relativa entre 30 y 90%
             return str(random.uniform(30.0, 90.0))
