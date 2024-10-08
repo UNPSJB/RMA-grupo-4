@@ -20,8 +20,28 @@ def validar_mensaje(mensaje_json):
         else:
             return False  # Mensaje inválido (fuera del rango)
     
+    elif tipo == 'humidity_t':
+        # Definir rango de humedad (por ejemplo, 30% a 85%)
+        humedad_minima = 30
+        humedad_maxima = 85
+        # Verificar si el valor de la humedad está dentro del rango
+        if humedad_minima <= data <= humedad_maxima:
+            return True
+        else:
+            return False
+
+    elif tipo == 'pressure_t':
+        # Definir rango de presión (por ejemplo, 900 a 1100 hPa)
+        presion_minima = 900
+        presion_maxima = 1100
+        # Verificar si el valor de la presión está dentro del rango
+        if presion_minima <= data <= presion_maxima:
+            return True
+        else:
+            return False
+    
     # Puedes agregar más validaciones para otros tipos de mensajes aquí
-    return True  # Si el 'type' no es temperatura, asumimos que es válido
+    #return True 
     
 
 def mensaje_recibido(client, userdata, msg):

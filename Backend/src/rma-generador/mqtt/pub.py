@@ -102,11 +102,11 @@ class Nodo:
             # Genera un valor de temperatura entre 15 y 30°C
             return str(random.uniform(-30.0, 60.0))
         elif tipo == TipoMensaje.HUMIDITY_T:
-            # Genera un valor de humedad relativa entre 30 y 90%
-            return str(random.uniform(30.0, 90.0))
+            # Genera un valor de humedad relativa entre 20 y 100%
+            return str(random.uniform(20.0, 100.0))
         elif tipo == TipoMensaje.PRESSURE_T:
-            # Genera un valor de presión atmosférica entre 950 y 1050 hPa
-            return str(random.uniform(950.0, 1050.0))
+            # Genera un valor de presión atmosférica entre 500 y 1050 hPa
+            return str(random.uniform(500.0, 1050.0))
         elif tipo == TipoMensaje.WINDSPD_T:
             # Genera un valor de velocidad de viento entre 0 y 100 km/h
             return str(random.uniform(0.0, 100.0))
