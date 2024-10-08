@@ -1,16 +1,15 @@
+# mqtt/pub.py
 import sys
 import time
 import random
 import threading
 import paho.mqtt.client as paho
-from typing import Optional
+from typing import Optional, List  # Importar List para manejar lista de tipos
 from datetime import datetime
 from dataclasses import dataclass
 from pydantic import BaseModel
 from mqtt import TipoMensaje
 from mqtt.config import config
-from dotenv import load_dotenv
-
 
 class Mensaje(BaseModel):
     id: int
@@ -18,13 +17,13 @@ class Mensaje(BaseModel):
     data: str
     time: str
 
-
 @dataclass
 class Nodo:
     id: int
     stop_event: threading.Event
     cliente: paho.Client = paho.Client()
-    frecuencia: int = 10  # tiempo entre mensajes (segundos)
+    tipos_de_mensaje: List[TipoMensaje] = None  # Agregar lista de tipos de mensajes
+    frecuencia: int = 30  # Cambiar la frecuencia por defecto a 30 segundos
     mensajes_enviados: int = 0
 
     def __post_init__(self) -> None:
@@ -42,44 +41,40 @@ class Nodo:
     def publicar(
         self,
         topic: str,
-        tipo: TipoMensaje,
-        message: str = "",
         qos: int = 1,
     ) -> None:
         if not self.cliente.is_connected():
             self.conectar()
 
         while not self.stop_event.is_set():
-            if len(message) == 0:
-                message = str(
-                    random.uniform(22.0, 23.0)
-                )  # temperatura random entre 22 y 23°C
+            for tipo in self.tipos_de_mensaje:
+                # Generar el mensaje dependiendo del tipo
+                message = self.generar_valor(tipo)
 
-            mensaje = self.formatear_mensaje(
-                topic,
-                tipo,
-                message,
-            )
+                mensaje = self.formatear_mensaje(
+                    topic,
+                    tipo,
+                    message,
+                )
 
-            res = self.cliente.publish(
-                topic,
-                mensaje,
-                qos,
-            )
+                res = self.cliente.publish(
+                    topic,
+                    mensaje,
+                    qos,
+                )
 
-            try:
-                res.wait_for_publish()
-                if res.is_published():
-                    self.cliente.logger.warn(f"{res.mid} - {mensaje}")
-                    self.mensajes_enviados += 1
-                else:
-                    print(f"El mensaje n° {res.mid} no fue publicado.")
-            except RuntimeError as re:
-                print(f"El cliente se ha desconectado con el mensaje: {res.rc}.")
-                break
+                try:
+                    res.wait_for_publish()
+                    if res.is_published():
+                        self.cliente.logger.warn(f"{res.mid} - {mensaje}")
+                        self.mensajes_enviados += 1
+                    else:
+                        print(f"El mensaje n° {res.mid} no fue publicado.")
+                except RuntimeError as re:
+                    print(f"El cliente se ha desconectado con el mensaje: {res.rc}.")
+                    break
 
-            message = ""
-            time.sleep(self.frecuencia)
+                time.sleep(self.frecuencia / len(self.tipos_de_mensaje))  # Ajustar la frecuencia para distribuirla entre los tipos de mensajes
 
         self.cliente.loop_stop()
         self.desconectar()
@@ -100,3 +95,24 @@ class Nodo:
             id=self.id, type=tipo, data=str(mensaje), time=str(datetime.now())
         ).model_dump()
         return str(mensaje)
+
+    def generar_valor(self, tipo: TipoMensaje) -> str:
+        """Genera un valor aleatorio según el tipo de mensaje."""
+        if tipo == TipoMensaje.TEMP_T:
+            # Genera un valor de temperatura entre 15 y 30°C
+            return str(random.uniform(15.0, 30.0))
+        elif tipo == TipoMensaje.HUMIDITY_T:
+            # Genera un valor de humedad relativa entre 30 y 90%
+            return str(random.uniform(30.0, 90.0))
+        elif tipo == TipoMensaje.PRESSURE_T:
+            # Genera un valor de presión atmosférica entre 950 y 1050 hPa
+            return str(random.uniform(950.0, 1050.0))
+        elif tipo == TipoMensaje.WINDSPD_T:
+            # Genera un valor de velocidad de viento entre 0 y 100 km/h
+            return str(random.uniform(0.0, 100.0))
+        elif tipo == TipoMensaje.LIGHT_T:
+            # Genera un valor de intensidad de luz entre 0 y 10000 lux
+            return str(random.uniform(0.0, 10000.0))
+        else:
+            # Por defecto, devuelve un número aleatorio
+            return str(random.uniform(0.0, 100.0))
