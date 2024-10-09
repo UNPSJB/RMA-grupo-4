@@ -4,7 +4,7 @@ from typing import List, Optional
 from datetime import datetime
 from src.database import get_db  
 from src.models import Mensaje  
-from .schemas import (
+from src.mensajes.schemas import (
     TemperatureData, 
     TemperatureResponse,
     HumidityResponse,
@@ -16,6 +16,8 @@ from .schemas import (
     WindResponse,
     WindData,
 )
+
+
 # Inicializa el router para definir las rutas de este módulo
 router = APIRouter() 
 

@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import List, Dict
 from datetime import datetime
 
@@ -9,8 +9,8 @@ class BaseDataSchema(BaseModel):
     data: str
     timestamp: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)  # Permitir tipos arbitrarios
+
 
 # Esquema para representar un mensaje individual desde la base de datos
 class MensajeSchema(BaseModel):
@@ -20,15 +20,15 @@ class MensajeSchema(BaseModel):
     data: str  
     time: datetime
 
-    class Config:
-        orm_mode = True  
+    model_config = ConfigDict(arbitrary_types_allowed=True)  # Permitir tipos arbitrarios
+
 
 # Esquema para representar una lista de mensajes
 class MensajeListSchema(BaseModel):
     messages: List[MensajeSchema] 
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)  # Permitir tipos arbitrarios
+
 
 # Esquemas para las respuestas de datos específicos
 class TemperatureData(BaseDataSchema):
@@ -46,26 +46,26 @@ class PrecipitationData(BaseDataSchema):
 class PressureData(BaseDataSchema):
     pass
 
+
 # Esquemas para la respuesta final del endpoint con un resumen
 class DataResponse(BaseModel):
     data: List[BaseDataSchema]  
     summary: Dict[str, any]  
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(arbitrary_types_allowed=True)  # Permitir tipos arbitrarios
 
 
 class TemperatureResponse(DataResponse):
     data: List[TemperatureData]
 
-class HumedadResponse(DataResponse):
+class HumidityResponse(DataResponse):
     data: List[HumidityData]
 
-class VientoResponse(DataResponse):
+class WindResponse(DataResponse):
     data: List[WindData]
 
-class PrecipitacionResponse(DataResponse):
+class PrecipitationResponse(DataResponse):
     data: List[PrecipitationData]
 
-class PresionResponse(DataResponse):
+class PressureResponse(DataResponse):
     data: List[PressureData]
