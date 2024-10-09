@@ -6,7 +6,16 @@ from sqlalchemy.orm import sessionmaker
 
 load_dotenv()
 
-engine = create_engine(os.getenv("DB_URL"), connect_args={"check_same_thread": False})
+# Crear la instancia de base para nuestros modelos
+Base = declarative_base()
+
+# Crear el motor de la base de datos
+# Verifica que DB_URL esté presente y no sea None
+DB_URL = os.getenv("DB_URL")
+if not DB_URL:
+    raise ValueError("La variable de entorno DB_URL no está configurada correctamente.")
+
+engine = create_engine(DB_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # Dependency

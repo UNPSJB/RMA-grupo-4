@@ -113,6 +113,8 @@ class Nodo:
         elif tipo == TipoMensaje.LIGHT_T:
             # Genera un valor de intensidad de luz entre 0 y 10000 lux
             return str(random.uniform(0.0, 10000.0))
+        elif tipo == TipoMensaje.RAINFALL_T:
+            return str(random.uniform(0.0, 150.0))
         else:
             # Por defecto, devuelve un número aleatorio
             return str(random.uniform(0.0, 100.0))

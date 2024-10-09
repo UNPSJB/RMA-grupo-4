@@ -1,123 +1,75 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import func, cast, Float
-from datetime import datetime, timedelta, timezone
-from src.database import get_db
-from src.models import Mensaje
 from typing import List, Optional
+from datetime import datetime
+from src.database import get_db  
+from src.models import Mensaje  
+from src.mensajes.schemas import TemperatureData, TemperatureResponse  
 
-router = APIRouter()
+# Inicializa el router para definir las rutas de este módulo
+router = APIRouter() 
 
-@router.get("/mensajes")
-def get_messages(
-    db: Session = Depends(get_db),
-    id_nodo: Optional[int] = Query(None, description="ID del nodo"),
-    type: Optional[str] = Query(None, description="Tipo de mensaje"),
-    time_range: str = Query("1h", description="Rango de tiempo (1h, 24h, 7d)")
+@router.get("/clima/temperatura/", response_model=TemperatureResponse)
+def get_temperature_data(
+    node_id: Optional[int] = Query(None, description="Identificador del nodo"),
+    start_time: Optional[datetime] = Query(None, description="Inicio del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
+    end_time: Optional[datetime] = Query(None, description="Fin del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
+    limit: Optional[int] = Query(10, description="Número máximo de registros a devolver"),
+    sort: Optional[str] = Query("asc", description="Orden de los resultados (asc o desc)"),
+    db: Session = Depends(get_db)  
 ):
     """
-    Obtiene los mensajes agrupados en intervalos de 10 minutos,
-    con opción de filtrar por nodo, tipo y rango de tiempo.
+    Endpoint para obtener los datos de temperatura actual e histórica.
     """
-    # Obtener la fecha y hora actual en UTC
-    now = datetime.utcnow().replace(tzinfo=timezone.utc)
+    # Valida que el parámetro `sort` sea 'asc' o 'desc'
+    if sort not in ["asc", "desc"]:
+        raise HTTPException(status_code=400, detail="El parámetro 'sort' debe ser 'asc' o 'desc'.")
 
-    # Definir el tiempo de inicio basado en el rango de tiempo
-    if time_range == "1h":
-        start_time = now - timedelta(hours=1)
-    elif time_range == "24h":
-        start_time = now - timedelta(days=1)
-    elif time_range == "7d":
-        start_time = now - timedelta(days=7)
+    # Construye la consulta base a la tabla Mensaje
+    query = db.query(Mensaje).filter(Mensaje.type == "temp_t")
+
+    # Agrega filtro por `node_id` si se proporciona
+    if node_id is not None:
+        query = query.filter(Mensaje.id_nodo == node_id)
+
+    # Agrega filtro por `start_time` y `end_time` si se proporcionan
+    if start_time:
+        query = query.filter(Mensaje.time >= start_time)
+    if end_time:
+        query = query.filter(Mensaje.time <= end_time)
+
+    # Ordena los resultados por `time`
+    if sort == "asc":
+        query = query.order_by(Mensaje.time.asc())
     else:
-        start_time = now - timedelta(hours=1)  # Por defecto, última hora
+        query = query.order_by(Mensaje.time.desc())
 
-    print(f"Tiempo de inicio: {start_time.isoformat()}")
-    print(f"Tiempo actual: {now.isoformat()}")
+    query = query.limit(limit) # Limitar el número de resultados
 
-    # Ajuste de la zona horaria (por ejemplo, UTC-3 para Argentina)
-    utc_offset = timedelta(hours=-3)  # Cambiar según tu zona horaria local
-    adjusted_start_time = start_time + utc_offset
-    adjusted_now = now + utc_offset
+    results = query.all() # Ejecutar la consulta y obtener los resultados
 
-    # Construir la consulta base
-    query = db.query(
-        Mensaje.id_nodo,
-        Mensaje.type,
-        func.strftime('%Y-%m-%d %H:%M', Mensaje.time).label('time_interval'),
-        func.avg(cast(Mensaje.data, Float)).label('avg_data')
-    ).filter(Mensaje.time >= adjusted_start_time)
+    # Verificar si se encontraron registros
+    if not results:
+        raise HTTPException(status_code=404, detail="No se encontraron registros para los filtros proporcionados.")
 
-    # Aplicar filtros adicionales si se proporcionan
-    if id_nodo is not None:
-        query = query.filter(Mensaje.id_nodo == id_nodo)
-    if type is not None:
-        query = query.filter(Mensaje.type == type)
+    # Calcular el resumen de los resultados
+    temperatures = [float(record.data) for record in results]  
+    summary = {
+        "total_records": len(results),
+        "max_value": max(temperatures),
+        "min_value": min(temperatures),
+        "average_value": sum(temperatures) / len(temperatures)
+    }
 
-    # Agrupar y ordenar los resultados
-    mensajes = query.group_by(
-        Mensaje.id_nodo,
-        Mensaje.type,
-        func.strftime('%Y-%m-%d %H:%M', Mensaje.time)
-    ).order_by(Mensaje.time).all()
-
-    print(f"Mensajes recuperados: {len(mensajes)}")
-    if len(mensajes) == 0:
-        print("No se encontraron mensajes. Verificando datos más antiguos...")
-
-        # Intenta obtener el mensaje más reciente sin filtro de tiempo
-        ultimo_mensaje = db.query(Mensaje).order_by(Mensaje.time.desc()).first()
-        if ultimo_mensaje:
-            print(f"Último mensaje en la base de datos: {ultimo_mensaje.time}")
-        else:
-            print("No hay mensajes en la base de datos.")
-
-    # Convertir a un formato de lista para enviar como JSON
-    result = [
-        {
-            "id_nodo": m.id_nodo,
-            "type": m.type,
-            "time": m.time_interval,
-            "data": float(m.avg_data) if m.avg_data is not None else None
-        } for m in mensajes
+    # Formatear los datos de la respuesta
+    response_data = [
+        TemperatureData(
+            id_nodo=record.id_nodo,
+            type=record.type,
+            data=record.data,  
+            timestamp=record.time  
+        ) for record in results
     ]
 
-    return result
-
-#------------------------------------------------------------
-@router.get("/clima/temperatura")
-def get_temperatura(
-    db: Session = Depends(get_db),
-    id_nodo: Optional[int] = Query(None, description="ID del nodo"),
-    time_range: str = Query("1h", description="Rango de tiempo (1h, 24h, 7d)")
-):
-    """
-    Obtiene las lecturas de temperatura agrupadas en intervalos de 10 minutos.
-    """
-    # Se reutiliza la lógica para obtener el rango de tiempo y la consulta base.
-    now = datetime.utcnow().replace(tzinfo=timezone.utc)
-    start_time = now - timedelta(hours=1) if time_range == "1h" else (
-        now - timedelta(days=1) if time_range == "24h" else now - timedelta(days=7)
-    )
-    utc_offset = timedelta(hours=-3)  # Ajuste de zona horaria, cambiar según sea necesario
-    adjusted_start_time = start_time + utc_offset
-    adjusted_now = now + utc_offset
-
-    query = db.query(
-        Mensaje.id_nodo,
-        func.strftime('%Y-%m-%d %H:%M', Mensaje.time).label('time_interval'),
-        func.avg(cast(Mensaje.data, Float)).label('avg_temperatura')
-    ).filter(Mensaje.time >= adjusted_start_time, Mensaje.type == "temp_t")#temperatura
-
-    if id_nodo is not None:
-        query = query.filter(Mensaje.id_nodo == id_nodo)
-
-    mensajes = query.group_by(
-        Mensaje.id_nodo,
-        func.strftime('%Y-%m-%d %H:%M', Mensaje.time)
-    ).order_by(Mensaje.time).all()
-
-    return [
-        {"id_nodo": m.id_nodo, "time": m.time_interval, "temperatura": float(m.avg_temperatura)}
-        for m in mensajes
-    ]
+    # Devolver la respuesta formateada
+    return TemperatureResponse(data=response_data, summary=summary)
