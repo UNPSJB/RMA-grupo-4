@@ -15,6 +15,8 @@ from src.mensajes.schemas import (
     PrecipitationData,
     WindResponse,
     WindData,
+    NodeSummary,
+    NodeSummaryResponse
 )
 
 
@@ -316,3 +318,64 @@ def get_wind_data(
     ]
 
     return WindResponse(data=response_data, summary=summary)
+
+@router.get("/clima/nodos/resumen", response_model=NodeSummaryResponse)
+def get_node_summary(db: Session = Depends(get_db)):
+    """
+    Endpoint para obtener el resumen de todos los nodos con el último valor registrado de cada variable.
+    """
+    subquery = (
+        db.query(
+            Mensaje.id_nodo,
+            Mensaje.type,
+            Mensaje.data,
+            Mensaje.time
+        )
+        .order_by(Mensaje.id_nodo, Mensaje.type, Mensaje.time.desc())
+        .distinct(Mensaje.id_nodo, Mensaje.type)
+        .subquery()
+    )
+
+    results = (
+        db.query(
+            subquery.c.id_nodo,
+            subquery.c.type,
+            subquery.c.data,
+            subquery.c.time
+        )
+        .all()
+    )
+
+    node_data = {}
+    for record in results:
+        node_id = record.id_nodo
+        if node_id not in node_data:
+            node_data[node_id] = {
+                "id_nodo": node_id,
+                "last_temperature": None,
+                "last_humidity": None,
+                "last_pressure": None,
+                "last_precipitation": None,
+                "last_wind": None,
+                "last_update": None
+            }
+
+        if record.type == "temp_t":
+            node_data[node_id]["last_temperature"] = float(record.data)
+        elif record.type == "humidity_t":
+            node_data[node_id]["last_humidity"] = float(record.data)
+        elif record.type == "pressure_t":
+            node_data[node_id]["last_pressure"] = float(record.data)
+        elif record.type == "rainfall_t":
+            node_data[node_id]["last_precipitation"] = float(record.data)
+        elif record.type == "windspd_t":
+            node_data[node_id]["last_wind"] = float(record.data)
+
+        if node_data[node_id]["last_update"] is None or record.time > node_data[node_id]["last_update"]:
+            node_data[node_id]["last_update"] = record.time
+
+    summary_response = [
+        NodeSummary(**data) for data in node_data.values()
+    ]
+
+    return NodeSummaryResponse(summary=summary_response)

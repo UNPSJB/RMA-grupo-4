@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from typing import List, Dict
+from typing import List, Dict, Optional
 from datetime import datetime
 
 # Esquema base para representar datos con campos comunes
@@ -69,3 +69,15 @@ class PrecipitationResponse(DataResponse):
 
 class PressureResponse(DataResponse):
     data: List[PressureData]
+    
+class NodeSummary(BaseModel):
+    id_nodo: int
+    last_temperature: Optional[float] = None
+    last_humidity: Optional[float] = None
+    last_pressure: Optional[float] = None
+    last_precipitation: Optional[float] = None
+    last_wind: Optional[float] = None
+    last_update: Optional[datetime] = None
+
+class NodeSummaryResponse(BaseModel):
+    summary: List[NodeSummary]
