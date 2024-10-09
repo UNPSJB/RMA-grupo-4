@@ -99,7 +99,7 @@ class Nodo:
     def generar_valor(self, tipo: TipoMensaje) -> str:
         """Genera un valor aleatorio según el tipo de mensaje."""
         if tipo == TipoMensaje.TEMP_T:
-            # Genera un valor de temperatura entre 15 y 30°C
+            # Genera un valor de temperatura entre -30 y 60°C
             return str(random.uniform(-30.0, 60.0))
         elif tipo == TipoMensaje.HUMIDITY_T:
             # Genera un valor de humedad relativa entre 20 y 100%
@@ -109,12 +109,12 @@ class Nodo:
             return str(random.uniform(500.0, 1050.0))
         elif tipo == TipoMensaje.WINDSPD_T:
             # Genera un valor de velocidad de viento entre 0 y 100 km/h
-            return str(random.uniform(0.0, 100.0))
+            return str(random.uniform(0.0, 160.0))
         elif tipo == TipoMensaje.LIGHT_T:
             # Genera un valor de intensidad de luz entre 0 y 10000 lux
             return str(random.uniform(0.0, 10000.0))
         elif tipo == TipoMensaje.RAINFALL_T:
-            return str(random.uniform(0.0, 150.0))
+            return str(random.uniform(0.0, 170.0))
         else:
             # Por defecto, devuelve un número aleatorio
             return str(random.uniform(0.0, 100.0))
