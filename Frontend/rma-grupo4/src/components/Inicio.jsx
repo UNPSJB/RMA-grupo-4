@@ -12,48 +12,65 @@ export default function Inicio() {
   const [filteredData, setFilteredData] = useState([]); // Datos filtrados por la selección de la tabla
   const [summary, setSummary] = useState({}); // Resumen de los datos
 
-  // Lógica para obtener los datos de la API
+  // Lógica para obtener los datos de la API y combinarlos por nodo
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Obtener temperatura
-        const tempResponse = await axios.get('http://localhost:8000/api/v1/clima/temperatura');
-        const tempData = tempResponse.data.data.map(item => ({
-          Nodo: item.id_nodo ?? 'Desconocido',
-          Temperatura: parseFloat(item.data ?? 0),
-          Timestamp: item.timestamp ? new Date(item.timestamp).toLocaleString('es-AR') : "Sin timestamp",
-        }));
+        const endpoints = [
+          { url: 'http://localhost:8000/api/v1/clima/temperatura', variable: 'Temperatura' },
+          { url: 'http://localhost:8000/api/v1/clima/humedad', variable: 'Humedad' },
+          { url: 'http://localhost:8000/api/v1/clima/presion', variable: 'Presion' },
+          { url: 'http://localhost:8000/api/v1/clima/precipitacion', variable: 'Precipitacion' },
+          { url: 'http://localhost:8000/api/v1/clima/viento', variable: 'Viento' },
+        ];
 
-        // Obtener humedad
-        const humidityResponse = await axios.get('http://localhost:8000/api/v1/clima/humedad');
-        const humidityData = humidityResponse.data.data.map(item => ({
-          Nodo: item.id_nodo ?? 'Desconocido',
-          Humedad: parseFloat(item.data ?? 0),
-          Timestamp: item.timestamp ? new Date(item.timestamp).toLocaleString('es-AR') : "Sin timestamp",
-        }));
+        let combinedData = {};
 
-        // Obtener presión
-        const pressureResponse = await axios.get('http://localhost:8000/api/v1/clima/presion');
-        const pressureData = pressureResponse.data.data.map(item => ({
-          Nodo: item.id_nodo ?? 'Desconocido',
-          Presion: parseFloat(item.data ?? 0),
-          Timestamp: item.timestamp ? new Date(item.timestamp).toLocaleString('es-AR') : "Sin timestamp",
-        }));
+        // Obtener y procesar datos de cada endpoint
+        for (const endpoint of endpoints) {
+          const response = await axios.get(endpoint.url);
+          const variableData = response.data.data;
 
-        // Combinar los datos
-        const combinedData = [...tempData, ...humidityData, ...pressureData];
+          variableData.forEach(item => {
+            const nodo = item.id_nodo ?? 'Desconocido';
+            const timestamp = item.timestamp ? new Date(item.timestamp) : null;
+            const value = parseFloat(item.data ?? 0);
+          
+            if (!combinedData[nodo]) {
+              combinedData[nodo] = {
+                Nodo: nodo,
+                Temperatura: null,
+                Humedad: null,
+                Presion: null,
+                Precipitacion: null,
+                Viento: null,
+                Timestamp: null // Guardar como objeto Date en lugar de string
+              };
+            }
+          
+            // Actualizar el valor y el timestamp solo si es más reciente
+            if (!combinedData[nodo][endpoint.variable] || (timestamp && (!combinedData[nodo].Timestamp || timestamp > combinedData[nodo].Timestamp))) {
+              combinedData[nodo][endpoint.variable] = value;
+              combinedData[nodo].Timestamp = timestamp; // Guardar como objeto Date
+            }
+          });
+        }
 
-        setTablaData(combinedData);
-        setFilteredData(combinedData);  // Inicialmente, los datos filtrados son los mismos que los de la tabla
+        // Convertir el objeto a un array para la tabla
+        const combinedArray = Object.values(combinedData);
+
+        setTablaData(combinedArray);
+        setFilteredData(combinedArray);  // Inicialmente, los datos filtrados son los mismos que los de la tabla
         setSummary({}); // Aquí podrías agregar un resumen si es necesario
 
-        console.log("Datos combinados de la API:", combinedData);
+        console.log("Datos combinados por nodo:", combinedArray);
       } catch (error) {
         console.error('Error al obtener los datos de la API:', error);
       }
     };
     fetchData();
   }, []);
+
   // Función para manejar el filtrado de datos desde la tabla
   const handleRowSelection = (selectedRows) => {
     const newFilteredData = selectedRows.length
@@ -74,11 +91,11 @@ export default function Inicio() {
           gap={4}
           maxWidth="100%"
           bg="gray.900"
-          p={{ base: 2, md: 6 }} 
+          p={{ base: 1, md: 2 }} 
           borderRadius="md"
         >
           {/* Componente de la Tabla */}
-          <GridItem colSpan={{ base: 1, md: 1 }} bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
+          <GridItem colSpan={{ base: 1, md: 1 }} bg="gray.800" p={{ base: 1, md: 2 }} borderRadius="md" boxShadow="lg">
             <TablaPage
               data={tablaData}          // Pasar los datos a la tabla
               onRowSelection={handleRowSelection} // Manejar selección de filas
@@ -86,7 +103,7 @@ export default function Inicio() {
           </GridItem>
 
           {/* Componente de Gráficos adicionales */}
-          <GridItem colSpan={{ base: 1, md: 1 }} bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md">
+          <GridItem colSpan={{ base: 1, md: 1 }} bg="gray.800" p={{ base: 1, md: 2 }} borderRadius="md">
             <GraficosPage data={filteredData} /> {/* Pasar datos filtrados */}
           </GridItem>
         </Grid>

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Box, Table, Thead, Tr, Th, Tbody, Td, Select, Button, Flex, useMediaQuery, Text, Center } from "@chakra-ui/react";
+import { FaTemperatureHigh, FaTint, FaWind, FaClock } from 'react-icons/fa'; 
+import { GiWaterDrop, GiSpeedometer } from 'react-icons/gi';
 
 function TablaPage({ data, onRowSelection }) {
   const [selectedNodo, setSelectedNodo] = useState("");
@@ -59,18 +61,21 @@ function TablaPage({ data, onRowSelection }) {
 
   const formatNumber = (number) => new Intl.NumberFormat('es-AR', { maximumFractionDigits: 2 }).format(number);
   const uniqueNodos = [...new Set(data.map(item => item.Nodo))];
-  const formatTime = (time) => {
-    if (!time || typeof time !== "string") return "N/A"; 
+  const formatTime = (timestamp) => {
+    if (!timestamp) return "N/A"; 
   
-    try {
-      const datePart = time.split(".")[0]; 
-      const dateObject = new Date(datePart.replace(" ", "T"));
-      return dateObject.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-    } catch (error) {
-      console.error("Error formateando el tiempo:", error, "Valor de time:", time);
-      return "N/A"; // Si ocurre un error, retornar un valor por defecto
+    if (!(timestamp instanceof Date)) {
+      console.error("Error: timestamp no es un objeto Date válido.", timestamp);
+      return "N/A";
     }
-  };
+  
+    if (isNaN(timestamp.getTime())) {
+      console.error("Error: fecha inválida.", timestamp);
+      return "N/A"; 
+    }
+
+    return timestamp.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+  }; 
 
   return (
     <Box bg="gray.700" color="white" p={isMobile ? 2 : 4} borderRadius="md" boxShadow="md">
@@ -95,25 +100,80 @@ function TablaPage({ data, onRowSelection }) {
       </Box>
 
       <Box overflowX="auto">
-        <Table variant="simple" colorScheme="whiteAlpha" size={isMobile ? "sm" : "md"}>
+        <Table variant="simple" colorScheme="whiteAlpha" size={isMobile ? "xs" : "md" }>
           <Thead>
-            <Tr>
-              <Th onClick={() => handleSort("Nodo")} cursor="pointer">
-                Nodo {sortConfig.key === "Nodo" && (sortConfig.direction === "asc" ? "↑" : "↓")}
-              </Th>
-              <Th onClick={() => handleSort("Humedad")} cursor="pointer">
-                Humedad {sortConfig.key === "Humedad" && (sortConfig.direction === "asc" ? "↑" : "↓")}
-              </Th>
-              <Th onClick={() => handleSort("Temperatura")} cursor="pointer">
-                Temp. {sortConfig.key === "Temperatura" && (sortConfig.direction === "asc" ? "↑" : "↓")}
-              </Th>
-              <Th display={{ base: "none", md: "table-cell" }} onClick={() => handleSort("Presion")} cursor="pointer">
-                Presión {sortConfig.key === "Presion" && (sortConfig.direction === "asc" ? "↑" : "↓")}
-              </Th>
-              <Th onClick={() => handleSort("value")} isNumeric cursor="pointer">
-                Time {sortConfig.key === "value" && (sortConfig.direction === "asc" ? "↑" : "↓")}
-              </Th>
-            </Tr>
+          <Tr>
+            <Th onClick={() => handleSort("Nodo")} cursor="pointer">
+              <span style={{ display: "inline-flex", alignItems: "center", color:"white"}}>
+                Nodo
+                {sortConfig.key === "Nodo" && (
+                  <span style={{ marginLeft: "5px" }}>
+                    {sortConfig.direction === "asc" ? "↑" : "↓"}
+                  </span>
+                )}
+              </span>
+            </Th>
+            <Th onClick={() => handleSort("Humedad")} cursor="pointer">
+              <span style={{ display: "inline-flex", alignItems: "center", color:"white"}}>
+                <FaTint size="1.5em" /> {/* Ícono de Humedad */}
+                {sortConfig.key === "Humedad" && (
+                  <span style={{ marginLeft: "5px" }}>
+                    {sortConfig.direction === "asc" ? "↑" : "↓"}
+                  </span>
+                )}
+              </span>
+            </Th>
+            <Th onClick={() => handleSort("Temperatura")} cursor="pointer">
+              <span style={{ display: "inline-flex", alignItems: "center" , color:"white"}}>
+                <FaTemperatureHigh size="1.5em"/> {/* Ícono de Temperatura */}
+                {sortConfig.key === "Temperatura" && (
+                  <span style={{ marginLeft: "5px" }}>
+                    {sortConfig.direction === "asc" ? "↑" : "↓"}
+                  </span>
+                )}
+              </span>
+            </Th>
+            <Th display={{ base: "none", md: "table-cell" }} onClick={() => handleSort("Presion")} cursor="pointer">
+              <span style={{ display: "inline-flex", alignItems: "center" , color:"white"}}>
+                <GiSpeedometer size="1.5em"/> {/* Ícono de Presión */}
+                {sortConfig.key === "Presion" && (
+                  <span style={{ marginLeft: "5px" }}>
+                    {sortConfig.direction === "asc" ? "↑" : "↓"}
+                  </span>
+                )}
+              </span>
+            </Th>
+            <Th onClick={() => handleSort("Viento")} cursor="pointer">
+              <span style={{ display: "inline-flex", alignItems: "center" , color:"white"}}>
+                <FaWind size="1.5em"/> {/* Ícono de Viento */}
+                {sortConfig.key === "Viento" && (
+                  <span style={{ marginLeft: "5px" }}>
+                    {sortConfig.direction === "asc" ? "↑" : "↓"}
+                  </span>
+                )}
+              </span>
+            </Th>
+            <Th onClick={() => handleSort("Precipitacion")} cursor="pointer">
+              <span style={{ display: "inline-flex", alignItems: "center" , color:"white"}}>
+                <GiWaterDrop size="1.5em"/> {/* Ícono de Precipitación */}
+                {sortConfig.key === "Precipitacion" && (
+                  <span style={{ marginLeft: "5px" }}>
+                    {sortConfig.direction === "asc" ? "↑" : "↓"}
+                  </span>
+                )}
+              </span>
+            </Th>
+            <Th onClick={() => handleSort("value")} isNumeric cursor="pointer">
+              <span style={{ display: "inline-flex", alignItems: "center" , color:"white"}}>
+                <FaClock size="1.5em"/> {/* Ícono de Tiempo */}
+                {sortConfig.key === "value" && (
+                  <span style={{ marginLeft: "5px" }}>
+                    {sortConfig.direction === "asc" ? "↑" : "↓"}
+                  </span>
+                )}
+              </span>
+            </Th>
+          </Tr>
           </Thead>
           <Tbody>
             {paginatedData.map((row, index) => (
@@ -128,7 +188,9 @@ function TablaPage({ data, onRowSelection }) {
                 <Td textAlign="center">{formatNumber(row.Humedad)}</Td>
                 <Td textAlign="center">{formatNumber(row.Temperatura)}</Td>
                 <Td textAlign="center" display={{ base: "none", md: "table-cell" }}>{formatNumber(row.Presion)}</Td>
-                <Td textAlign="center">{formatTime(row.time)}</Td> {/* Ajustado para usar el campo 'time' */}
+                <Td textAlign="center">{formatNumber(row.Viento)}</Td>
+                <Td textAlign="center">{formatNumber(row.Precipitacion)}</Td>
+                <Td textAlign="center">{formatTime(row.Timestamp)}</Td> {/* Ajustado para usar el campo 'time' */}
               </Tr>
             ))}
           </Tbody>
