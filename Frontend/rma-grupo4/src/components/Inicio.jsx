@@ -87,27 +87,24 @@ export default function Inicio() {
       {/* Sección de Tabla y Gráficos adicionales */}
       <Box mt={0} p={{ base: 2, md: 4 }}>
         <Grid
-          templateColumns={{ base: '1fr', md: '1fr 1fr' }} 
+          templateColumns="1fr" // Ajustar la tabla para que use todo el ancho disponible
           gap={4}
           maxWidth="100%"
           bg="gray.900"
-          p={{ base: 1, md: 2 }} 
+          p={{ base: 2, md: 6 }}
           borderRadius="md"
         >
           {/* Componente de la Tabla */}
-          <GridItem colSpan={{ base: 1, md: 1 }} bg="gray.800" p={{ base: 1, md: 2 }} borderRadius="md" boxShadow="lg">
+          <GridItem colSpan={1} bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
             <TablaPage
               data={tablaData}          // Pasar los datos a la tabla
               onRowSelection={handleRowSelection} // Manejar selección de filas
-            />
-          </GridItem>
 
-          {/* Componente de Gráficos adicionales */}
-          <GridItem colSpan={{ base: 1, md: 1 }} bg="gray.800" p={{ base: 1, md: 2 }} borderRadius="md">
-            <GraficosPage data={filteredData} /> {/* Pasar datos filtrados */}
+            />
           </GridItem>
         </Grid>
       </Box>
+      
       {/* Sección de gráficos lineales y de barras */}
       <Box p={{ base: 2, md: 4 }}>
         <Grid
@@ -117,11 +114,17 @@ export default function Inicio() {
           bg="gray.900"
           p={{ base: 2, md: 6 }} 
           borderRadius="md"
+          
         >
           <GridItem colSpan={2} bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
-            <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={4}>
+            <Grid 
+              templateColumns={{ base: '1fr', md: '1fr 1fr' }} 
+              gap={4}
+              maxWidth="100%"
+              overflow="hidden"  // Evita desbordamiento en contenedor padre
+            >
               {/* Grafico Linea */}
-              <GridItem>
+              <GridItem maxWidth="100%" overflowX="auto">  {/* Ajustar tamaño máximo y desbordamiento */}
                 <GraficoLinea
                   selectedVariables={selectedVariables}
                   data={filteredData} // Pasar datos filtrados a GraficoLinea
@@ -129,13 +132,20 @@ export default function Inicio() {
               </GridItem>
 
               {/* Grafico Barra */}
-              <GridItem>
+              <GridItem maxWidth="100%" overflowX="auto">  {/* Ajustar tamaño máximo y desbordamiento */}
                 <GraficoBarra
                   selectedVariables={selectedVariables}
                   data={filteredData} // Pasar datos filtrados a GraficoBarra
                 />
               </GridItem>
             </Grid>
+          </GridItem>
+          {/* Componente de Gráficos adicionales */}
+          <GridItem colSpan={{ base: 1, md: 1 }} bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md">
+            <GraficosPage 
+              data={filteredData} 
+              selectedVariables={selectedVariables} 
+            />
           </GridItem>
         </Grid>
       </Box>
