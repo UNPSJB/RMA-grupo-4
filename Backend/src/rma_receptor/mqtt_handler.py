@@ -11,7 +11,8 @@ def validar_mensaje(mensaje_json):
         'humidity_t': (30, 85),    # Rango de humedad en porcentaje
         'pressure_t': (900, 1100), # Rango de presión en hPa
         'windspd_t': (0, 150),     # Rango de velocidad del viento en km/h
-        'rainfall_t': (0, 150)     # Rango de precipitación en mm
+        'rainfall_t': (0, 150),     # Rango de precipitación en mm
+        'altitude_t': (0, 2)  
     }
     
     # Obtener el tipo y el dato

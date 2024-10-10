@@ -115,6 +115,8 @@ class Nodo:
             return str(random.uniform(0.0, 10000.0))
         elif tipo == TipoMensaje.RAINFALL_T:
             return str(random.uniform(0.0, 170.0))
+        elif tipo == TipoMensaje.ALTITUDE_T:
+            return str(random.uniform(0.0, 170.0))
         else:
             # Por defecto, devuelve un número aleatorio
             return str(random.uniform(0.0, 100.0))
