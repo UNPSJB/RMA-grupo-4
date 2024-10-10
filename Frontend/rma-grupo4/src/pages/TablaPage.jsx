@@ -1,37 +1,40 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Table,
-  Thead,
-  Tr,
-  Th,
-  Tbody,
-  Td,
-  Select,
-  Button,
-  Flex,
-  useMediaQuery,
-  Text,
-  Center,
-} from "@chakra-ui/react";
+import React, { useState, useEffect } from "react";
+import { Box, Table, Thead, Tr, Th, Tbody, Td, Button, Flex, Text, Center, useMediaQuery } from "@chakra-ui/react";
 import { FaTemperatureHigh, FaTint, FaWind, FaClock } from "react-icons/fa";
 import { GiWaterDrop, GiSpeedometer } from "react-icons/gi";
+import axios from 'axios';  // Asegúrate de que axios esté importado
 
-function TablaPage({ data, onRowSelection }) {
-  const [selectedNodo, setSelectedNodo] = useState("");
+function TablaPage({ onRowSelection }) {
+  const [data, setData] = useState([]);
   const [sortConfig, setSortConfig] = useState({ key: "value", direction: "asc" });
   const [page, setPage] = useState(1);
-  const [selectedRowIndex, setSelectedRowIndex] = useState(null); // Solo un índice seleccionado
+  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
   const [isMobile] = useMediaQuery("(max-width: 48em)");
-
   const rowsPerPage = isMobile ? 5 : 8;
 
-  const handleSelectChange = (e) => {
-    const value = e.target.value;
-    setSelectedNodo(value === "" ? "" : parseInt(value, 10));
-    setPage(1);
-    setSelectedRowIndex(null); // Resetear la selección cuando se cambia el nodo
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/v1/clima/nodos/resumen');
+        const resumenData = response.data.summary;
+
+        const formattedData = resumenData.map((item) => ({
+          Nodo: item.id_nodo,
+          Temperatura: item.last_temperature ?? 'N/A',
+          Humedad: item.last_humidity ?? 'N/A',
+          Presion: item.last_pressure ?? 'N/A',
+          Precipitacion: item.last_precipitation ?? 'N/A',
+          Viento: item.last_wind ?? 'N/A',
+          Timestamp: item.last_update ? new Date(item.last_update) : 'N/A'
+        }));
+
+        setData(formattedData);
+      } catch (error) {
+        console.error('Error al obtener los datos del endpoint de resumen:', error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleSort = (columnKey) => {
     let direction = "asc";
@@ -41,8 +44,7 @@ function TablaPage({ data, onRowSelection }) {
     setSortConfig({ key: columnKey, direction });
   };
 
-  const filteredData = selectedNodo === "" ? data : data.filter((row) => row.Nodo === selectedNodo);
-  const sortedData = [...filteredData].sort((a, b) => {
+  const sortedData = [...data].sort((a, b) => {
     const aValue = a[sortConfig.key];
     const bValue = b[sortConfig.key];
 
@@ -65,46 +67,26 @@ function TablaPage({ data, onRowSelection }) {
 
   const handleRowClick = (index) => {
     if (selectedRowIndex === index) {
-      setSelectedRowIndex(null); // Desmarcar si ya estaba seleccionado
+      setSelectedRowIndex(null);
     } else {
-      setSelectedRowIndex(index); // Seleccionar la fila
-      onRowSelection(index); // Llamar a la función de callback con la fila seleccionada
+      setSelectedRowIndex(index);
+      onRowSelection(index);
     }
   };
 
-  const formatNumber = (number) =>
-  new Intl.NumberFormat("es-AR", { maximumFractionDigits: 2 }).format(number);
-  const uniqueNodos = [...new Set(data.map((item) => item.Nodo))];
+  const formatNumber = (number) => new Intl.NumberFormat("es-AR", { maximumFractionDigits: 2 }).format(number);
   const formatTime = (timestamp) => {
-    if (!timestamp) return "N/A"; 
-  
-    if (!(timestamp instanceof Date)) {
-      console.error("Error: timestamp no es un objeto Date válido.", timestamp);
-      return "N/A";
-    }
-  
-    if (isNaN(timestamp.getTime())) {
-      console.error("Error: fecha inválida.", timestamp);
-      return "N/A"; 
-    }
-
+    if (!timestamp || isNaN(timestamp.getTime())) return "N/A";
     return timestamp.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
   };
 
   return (
-    <Box bg="gray.700" color="white" p={isMobile ? 2 : 4} borderRadius="md" boxShadow="md">
-      
-
+    <Box bg="gray.700" color="white" p={isMobile ? 1 : 2} borderRadius="md" boxShadow="md" width="100%">
       <Box overflowX="auto">
         <Table variant="simple" colorScheme="whiteAlpha" size={isMobile ? "xs" : "md"}>
           <Thead>
             <Tr>
-              <Th
-                onClick={() => handleSort("Nodo")}
-                cursor="pointer"
-                title="Nodo"
-                _hover={{ backgroundColor: "gray.700", color: "cyan.400" }}
-              >
+              <Th onClick={() => handleSort("Nodo")}>
                 <Center color="white">
                   Nodo
                   {sortConfig.key === "Nodo" && (
@@ -114,30 +96,20 @@ function TablaPage({ data, onRowSelection }) {
                   )}
                 </Center>
               </Th>
-              <Th
-                onClick={() => handleSort("Humedad")}
-                cursor="pointer"
-                title="Humedad"
-                _hover={{ backgroundColor: "gray.700", color: "cyan.400" }}
-              >
+              <Th onClick={() => handleSort("Humedad")}>
                 <Center color="white">
-                  <FaTint size="1.5em" style={{ marginRight: "5px", color: "white" }} /> {/* Ícono de Humedad */}
+                  <FaTint size="1.5em" style={{ marginRight: "5px" }} />
                   Humedad
                   {sortConfig.key === "Humedad" && (
-                    <span style={{ marginLeft: "5px", color: "white" }}>
+                    <span style={{ marginLeft: "5px" }}>
                       {sortConfig.direction === "asc" ? "↑" : "↓"}
                     </span>
                   )}
                 </Center>
               </Th>
-              <Th
-                onClick={() => handleSort("Temperatura")}
-                cursor="pointer"
-                title="Temperatura"
-                _hover={{ backgroundColor: "gray.700", color: "cyan.400" }}
-              >
+              <Th onClick={() => handleSort("Temperatura")}>
                 <Center color="white">
-                  <FaTemperatureHigh size="1.5em" style={{ marginRight: "5px" }} /> {/* Ícono de Temperatura */}
+                  <FaTemperatureHigh size="1.5em" style={{ marginRight: "5px" }} />
                   Temperatura
                   {sortConfig.key === "Temperatura" && (
                     <span style={{ marginLeft: "5px" }}>
@@ -146,15 +118,9 @@ function TablaPage({ data, onRowSelection }) {
                   )}
                 </Center>
               </Th>
-              <Th
-                display={{ base: "none", md: "table-cell" }}
-                onClick={() => handleSort("Presion")}
-                cursor="pointer"
-                title="Presión"
-                _hover={{ backgroundColor: "gray.700", color: "cyan.400" }}
-              >
+              <Th onClick={() => handleSort("Presion")} display={{ base: "none", md: "table-cell" }}>
                 <Center color="white">
-                  <GiSpeedometer size="1.5em" style={{ marginRight: "5px" }} /> {/* Ícono de Presión */}
+                  <GiSpeedometer size="1.5em" style={{ marginRight: "5px" }} />
                   Presión
                   {sortConfig.key === "Presion" && (
                     <span style={{ marginLeft: "5px" }}>
@@ -163,14 +129,9 @@ function TablaPage({ data, onRowSelection }) {
                   )}
                 </Center>
               </Th>
-              <Th
-                onClick={() => handleSort("Viento")}
-                cursor="pointer"
-                title="Viento"
-                _hover={{ backgroundColor: "gray.700", color: "cyan.400" }}
-              >
+              <Th onClick={() => handleSort("Viento")}>
                 <Center color="white">
-                  <FaWind size="1.5em" style={{ marginRight: "5px" }} /> {/* Ícono de Viento */}
+                  <FaWind size="1.5em" style={{ marginRight: "5px" }} />
                   Viento
                   {sortConfig.key === "Viento" && (
                     <span style={{ marginLeft: "5px" }}>
@@ -179,14 +140,9 @@ function TablaPage({ data, onRowSelection }) {
                   )}
                 </Center>
               </Th>
-              <Th
-                onClick={() => handleSort("Precipitacion")}
-                cursor="pointer"
-                title="Precipitación"
-                _hover={{ backgroundColor: "gray.700", color: "cyan.400" }}
-              >
+              <Th onClick={() => handleSort("Precipitacion")}>
                 <Center color="white">
-                  <GiWaterDrop size="1.5em" style={{ marginRight: "5px" }} /> {/* Ícono de Precipitación */}
+                  <GiWaterDrop size="1.5em" style={{ marginRight: "5px" }} />
                   Precipitación
                   {sortConfig.key === "Precipitacion" && (
                     <span style={{ marginLeft: "5px" }}>
@@ -195,14 +151,9 @@ function TablaPage({ data, onRowSelection }) {
                   )}
                 </Center>
               </Th>
-              <Th
-                onClick={() => handleSort("Fecha")}
-                cursor="pointer"
-                title="Fecha"
-                _hover={{ backgroundColor: "gray.700", color: "cyan.400" }}
-              >
+              <Th onClick={() => handleSort("Fecha")}>
                 <Center color="white">
-                  <FaClock size="1.5em" style={{ marginRight: "5px" }} /> {/* Ícono de Fecha */}
+                  <FaClock size="1.5em" style={{ marginRight: "5px" }} />
                   Fecha
                   {sortConfig.key === "Fecha" && (
                     <span style={{ marginLeft: "5px" }}>
@@ -231,9 +182,7 @@ function TablaPage({ data, onRowSelection }) {
                   <Td textAlign="center">{row.Nodo}</Td>
                   <Td textAlign="center">{formatNumber(row.Humedad)} %</Td>
                   <Td textAlign="center">{formatNumber(row.Temperatura)} °C</Td>
-                  <Td textAlign="center" display={{ base: "none", md: "table-cell" }}>
-                    {formatNumber(row.Presion)} hPa
-                  </Td>
+                  <Td textAlign="center" display={{ base: "none", md: "table-cell" }}>{formatNumber(row.Presion)} hPa</Td>
                   <Td textAlign="center">{formatNumber(row.Viento)} km/h</Td>
                   <Td textAlign="center">{formatNumber(row.Precipitacion)} mm</Td>
                   <Td textAlign="center">{formatTime(row.Timestamp)}</Td>
@@ -243,15 +192,14 @@ function TablaPage({ data, onRowSelection }) {
           </Tbody>
         </Table>
       </Box>
-
-      <Flex justify="space-around" mt={3} alignItems="center">
-        <Button onClick={handlePreviousPage} isDisabled={page === 1}>
+      <Flex justify="center" mt={4}>
+        <Button onClick={handlePreviousPage} disabled={page === 1} colorScheme="teal" size="sm" mr={2}>
           Anterior
         </Button>
-        <Text color="white">
+        <Text fontSize="sm" alignSelf="center">
           Página {page} de {totalPages}
         </Text>
-        <Button onClick={handleNextPage} isDisabled={page === totalPages}>
+        <Button onClick={handleNextPage} disabled={page === totalPages} colorScheme="teal" size="sm" ml={2}>
           Siguiente
         </Button>
       </Flex>
