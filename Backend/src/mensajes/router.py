@@ -17,7 +17,9 @@ from src.mensajes.schemas import (
     WindResponse,
     WindData,
     NodeSummary,
-    NodeSummaryResponse
+    NodeSummaryResponse,
+    NodeHistoricalData,
+    HistoricalDataPoint
 )
 
 
@@ -383,3 +385,59 @@ def get_node_summary(db: Session = Depends(get_db)):
     ]
 
     return NodeSummaryResponse(summary=summary_response)
+
+
+@router.get("/clima/nodos/historico", response_model=List[NodeHistoricalData])
+def get_node_historical_data(db: Session = Depends(get_db)):
+    """
+    Endpoint para obtener los datos históricos de todos los nodos con valores de cada variable.
+    """
+    # Consultar todos los registros de Mensaje para cada nodo y tipo de variable
+    results = (
+        db.query(
+            Mensaje.id_nodo,
+            Mensaje.type,
+            Mensaje.data,
+            Mensaje.time.label("timestamp")
+        )
+        .order_by(Mensaje.id_nodo, Mensaje.type, Mensaje.time)  # Ordenar por nodo, tipo y tiempo
+        .all()
+    )
+
+    node_data = {}
+    type_to_field = {
+        "temp_t": "temperature",
+        "humidity_t": "humidity",
+        "pressure_t": "pressure",
+        "rainfall_t": "precipitation",
+        "windspd_t": "wind"
+    }
+
+    for record in results:
+        node_id = record.id_nodo
+        if node_id not in node_data:
+            node_data[node_id] = {
+                "id_nodo": node_id,
+                "temperature": [],
+                "humidity": [],
+                "pressure": [],
+                "precipitation": [],
+                "wind": []
+            }
+
+        if record.type in type_to_field:
+            try:
+                data_point = HistoricalDataPoint(
+                    timestamp=record.timestamp,
+                    value=float(record.data)
+                )
+                node_data[node_id][type_to_field[record.type]].append(data_point)
+            except ValueError:
+                pass  # Ignorar datos inválidos
+
+    # Convertir el objeto node_data en una lista de NodeHistoricalData
+    historical_response = [
+        NodeHistoricalData(**data) for data in node_data.values()
+    ]
+
+    return historical_response

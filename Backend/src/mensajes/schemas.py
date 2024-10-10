@@ -81,3 +81,17 @@ class NodeSummary(BaseModel):
 
 class NodeSummaryResponse(BaseModel):
     summary: List[NodeSummary]
+
+
+
+class HistoricalDataPoint(BaseModel):
+    timestamp: datetime
+    value: float
+
+class NodeHistoricalData(BaseModel):
+    id_nodo: int
+    temperature: List[HistoricalDataPoint] = []
+    humidity: List[HistoricalDataPoint] = []
+    pressure: List[HistoricalDataPoint] = []
+    precipitation: List[HistoricalDataPoint] = []
+    wind: List[HistoricalDataPoint] = []
