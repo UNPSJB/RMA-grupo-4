@@ -7,37 +7,37 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
-    // Recupera el estado de autenticación desde localStorage al cargar la aplicación
+    // Recupera el estado de autenticación desde sessionStorage al cargar la aplicación
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
-        const storedAuth = localStorage.getItem('isAuthenticated');
+        const storedAuth = sessionStorage.getItem('isAuthenticated');
         return storedAuth === 'true'; // Convierte el string a booleano
     });
     
     const [user, setUser] = useState(() => {
-        return localStorage.getItem('user'); // Recupera el nombre de usuario almacenado
+        return sessionStorage.getItem('user'); // Recupera el nombre de usuario almacenado
     });
 
-    // Efecto para actualizar localStorage cada vez que cambie isAuthenticated o user
+    // Efecto para actualizar sessionStorage cada vez que cambie isAuthenticated o user
     useEffect(() => {
-        localStorage.setItem('isAuthenticated', isAuthenticated);
+        sessionStorage.setItem('isAuthenticated', isAuthenticated);
         if (user) {
-            localStorage.setItem('user', user);
+            sessionStorage.setItem('user', user);
         } else {
-            localStorage.removeItem('user');
+            sessionStorage.removeItem('user');
         }
     }, [isAuthenticated, user]);
 
     const login = (username) => {
         setIsAuthenticated(true);
         setUser(username);
-        localStorage.setItem(`token_${username}`, 'your_token_value'); // Guarda el token en localStorage (si es necesario)
+        sessionStorage.setItem(`token_${username}`, 'your_token_value'); // Guarda el token en sessionStorage (si es necesario)
     };
 
     const logout = () => {
         setIsAuthenticated(false);
         setUser(null);
-        localStorage.removeItem('user');
-        localStorage.removeItem(`token_${user}`); // Elimina el token de localStorage
+        sessionStorage.removeItem('user');
+        sessionStorage.removeItem(`token_${user}`); // Elimina el token de sessionStorage
     };
 
     return (

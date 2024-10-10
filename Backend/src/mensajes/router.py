@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import List, Optional
 from datetime import datetime
 from src.database import get_db  
@@ -329,10 +330,9 @@ def get_node_summary(db: Session = Depends(get_db)):
             Mensaje.id_nodo,
             Mensaje.type,
             Mensaje.data,
-            Mensaje.time
+            func.max(Mensaje.time).label("latest_time")
         )
-        .order_by(Mensaje.id_nodo, Mensaje.type, Mensaje.time.desc())
-        .distinct(Mensaje.id_nodo, Mensaje.type)
+        .group_by(Mensaje.id_nodo, Mensaje.type)
         .subquery()
     )
 
@@ -341,12 +341,21 @@ def get_node_summary(db: Session = Depends(get_db)):
             subquery.c.id_nodo,
             subquery.c.type,
             subquery.c.data,
-            subquery.c.time
+            subquery.c.latest_time.label("time")
         )
+        .order_by(subquery.c.id_nodo, subquery.c.type)
         .all()
     )
 
     node_data = {}
+    type_to_field = {
+        "temp_t": "last_temperature",
+        "humidity_t": "last_humidity",
+        "pressure_t": "last_pressure",
+        "rainfall_t": "last_precipitation",
+        "windspd_t": "last_wind"
+    }
+
     for record in results:
         node_id = record.id_nodo
         if node_id not in node_data:
@@ -360,16 +369,11 @@ def get_node_summary(db: Session = Depends(get_db)):
                 "last_update": None
             }
 
-        if record.type == "temp_t":
-            node_data[node_id]["last_temperature"] = float(record.data)
-        elif record.type == "humidity_t":
-            node_data[node_id]["last_humidity"] = float(record.data)
-        elif record.type == "pressure_t":
-            node_data[node_id]["last_pressure"] = float(record.data)
-        elif record.type == "rainfall_t":
-            node_data[node_id]["last_precipitation"] = float(record.data)
-        elif record.type == "windspd_t":
-            node_data[node_id]["last_wind"] = float(record.data)
+        if record.type in type_to_field:
+            try:
+                node_data[node_id][type_to_field[record.type]] = float(record.data)
+            except ValueError:
+                node_data[node_id][type_to_field[record.type]] = None
 
         if node_data[node_id]["last_update"] is None or record.time > node_data[node_id]["last_update"]:
             node_data[node_id]["last_update"] = record.time
