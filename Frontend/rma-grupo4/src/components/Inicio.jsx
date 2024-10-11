@@ -1,5 +1,5 @@
 import { Box, Grid, GridItem } from '@chakra-ui/react';
-import ResumenVariable from '../components/ResumenVariable'; // Importa el componente
+import ResumenVariable from '../pages/ResumenVariable'; // Importa el componente
 import GraficoLinea from '../pages/GraficoLinea';
 import GraficoBarra from '../pages/GraficoBarra';
 import TablaPage from '../pages/TablaPage';
@@ -45,7 +45,21 @@ export default function Inicio() {
           <ResumenVariable title="Presión" url="http://localhost:8000/api/v1/clima/presion" />
         </Grid>
       </Box>
-
+      <Box p={{ base: 2, md: 4 }}>
+        <GridItem colSpan={2} bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
+          <Grid 
+            templateColumns={{ base: '1fr', md: '1fr 1fr' }} 
+            gap={4}
+            maxWidth="100%"
+            overflow="hidden"  // Evita desbordamiento en contenedor padre
+          >
+            {/* Grafico Linea */}
+            <GridItem maxWidth="100%" overflowX="auto">  {/* Ajustar tamaño máximo y desbordamiento */}
+              <GraficoLinea title="Temperatura" url="http://localhost:8000/api/v1/clima/temperatura" />
+            </GridItem>
+          </Grid>
+        </GridItem>
+      </Box>
       {/* Sección de gráficos lineales y de barras */}
       <Box p={{ base: 2, md: 4 }}>
         <Grid
@@ -53,7 +67,6 @@ export default function Inicio() {
           gap={4}
           maxWidth="100%"
           bg="gray.900"
-          p={{ base: 2, md: 6 }} 
           borderRadius="md"
         >
          
@@ -61,7 +74,7 @@ export default function Inicio() {
           <GridItem colSpan={{ base: 1, md: 1 }} bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md">
             <GraficoArea url="http://localhost:8000/api/v1/clima/humedad" />
           </GridItem>
-          <GridItem colSpan={{ base: 1, md: 1 }} bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md">
+          <GridItem colSpan={{ base: 1, md: 1 }} bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md" >
             <GraficoBarra url="http://localhost:8000/api/v1/clima/precipitacion"/>
           </GridItem>
 

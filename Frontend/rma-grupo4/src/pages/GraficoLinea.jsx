@@ -1,45 +1,53 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Text } from '@chakra-ui/react';
-import { Chart as ChartJS, registerables } from 'chart.js';
 import { Line } from 'react-chartjs-2'; 
+import axios from 'axios';
 
-ChartJS.register(...registerables);
-
-const variables = [
-  { name: 'temperatura', color: 'rgba(255, 99, 132, 1)' },
-  { name: 'humedad', color: 'rgba(54, 162, 235, 1)' },
-  { name: 'presion', color: 'rgba(255, 206, 86, 1)' },
-  { name: 'viento', color: 'rgba(75, 192, 192, 1)' },
-];
-
-const GraficoLinea = ({ data, selectedVariables }) => {
+const GraficoLinea = ({ title, url }) => {
   const [chartData, setChartData] = useState(null);
+  const [summary, setSummary] = useState(null);  // Para almacenar el resumen
 
   useEffect(() => {
-    // Si no hay datos, no hacer nada
-    if (!data || data.length === 0) return;
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(url);
 
-    // Filtrar las variables seleccionadas para mostrarlas en el gráfico
-    const filteredVariables = variables.filter(variable =>
-      selectedVariables.includes(variable.name)
-    );
+        const dataArray = response.data.data;
+        const summaryData = response.data.summary;
 
-    // Crear nuevo conjunto de datos basado en los datos pasados por `props`
-    const newData = {
-      labels: data.map(item => item.Nodo), // Usamos los Nodos como etiquetas
-      datasets: filteredVariables.map(variable => ({
-        label: variable.name,
-        data: data.map(item => item[variable.name.charAt(0).toUpperCase() + variable.name.slice(1)]), // Obtenemos los valores de la variable seleccionada
-        borderColor: variable.color,
-        backgroundColor: variable.color.replace('1)', '0.2)'),
-        borderWidth: 2,
-        fill: false,
-        tension: 0.4,
-      })),
+        setSummary(summaryData);
+
+        const processedData = dataArray
+          .filter(item => item.type === 'temp_t')  
+          .map(item => ({
+            ...item,
+            data: parseFloat(item.data)  
+          }));
+
+        if (processedData.length > 0) {
+          const newData = {
+            labels: processedData.map(item => new Date(item.timestamp).toLocaleDateString()), // Etiquetas con el timestamp formateado
+            datasets: [{
+              label: `${title}`,
+              data: processedData.map(item => item.data), // Datos de temperatura
+              borderColor: 'rgba(75,192,192,1)',
+              backgroundColor: 'rgba(75,192,192,0.2)',
+              borderWidth: 2,
+              fill: false,
+              tension: 0.4
+            }]
+          };
+          setChartData(newData);
+        } else {
+          console.error('No se encontraron datos procesables.');
+        }
+
+      } catch (error) {
+        console.error(`Error al obtener los datos del resumen de ${title}:`, error);
+      }
     };
-
-    setChartData(newData);
-  }, [data, selectedVariables]); // Se actualiza cada vez que cambien los datos o las variables seleccionadas
+    fetchData();
+  }, [url, title]);
 
   const chartOptions = {
     responsive: true,
@@ -51,7 +59,7 @@ const GraficoLinea = ({ data, selectedVariables }) => {
       },
       title: {
         display: true,
-        text: 'Gráfico de Linea',
+        text: `Gráfico de Línea - ${title}`,
         font: { size: 16, weight: 'bold' },
         color: 'white',
         padding: { top: 10, bottom: 10 },
