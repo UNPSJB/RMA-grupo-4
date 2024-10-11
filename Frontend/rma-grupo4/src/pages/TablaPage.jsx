@@ -9,6 +9,7 @@ function TablaPage({ onRowSelection }) {
   const [sortConfig, setSortConfig] = useState({ key: "value", direction: "asc" });
   const [page, setPage] = useState(1);
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
+  const [isFahrenheit, setIsFahrenheit] = useState(false);
   const [isMobile] = useMediaQuery("(max-width: 48em)");
   const rowsPerPage = isMobile ? 5 : 8;
 
@@ -80,6 +81,11 @@ function TablaPage({ onRowSelection }) {
     return timestamp.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
   };
 
+  const convertToFahrenheit = (celsius) => {
+    if (celsius === 'N/A') return 'N/A';
+    return (celsius * 9/5 + 32).toFixed(2);
+  };
+
   return (
     <Box bg="gray.700" color="white" p={isMobile ? 1 : 2} borderRadius="md" boxShadow="md" width="100%">
       <Box overflowX="auto">
@@ -107,10 +113,18 @@ function TablaPage({ onRowSelection }) {
                   )}
                 </Center>
               </Th>
-              <Th onClick={() => handleSort("Temperatura")}>
+              <Th>
                 <Center color="white">
                   <FaTemperatureHigh size="1.5em" style={{ marginRight: "5px" }} />
                   Temperatura
+                  <Button
+                    size="xs"
+                    colorScheme="teal"
+                    onClick={() => setIsFahrenheit(!isFahrenheit)}
+                    ml={2}
+                  >
+                    {isFahrenheit ? "°C" : "°F"}
+                  </Button>
                   {sortConfig.key === "Temperatura" && (
                     <span style={{ marginLeft: "5px" }}>
                       {sortConfig.direction === "asc" ? "↑" : "↓"}
@@ -181,7 +195,9 @@ function TablaPage({ onRowSelection }) {
                 >
                   <Td textAlign="center">{row.Nodo}</Td>
                   <Td textAlign="center">{formatNumber(row.Humedad)} %</Td>
-                  <Td textAlign="center">{formatNumber(row.Temperatura)} °C</Td>
+                  <Td textAlign="center">
+                    {isFahrenheit ? formatNumber(convertToFahrenheit(row.Temperatura)) + " °F" : formatNumber(row.Temperatura) + " °C"}
+                  </Td>
                   <Td textAlign="center" display={{ base: "none", md: "table-cell" }}>{formatNumber(row.Presion)} hPa</Td>
                   <Td textAlign="center">{formatNumber(row.Viento)} km/h</Td>
                   <Td textAlign="center">{formatNumber(row.Precipitacion)} mm</Td>
