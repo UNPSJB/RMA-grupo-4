@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Text } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables } from 'chart.js';
-import { Bar } from 'react-chartjs-2'; // Cambiar a Bar para gráficos de barras
+import { Line } from 'react-chartjs-2';
 import axios from 'axios';
 
 ChartJS.register(...registerables);
 
-const GraficoBarra = ({ title, url }) => {
+const GraficoArea = ({ title, url }) => {
   const [chartData, setChartData] = useState(null);
   const [summary, setSummary] = useState(null);  // Para almacenar el resumen
 
@@ -25,9 +25,9 @@ const GraficoBarra = ({ title, url }) => {
         // Guardar el resumen en el estado si es necesario
         setSummary(summaryData);
 
-        // Procesar los datos para obtener la precipitación
+        // Procesar los datos para obtener la humedad
         const processedData = dataArray
-          .filter(item => item.type === 'rainfall_t')  // Filtrar por tipo, en este caso "precipitación"
+          .filter(item => item.type === 'humidity_t')  // Filtrar por tipo, en este caso "humedad"
           .map(item => ({
             ...item,
             data: parseFloat(item.data)  // Convertir el valor de `data` a número
@@ -38,11 +38,13 @@ const GraficoBarra = ({ title, url }) => {
           const newData = {
             labels: processedData.map(item => new Date(item.timestamp).toLocaleTimeString()), // Etiquetas con el timestamp formateado
             datasets: [{
-              label: `Precipitación`,
-              data: processedData.map(item => item.data), // Datos de precipitación
-              backgroundColor: 'rgba(255, 0, 0, 0.5)', // Cambiar a rojo con opacidad
-              borderColor: 'rgba(255, 0, 0, 1)', // Cambiar el borde a rojo
+              label: `Humedad`,
+              data: processedData.map(item => item.data), // Datos de humedad
+              borderColor: 'rgba(54, 162, 235, 1)',
+              backgroundColor: 'rgba(54, 162, 235, 0.5)', // Cambiar la opacidad para el área
               borderWidth: 2,
+              fill: true, // Habilitar el relleno debajo de la línea
+              tension: 0.4
             }]
           };
           setChartData(newData);
@@ -67,7 +69,7 @@ const GraficoBarra = ({ title, url }) => {
       },
       title: {
         display: true,
-        text: `Gráfico de Barras - Precipitación`,
+        text: `Gráfico de Área - Humedad`,
         font: { size: 16, weight: 'bold' },
         color: 'white',
         padding: { top: 10, bottom: 10 },
@@ -97,7 +99,7 @@ const GraficoBarra = ({ title, url }) => {
     >
       {chartData ? (
         <Box height={{ base: '300px', md: '400px' }}>
-          <Bar data={chartData} options={chartOptions} /> {/* Cambiar a Bar */}
+          <Line data={chartData} options={chartOptions} />
         </Box>
       ) : (
         <Text fontSize={{ base: 'sm', md: 'md' }}>
@@ -108,4 +110,4 @@ const GraficoBarra = ({ title, url }) => {
   );
 };
 
-export default GraficoBarra;
+export default GraficoArea;

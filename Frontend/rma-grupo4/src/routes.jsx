@@ -5,11 +5,11 @@ import Login from './components/Login';
 import Registrar from './components/Registrar';
 import Inicio from './components/Inicio';
 import PrivateRoute from './components/PrivateRoute';
-import TablaPage from './pages/TablaPage';  
-import GraficosPage from './pages/GraficosPage';  
+import TablaPage from './pages/TablaPage';   
 import HistoricosPage from './pages/HistoricosPage'; 
 import GraficoLinea from './pages/GraficoLinea';   
 import GraficoBarra from './pages/GraficoBarra';  
+import GraficoArea from './pages/GraficoArea';
 import ModificarDatos from './components/ModificarDatos';
 import ModificarPassword from './components/ModificarPassword';
 import EliminarUsuario from './components/EliminarUsuario';
@@ -48,11 +48,11 @@ function AppRoutes() {
           } 
         />
         <Route 
-          path="/graficos" 
+          path="/area" 
           element={
             <App>
               <PrivateRoute>
-                <GraficosPage />
+                <GraficoArea />
               </PrivateRoute>
             </App>
           } 
