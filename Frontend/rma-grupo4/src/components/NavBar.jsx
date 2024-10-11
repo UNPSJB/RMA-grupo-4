@@ -122,7 +122,7 @@ function NavBar() {
                                     bg="gray.900"
                                     color="white"
                                     _hover={{ bg: 'orange.500' }}
-                                    borderRadius="full"
+                                    
                                 >
                                     Modificar datos de usuario
                                 </MenuItem>
@@ -132,7 +132,7 @@ function NavBar() {
                                     bg="gray.900"
                                     color="white"
                                     _hover={{ bg: 'orange.500' }}
-                                    borderRadius="full"
+                                    
                                 >
                                     Modificar password
                                 </MenuItem>
@@ -142,7 +142,7 @@ function NavBar() {
                                     bg="gray.900"
                                     color="white"
                                     _hover={{ bg: 'orange.500' }}
-                                    borderRadius="full"
+                                    
                                 >
                                     Eliminar usuario
                                 </MenuItem>
@@ -153,7 +153,7 @@ function NavBar() {
                                     color="white"
                                     _hover={{ bg: 'orange.500' }}
                                     leftIcon={<Icon as={FaQuestionCircle} boxSize={5} />}
-                                    borderRadius="full"
+                                   
                                 >
                                     Ayuda
                                 </MenuItem>
@@ -164,7 +164,7 @@ function NavBar() {
                                     color="white"
                                     _hover={{ bg: 'orange.500' }}
                                     leftIcon={<Icon as={FaSignOutAlt} />}
-                                    borderRadius="full"
+                                    
                                 >
                                     Cerrar sesión
                                 </MenuItem>

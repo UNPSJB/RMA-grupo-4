@@ -1,24 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Heading, Text, Button, Stack, Image, Flex, Icon } from '@chakra-ui/react';
+import React, { useEffect } from 'react';
+import { Box, Heading, Text, Button, Stack, Flex, Icon } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { FaLock, FaUserPlus, FaArrowRight } from 'react-icons/fa';
-import testImage1 from '../Images/test1.jpg';
-import testImage2 from '../Images/test2.jpg';
-import testImage3 from '../Images/test3.jpg';
-
-const images = [testImage1, testImage2, testImage3];
+import { useAuth } from './AuthContext'; // Importar el contexto de autenticación
 
 export default function Home() {
     const navigate = useNavigate();
-    const [currentImage, setCurrentImage] = useState(0);
+    const { isAuthenticated } = useAuth(); // Obtener estado de autenticación
 
+    // Redirigir al usuario a /inicio si ya está autenticado
     useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentImage((prev) => (prev + 1) % images.length);
-        }, 3000); // Cambia la imagen cada 3 segundos
-
-        return () => clearInterval(interval);
-    }, []);
+        if (isAuthenticated) {
+            navigate('/inicio');
+        }
+    }, [isAuthenticated, navigate]);
 
     return (
         <Box
@@ -31,28 +26,6 @@ export default function Home() {
             textAlign="center"
             overflow="hidden"
         >
-            <Image
-                src={images[currentImage]}
-                position="absolute"
-                top="0"
-                left="0"
-                width="100%"
-                height="100%"
-                objectFit="cover"
-                zIndex="-2"
-                opacity="1"
-            />
-
-            <Box
-                position="absolute"
-                top="0"
-                left="0"
-                width="100%"
-                height="100%"
-                zIndex="-1"
-                bg="linear-gradient(to right, rgba(20, 20, 20, 0.8) 50%, rgba(20, 20, 20, 0) 100%)"
-            />
-
             <Heading
                 as="h1"
                 size="4xl"
@@ -73,17 +46,17 @@ export default function Home() {
                 <Button
                     leftIcon={<FaLock />}
                     size="lg"
-                    bg="orange.500" // Color de fondo del botón
-                    color="white" // Color del texto
-                    borderRadius="30px" // Mayor redondez
+                    bg="orange.500"
+                    color="white"
+                    borderRadius="30px"
                     boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1)"
                     _hover={{
-                        bg: 'orange.600', // Color al pasar el mouse
+                        bg: 'orange.600',
                         boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1)',
                         transform: 'scale(1.05)',
                     }}
                     _active={{
-                        bg: 'orange.700', // Color al presionar
+                        bg: 'orange.700',
                         transform: 'translateY(2px)',
                         boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.5)',
                     }}
@@ -95,17 +68,17 @@ export default function Home() {
                     leftIcon={<FaUserPlus />}
                     size="lg"
                     variant="outline"
-                    borderColor="orange.500" // Color del borde
-                    color="orange.500" // Color del texto
-                    borderRadius="30px" // Mayor redondez
+                    borderColor="orange.500"
+                    color="orange.500"
+                    borderRadius="30px"
                     _hover={{
-                        borderColor: 'orange.600', // Color del borde al pasar el mouse
-                        color: 'orange.600', // Color del texto al pasar el mouse
+                        borderColor: 'orange.600',
+                        color: 'orange.600',
                         boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1)',
                         transform: 'scale(1.05)',
                     }}
                     _active={{
-                        borderColor: 'orange.700', // Color del borde al presionar
+                        borderColor: 'orange.700',
                         transform: 'translateY(2px)',
                         boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.5)',
                     }}
@@ -119,15 +92,15 @@ export default function Home() {
                 direction={{ base: 'column', md: 'row' }}
                 justify="space-around"
                 wrap="wrap"
-                mt={16}
+                mt={20}
                 px={4}
                 maxW="1200px"
                 w="100%"
             >
                 {[
-                    { title: 'Funcionalidad 1', description: 'Explora nuevas oportunidades.', icon: FaArrowRight },
-                    { title: 'Funcionalidad 2', description: 'Gestiona tus proyectos con facilidad.', icon: FaArrowRight },
-                    { title: 'Funcionalidad 3', description: 'Accede a estadísticas personalizadas.', icon: FaArrowRight }
+                    { title: 'Monitoreo en Tiempo Real', description: 'Mantén un control constante de las condiciones climáticas ', icon: FaArrowRight },
+                    { title: 'Análisis de Datos Históricos', description: 'Accede a los registros históricos para realizar análisis detallados', icon: FaArrowRight },
+                    { title: 'Alertas Personalizadas', description: 'Recibe notificaciones automáticas cuando las condiciones superen los límites establecidos', icon: FaArrowRight }
                 ].map((feature, index) => (
                     <Flex
                         key={index}
@@ -135,7 +108,7 @@ export default function Home() {
                         align="center"
                         bg="rgba(255, 255, 255, 0.1)"
                         borderRadius="xl"
-                        p={8}
+                        p={3}
                         m={4}
                         flex="1"
                         minW={{ base: '100%', md: '30%' }}
@@ -147,7 +120,7 @@ export default function Home() {
                         <Heading as="h3" size="lg" mb={4}>
                             {feature.title}
                         </Heading>
-                        <Text fontSize="md" color="gray.300">
+                        <Text fontSize="md" color="gray.300" textAlign="justify">
                             {feature.description}
                         </Text>
                     </Flex>
