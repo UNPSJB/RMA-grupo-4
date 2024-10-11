@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, Stack, Select, Table, Thead, Tbody, Tr, Th, Td, useMediaQuery } from '@chakra-ui/react';
+import { Box, Heading, Stack, Select, Table, Thead, Tbody, Tr, Th, Td, useMediaQuery, Flex } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
 import axios from 'axios';
@@ -32,6 +32,16 @@ const months = [
   { name: 'Octubre', value: '10' },
   { name: 'Noviembre', value: '11' },
   { name: 'Diciembre', value: '12' },
+];
+
+const years = [
+  {value : '2024'},
+  {value : '2025'},
+  {value : '2026'},
+  {value : '2027'},
+  {value : '2028'},
+  {value : '2029'}
+
 ];
 
 function HistoricosPage() {
@@ -189,57 +199,63 @@ function HistoricosPage() {
 
   return (
     <Box p={4}>
-      <Heading as="h1" mb={4}>Históricos de variables</Heading>
-      <Stack spacing={4} mb={4}>
-        <Select value={selectedVariable} onChange={(e) => setSelectedVariable(e.target.value)}
-          sx={{
-            option: {
-              backgroundColor: 'black',
-              
-            },
-          }}
-          >
+      <Heading as="h1" m={7} textAlign="center">Históricos de variables</Heading>
+      <Flex justify="center" mb={4} mt={5} wrap="wrap" gap={4}>
+        <Select 
+          value={selectedVariable} 
+          onChange={(e) => setSelectedVariable(e.target.value)} 
+          width="150px"
+          variant="outline"
+          focusBorderColor="teal.500"
+          _hover={{ borderColor: "teal.300" }}
+          _selected={{ bg: "teal.100" }}
+        >
           {variables.map((v) => (
             <option key={v.name} value={v.name}>{v.name}</option>
           ))}
         </Select>
-        <Select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} 
-          sx={{
-            option: {
-              backgroundColor: 'black',
-              
-            },
-          }}
-          >
-          <option value="2024">2024</option>
-          <option value="2023">2023</option>
+        <Select 
+          value={selectedYear} 
+          onChange={(e) => setSelectedYear(e.target.value)} 
+          width="100px"
+          variant="outline"
+          focusBorderColor="teal.500"
+          _hover={{ borderColor: "teal.300" }}
+          _selected={{ bg: "teal.100" }}
+        
+        >
+        {years.map((m) => (
+            <option key={m.value} value={m.value}>{m.value}</option>
+          ))}
         </Select>
-        <Select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}
-          sx={{
-            option: {
-              backgroundColor: 'black',
-              
-            },
-          }}
-          >
+        <Select 
+          value={selectedMonth} 
+          onChange={(e) => setSelectedMonth(e.target.value)} 
+          width="120px"
+          variant="outline"
+          focusBorderColor="teal.500"
+          _hover={{ borderColor: "teal.300" }}
+          _selected={{ bg: "teal.100" }}
+        >
           {months.map((m) => (
             <option key={m.value} value={m.value}>{m.name}</option>
           ))}
         </Select>
-        <Select value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)}
-          sx={{
-            option: {
-              backgroundColor: 'black',
-              
-            },
-          }}
-          >
+        <Select 
+          value={selectedDay} 
+          onChange={(e) => setSelectedDay(e.target.value)} 
+          width="80px"
+          variant="outline"
+          focusBorderColor="teal.500"
+          _hover={{ borderColor: "teal.300" }}
+          _selected={{ bg: "teal.100" }}
+        >
           <option value="">Seleccione un día</option>
           {days.map((d) => (
             <option key={d} value={d}>{d}</option>
           ))}
         </Select>
-      </Stack>
+      </Flex>
       {renderCombinedChart()}
       <Heading as="h2" size="md" mt={4}>Datos históricos</Heading>
       <Table variant="striped" mt={4}>
