@@ -3,14 +3,15 @@ import { Box, Text } from '@chakra-ui/react';
 import { Line } from 'react-chartjs-2'; 
 import axios from 'axios';
 
-const GraficoLinea = ({ title, url }) => {
+const GraficoLinea = ({ title, url, nodeId }) => {
   const [chartData, setChartData] = useState(null);
   const [summary, setSummary] = useState(null);  // Para almacenar el resumen
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(url);
+        const finalUrl = nodeId !== undefined ? `${url}?node_id=${nodeId}` : url;
+        const response = await axios.get(finalUrl);
 
         const dataArray = response.data.data;
         const summaryData = response.data.summary;
@@ -26,10 +27,10 @@ const GraficoLinea = ({ title, url }) => {
 
         if (processedData.length > 0) {
           const newData = {
-            labels: processedData.map(item => new Date(item.timestamp).toLocaleDateString()), // Etiquetas con el timestamp formateado
+            labels: processedData.map(item => new Date(item.timestamp).toLocaleDateString()), 
             datasets: [{
               label: `${title}`,
-              data: processedData.map(item => item.data), // Datos de temperatura
+              data: processedData.map(item => item.data), 
               borderColor: 'rgba(75,192,192,1)',
               backgroundColor: 'rgba(75,192,192,0.2)',
               borderWidth: 2,
@@ -47,7 +48,7 @@ const GraficoLinea = ({ title, url }) => {
       }
     };
     fetchData();
-  }, [url, title]);
+  }, [url, title, nodeId]); 
 
   const chartOptions = {
     responsive: true,

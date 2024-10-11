@@ -6,17 +6,15 @@ import axios from 'axios';
 
 ChartJS.register(...registerables);
 
-const GraficoArea = ({ title, url }) => {
+const GraficoArea = ({ title, url, nodeId }) => {
   const [chartData, setChartData] = useState(null);
   const [summary, setSummary] = useState(null);  // Para almacenar el resumen
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(url);
-        
-        // Verificar la estructura de response.data
-        console.log("Datos obtenidos de la API:", response.data);
+        const finalUrl = nodeId !== undefined ? `${url}?node_id=${nodeId}` : url;
+        const response = await axios.get(finalUrl);
 
         // Accede al arreglo de datos y al resumen
         const dataArray = response.data.data;
@@ -57,7 +55,7 @@ const GraficoArea = ({ title, url }) => {
       }
     };
     fetchData();
-  }, [url, title]);
+  }, [url, title, nodeId]);
 
   const chartOptions = {
     responsive: true,

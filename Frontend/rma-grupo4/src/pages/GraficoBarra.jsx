@@ -6,23 +6,19 @@ import axios from 'axios';
 
 ChartJS.register(...registerables);
 
-const GraficoBarra = ({ title, url }) => {
+const GraficoBarra = ({ title, url, nodeId }) => {
   const [chartData, setChartData] = useState(null);
   const [summary, setSummary] = useState(null);  // Para almacenar el resumen
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(url);
-        
-        // Verificar la estructura de response.data
-        console.log("Datos obtenidos de la API:", response.data);
+        const finalUrl = nodeId !== undefined ? `${url}?node_id=${nodeId}` : url;
+        const response = await axios.get(finalUrl);
 
-        // Accede al arreglo de datos y al resumen
         const dataArray = response.data.data;
         const summaryData = response.data.summary;
 
-        // Guardar el resumen en el estado si es necesario
         setSummary(summaryData);
 
         // Procesar los datos para obtener la precipitación
@@ -55,7 +51,7 @@ const GraficoBarra = ({ title, url }) => {
       }
     };
     fetchData();
-  }, [url, title]);
+  }, [url, title, nodeId]);
 
   const chartOptions = {
     responsive: true,

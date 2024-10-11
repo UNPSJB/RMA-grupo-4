@@ -3,16 +3,16 @@ import { Box, Text } from '@chakra-ui/react';
 import { Doughnut } from 'react-chartjs-2'; 
 import axios from 'axios';
 
-const GraficoMedidor = ({ title, url }) => {
+const GraficoMedidor = ({ title, url, nodeId }) => {
   const [chartData, setChartData] = useState(null);
   const [summary, setSummary] = useState(null);  
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(url);
+        const finalUrl = nodeId !== undefined ? `${url}?node_id=${nodeId}` : url;
 
-        console.log("Datos obtenidos de la API de presión:", response.data.data);
+        const response = await axios.get(finalUrl);
 
         const dataArray = response.data.data;
         const summaryData = response.data.summary;
@@ -58,7 +58,7 @@ const GraficoMedidor = ({ title, url }) => {
       }
     };
     fetchData();
-  }, [url, title]);
+  }, [url, title, nodeId]);
 
   const chartOptions = {
     responsive: true,

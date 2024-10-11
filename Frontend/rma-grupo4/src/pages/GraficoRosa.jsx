@@ -3,19 +3,15 @@ import { Box, Text } from '@chakra-ui/react';
 import { Radar } from 'react-chartjs-2'; // Cambiamos PolarArea por Radar
 import axios from 'axios';
 
-const GraficoRosa = ({ title, url }) => {
+const GraficoRosa = ({ title, url, nodeId}) => {
   const [chartData, setChartData] = useState(null);
   const [summary, setSummary] = useState(null);  
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(url);
-
-        // Verificar la estructura de response.data
-        console.log("Datos obtenidos de la API ROSAS:", response.data.data);
-
-        // Accede al arreglo de datos y al resumen
+        const finalUrl = nodeId !== undefined ? `${url}?node_id=${nodeId}` : url;
+        const response = await axios.get(finalUrl);
         const dataArray = response.data.data;
         const summaryData = response.data.summary;
 
@@ -56,7 +52,7 @@ const GraficoRosa = ({ title, url }) => {
       }
     };
     fetchData();
-  }, [url, title]);
+  }, [url, title, nodeId]);
 
   const chartOptions = {
     responsive: true,
