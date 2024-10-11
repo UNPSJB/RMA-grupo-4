@@ -10,6 +10,8 @@ function TablaPage({ onRowSelection }) {
   const [page, setPage] = useState(1);
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
   const [isFahrenheit, setIsFahrenheit] = useState(false);
+  const [isMtsXSegundo, setIsMtsXSegundo] = useState(false);
+  const [isCm, setIsCm] = useState(false);
   const [isMobile] = useMediaQuery("(max-width: 48em)");
   const rowsPerPage = isMobile ? 5 : 8;
 
@@ -86,6 +88,17 @@ function TablaPage({ onRowSelection }) {
     return (celsius * 9/5 + 32).toFixed(2);
   };
 
+  const convertToMetroXSeg = (kmh) => {
+    if (kmh === 'N/A') return 'N/A';
+    return (kmh / 3.6).toFixed(2);  // Conversión de km/h a m/s
+  };
+
+  const convertToCentimeters = (mm) => {
+    if (mm === 'N/A') return 'N/A';
+    return (mm / 10).toFixed(2);  // Conversión de mm a cm
+  };
+
+
   return (
     <Box bg="gray.700" color="white" p={isMobile ? 1 : 2} borderRadius="md" boxShadow="md" width="100%">
       <Box overflowX="auto">
@@ -102,15 +115,10 @@ function TablaPage({ onRowSelection }) {
                   )}
                 </Center>
               </Th>
-              <Th onClick={() => handleSort("Humedad")}>
+              <Th>
                 <Center color="white">
                   <FaTint size="1.5em" style={{ marginRight: "5px" }} />
                   Humedad
-                  {sortConfig.key === "Humedad" && (
-                    <span style={{ marginLeft: "5px" }}>
-                      {sortConfig.direction === "asc" ? "↑" : "↓"}
-                    </span>
-                  )}
                 </Center>
               </Th>
               <Th>
@@ -125,55 +133,46 @@ function TablaPage({ onRowSelection }) {
                   >
                     {isFahrenheit ? "°C" : "°F"}
                   </Button>
-                  {sortConfig.key === "Temperatura" && (
-                    <span style={{ marginLeft: "5px" }}>
-                      {sortConfig.direction === "asc" ? "↑" : "↓"}
-                    </span>
-                  )}
                 </Center>
               </Th>
-              <Th onClick={() => handleSort("Presion")} display={{ base: "none", md: "table-cell" }}>
+              <Th display={{ base: "none", md: "table-cell" }}>
                 <Center color="white">
                   <GiSpeedometer size="1.5em" style={{ marginRight: "5px" }} />
                   Presión
-                  {sortConfig.key === "Presion" && (
-                    <span style={{ marginLeft: "5px" }}>
-                      {sortConfig.direction === "asc" ? "↑" : "↓"}
-                    </span>
-                  )}
                 </Center>
               </Th>
-              <Th onClick={() => handleSort("Viento")}>
+              <Th>
                 <Center color="white">
                   <FaWind size="1.5em" style={{ marginRight: "5px" }} />
                   Viento
-                  {sortConfig.key === "Viento" && (
-                    <span style={{ marginLeft: "5px" }}>
-                      {sortConfig.direction === "asc" ? "↑" : "↓"}
-                    </span>
-                  )}
+                  <Button
+                    size="xs"
+                    colorScheme="teal"
+                    onClick={() => setIsMtsXSegundo(!isMtsXSegundo)}
+                    ml={2}
+                  >
+                    {isMtsXSegundo ? "km/h" : "m/s"}
+                  </Button>
                 </Center>
               </Th>
-              <Th onClick={() => handleSort("Precipitacion")}>
+              <Th>
                 <Center color="white">
                   <GiWaterDrop size="1.5em" style={{ marginRight: "5px" }} />
                   Precipitación
-                  {sortConfig.key === "Precipitacion" && (
-                    <span style={{ marginLeft: "5px" }}>
-                      {sortConfig.direction === "asc" ? "↑" : "↓"}
-                    </span>
-                  )}
+                  <Button
+                    size="xs"
+                    colorScheme="teal"
+                    onClick={() => setIsCm(!isCm)}
+                    ml={2}
+                  >
+                    {isCm ? "mm" : "cm"}
+                  </Button>
                 </Center>
               </Th>
-              <Th onClick={() => handleSort("Fecha")}>
+              <Th>
                 <Center color="white">
                   <FaClock size="1.5em" style={{ marginRight: "5px" }} />
                   Fecha
-                  {sortConfig.key === "Fecha" && (
-                    <span style={{ marginLeft: "5px" }}>
-                      {sortConfig.direction === "asc" ? "↑" : "↓"}
-                    </span>
-                  )}
                 </Center>
               </Th>
             </Tr>
@@ -199,8 +198,14 @@ function TablaPage({ onRowSelection }) {
                     {isFahrenheit ? formatNumber(convertToFahrenheit(row.Temperatura)) + " °F" : formatNumber(row.Temperatura) + " °C"}
                   </Td>
                   <Td textAlign="center" display={{ base: "none", md: "table-cell" }}>{formatNumber(row.Presion)} hPa</Td>
-                  <Td textAlign="center">{formatNumber(row.Viento)} km/h</Td>
-                  <Td textAlign="center">{formatNumber(row.Precipitacion)} mm</Td>
+                  <Td textAlign="center">
+                    {isMtsXSegundo ? formatNumber(convertToMetroXSeg(row.Viento)) + " m/s" : formatNumber(row.Viento) + " km/h"}
+                  </Td>
+                  <Td textAlign="center">
+                    {isCm 
+                      ? formatNumber(convertToCentimeters(parseFloat(row.Precipitacion))) + " cm" 
+                      : formatNumber(row.Precipitacion) + " mm"}
+                  </Td>
                   <Td textAlign="center">{formatTime(row.Timestamp)}</Td>
                 </Tr>
               ))
