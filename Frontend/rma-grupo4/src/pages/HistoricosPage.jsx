@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, Checkbox, Stack, Select, Grid, GridItem, Table, Thead, Tbody, Tr, Th, Td, useMediaQuery } from '@chakra-ui/react';
+import { Box, Heading, Stack, Select, Table, Thead, Tbody, Tr, Th, Td, useMediaQuery } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
 import axios from 'axios';
@@ -12,6 +12,12 @@ const variables = [
   { name: 'presion', color: 'rgba(255, 206, 86, 1)' },
   { name: 'viento', color: 'rgba(75, 192, 192, 1)' },
 ];
+const variableMapping = {
+  temperatura: 'temperature',
+  humedad: 'humidity',
+  presion: 'pressure',
+  viento: 'wind',
+};
 
 const months = [
   { name: 'Enero', value: '01' },
@@ -28,14 +34,14 @@ const months = [
   { name: 'Diciembre', value: '12' },
 ];
 
-function HistoricosPage(data) {
+function HistoricosPage() {
   const [isMobile] = useMediaQuery("(max-width: 48em)");
   const [selectedCharts, setSelectedCharts] = useState(['line']);
   const [selectedVariable, setSelectedVariable] = useState('temperatura');
   const [selectedYear, setSelectedYear] = useState('2024');
   const [selectedMonth, setSelectedMonth] = useState('10');
   const [selectedDay, setSelectedDay] = useState('10');
-  const [chartData, setChartData] = useState('');
+  const [chartData, setChartData] = useState(null);
   const [days, setDays] = useState([]);
   const [historicalData, setHistoricalData] = useState([]);
 
@@ -44,41 +50,73 @@ function HistoricosPage(data) {
 
   useEffect(() => {
     if (selectedYear && selectedMonth) {
-      const monthIndex = parseInt(selectedMonth);
+      const monthIndex = parseInt(selectedMonth, 10);
       const daysArray = getDias(selectedYear, monthIndex);
       setDays(daysArray);
-      
     }
   }, [selectedYear, selectedMonth]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/v1/clima/temperatura`, {
-          params: { time_range: `${selectedYear}-${selectedMonth}-${selectedDay || ''}` },
-        });
+        const response = await axios.get('http://localhost:8000/api/v1/clima/nodos/historico');
         console.log('Datos obtenidos:', response.data);
-        const processedData = response.data.map((item) => ({
-          id_nodo: item.id_nodo ?? 'Desconocido',
-          time: item.time ?? 'Sin timestamp',
-          data: parseFloat(item.temperatura) || 0, 
-        }));
-        let labels = [];
+    
+        const nodes = response.data;
+        let processedData = [];
+    
+        nodes.forEach(node => {
+          const mappedVariable = variableMapping[selectedVariable];
+          const variableData = node[mappedVariable] || [];
+          variableData.forEach(item => {
+            const date = new Date(item.timestamp);
+            processedData.push({
+              id_nodo: node.id_nodo,
+              year: date.getFullYear(),
+              month: date.getMonth() + 1,
+              day: date.getDate(),
+              hour: date.getHours(),
+              value: parseFloat(item.value) || 0,
+            });
+          });
+        });
+    
+        console.log('Datos procesados:', processedData);
+    
+        processedData = processedData.filter(item => {
+          if (selectedYear && item.year !== parseInt(selectedYear)) return false;
+          if (selectedMonth && item.month !== parseInt(selectedMonth)) return false;
+          if (selectedDay && item.day !== parseInt(selectedDay)) return false;
+          return true;
+        });
+    
+        let labels, data;
         if (selectedYear && !selectedMonth && !selectedDay) {
           labels = months.map(m => m.name);
+          data = months.map(m => {
+            const monthData = processedData.filter(item => item.month === parseInt(m.value));
+            return monthData.length ? monthData.reduce((sum, item) => sum + item.value, 0) / monthData.length : 0;
+          });
         } else if (selectedYear && selectedMonth && !selectedDay) {
-          labels = getDias(selectedYear, selectedMonth);
+          labels = getDias(selectedYear, parseInt(selectedMonth));
+          data = labels.map(day => {
+            const dayData = processedData.filter(item => item.day === day);
+            return dayData.length ? dayData.reduce((sum, item) => sum + item.value, 0) / dayData.length : 0;
+          });
         } else if (selectedYear && selectedMonth && selectedDay) {
           labels = getHoras();
+          data = labels.map((_, hour) => {
+            const hourData = processedData.filter(item => item.hour === hour);
+            return hourData.length ? hourData.reduce((sum, item) => sum + item.value, 0) / hourData.length : 0;
+          });
         }
-
         setChartData({
           labels: labels,
           datasets: [
             {
               type: 'line',
               label: `${selectedVariable} (Línea) - ${selectedYear}/${selectedMonth}/${selectedDay}`,
-              data: processedData.map(d => d.data),
+              data: data,
               borderColor: variables.find(v => v.name === selectedVariable)?.color || 'rgba(75, 192, 192, 1)',
               backgroundColor: variables.find(v => v.name === selectedVariable)?.color.replace('1)', '0.2)'),
               borderWidth: 2,
@@ -87,23 +125,23 @@ function HistoricosPage(data) {
             {
               type: 'bar',
               label: `${selectedVariable} (Barra) - ${selectedYear}/${selectedMonth}/${selectedDay}`,
-              data: processedData.map(d => d.data),
+              data: data,
               backgroundColor: 'rgba(53, 162, 235, 0.5)',
             }
           ]
         });
-
+    
         const historicalValues = labels.map((label, index) => ({
           year: selectedYear,
           month: selectedMonth,
           day: selectedDay || '-',
           hora: selectedDay ? getHoras()[index % 24] : '-',
-          [selectedVariable]: processedData[index].data || '-',
-          humedad: selectedVariable === 'humedad' ? processedData[index].data : '-',
-          presion: selectedVariable === 'presion' ? processedData[index].data : '-',
-          viento: selectedVariable === 'viento' ? processedData[index].data : '-',
+          temperatura: selectedVariable === 'temperatura' ? data[index] : '-',
+          humedad: selectedVariable === 'humedad' ? data[index] : '-',
+          presion: selectedVariable === 'presion' ? data[index] : '-',
+          viento: selectedVariable === 'viento' ? data[index] : '-',
         }));
-
+    
         setHistoricalData(historicalValues);
       } catch (error) {
         console.error('Error al obtener los datos:', error);
@@ -134,116 +172,84 @@ function HistoricosPage(data) {
         easing: 'easeInOutQuad',
       },
       plugins: {
-        legend: { 
-          position: isMobile ? 'bottom' : 'top', 
-          labels: { color: 'white', boxWidth: isMobile ? 10 : 40 } 
-        },
-        title: {
-          display: true,
-          text: 'Gráfico Combinado',
-          font: { size: isMobile ? 16 : 20, weight: 'bold' },
-          color: 'gray',
-          padding: { top: 10, bottom: isMobile ? 10 : 20 },
+        legend: {
+          position: isMobile ? 'bottom' : 'top',
         },
       },
       scales: {
-        x: { 
-          ticks: { color: 'white', maxRotation: 90, minRotation: 90 }, 
-          grid: { color: 'rgba(255, 255, 255, 0.2)' } 
-        },
-        y: { ticks: { color: 'white' }, grid: { color: 'rgba(255, 255, 255, 0.2)' } },
+        x: { title: { display: true, text: 'Período' } },
+        y: { title: { display: true, text: 'Valores' } },
       },
     };
 
-    return (
-      <Box bg="gray.700" p={isMobile ? 2 : 4} borderRadius="md" boxShadow="md" height={isMobile ? "300px" : "400px"}>
-        <Chart type="bar" data={{ ...chartData, datasets: visibleDatasets }} options={chartOptions} />
-      </Box>
-    );
+    return <Box height="400px" maxHeight="400px" overflow="hidden"> {/* Ajusta la altura aquí */}
+    <Chart type="bar" data={{ ...chartData, datasets: visibleDatasets }} options={chartOptions} />
+  </Box>
   };
 
   return (
-    <Box bg="gray.800" color="white" p={isMobile ? 3 : 6} borderRadius="md">
-      <Heading as="h1" size={isMobile ? "lg" : "xl"} mb={isMobile ? 3 : 6} textAlign="center" color="white">
-        Datos Históricos
-      </Heading>
-
-      <Stack direction={isMobile ? "column" : "row"} spacing={isMobile ? 2 : 4} mb={isMobile ? 3 : 6} justifyContent="center">
-        <Select placeholder="Año" value={selectedYear}  onChange={(e)  => setSelectedYear(e.target.value) } 
-        sx={{ option : {
-          backgroundColor: 'black'
-        }
-          
-            
-        }}
-        >
-          <option value="2022">2022</option>
-          <option value="2023">2023</option>
-          <option value="2024">2024</option>
-        </Select>
-        <Select placeholder="Mes" value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}
-          sx={{ option : {
-            backgroundColor: 'black'
-          }
-            
-              
-          }}
-        >
-          {months.map((month) => (
-            <option key={month.value} value={month.value}>
-              {month.name}
-            </option>
-          ))}
-        </Select>
-        <Select placeholder="Día" value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)}
-          sx={{ option : {
-            backgroundColor: 'black'
-          }
-            
-              
-          }}
-          >
-          {days.map((day) => (
-            <option key={day} value={String(day).padStart(2, '0')}>
-              {day}
-            </option>
-          ))}
-        </Select>
+    <Box p={4}>
+      <Heading as="h1" mb={4}>Históricos de variables</Heading>
+      <Stack spacing={4} mb={4}>
         <Select value={selectedVariable} onChange={(e) => setSelectedVariable(e.target.value)}
-          sx={{ option : {
-            backgroundColor: 'black'
-          }
-            
+          sx={{
+            option: {
+              backgroundColor: 'black',
               
+            },
           }}
           >
-          {variables.map((variable) => (
-            <option key={variable.name} value={variable.name}>
-              {variable.name.charAt(0).toUpperCase() + variable.name.slice(1)}
-            </option>
+          {variables.map((v) => (
+            <option key={v.name} value={v.name}>{v.name}</option>
+          ))}
+        </Select>
+        <Select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} 
+          sx={{
+            option: {
+              backgroundColor: 'black',
+              
+            },
+          }}
+          >
+          <option value="2024">2024</option>
+          <option value="2023">2023</option>
+        </Select>
+        <Select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}
+          sx={{
+            option: {
+              backgroundColor: 'black',
+              
+            },
+          }}
+          >
+          {months.map((m) => (
+            <option key={m.value} value={m.value}>{m.name}</option>
+          ))}
+        </Select>
+        <Select value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)}
+          sx={{
+            option: {
+              backgroundColor: 'black',
+              
+            },
+          }}
+          >
+          <option value="">Seleccione un día</option>
+          {days.map((d) => (
+            <option key={d} value={d}>{d}</option>
           ))}
         </Select>
       </Stack>
-
-      <Stack direction="row" spacing={4} justifyContent="center" mb={4}>
-        <Checkbox isChecked={selectedCharts.includes('line')} onChange={() => handleChartTypeChange('line')}>
-          Línea
-        </Checkbox>
-        <Checkbox isChecked={selectedCharts.includes('bar')} onChange={() => handleChartTypeChange('bar')}>
-          Barra
-        </Checkbox>
-      </Stack>
-
       {renderCombinedChart()}
-
-      <Table variant="striped" colorScheme="gray" size="sm" mt={4}>
+      <Heading as="h2" size="md" mt={4}>Datos históricos</Heading>
+      <Table variant="striped" mt={4}>
         <Thead>
           <Tr>
             <Th>Año</Th>
             <Th>Mes</Th>
             <Th>Día</Th>
             <Th>Hora</Th>
-            <Th>{selectedVariable.charAt(0).toUpperCase() + selectedVariable.slice(1)}</Th>
+            <Th>Temperatura</Th>
             <Th>Humedad</Th>
             <Th>Presión</Th>
             <Th>Viento</Th>
@@ -253,10 +259,10 @@ function HistoricosPage(data) {
           {historicalData.map((row, index) => (
             <Tr key={index}>
               <Td>{row.year}</Td>
-              <Td>{months.find((m) => m.value === row.month)?.name}</Td>
+              <Td>{row.month}</Td>
               <Td>{row.day}</Td>
               <Td>{row.hora}</Td>
-              <Td>{row[selectedVariable]}</Td>
+              <Td>{row.temperatura}</Td>
               <Td>{row.humedad}</Td>
               <Td>{row.presion}</Td>
               <Td>{row.viento}</Td>
@@ -269,3 +275,4 @@ function HistoricosPage(data) {
 }
 
 export default HistoricosPage;
+
