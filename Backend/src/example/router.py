@@ -5,6 +5,7 @@ from src.example import models, exceptions
 from src.example.services import *
 from src.example.schemas import *
 import bcrypt
+from fastapi.security import OAuth2PasswordBearer
 
 router = APIRouter()
 
@@ -60,5 +61,9 @@ def eliminar_usuario(usuario: str, db: Session = Depends(get_db)):
     db.commit()
     
     return db_usuario  # Devuelve el usuario eliminado (opcional)
+
+@router.get("/test_rol", dependencies=[Depends(verificar_rol("profesional"))])
+def acceso_roles(db: Session = Depends(get_db)):
+    return {"mensaje": "Acceso permitido para profesionales"}
 
 

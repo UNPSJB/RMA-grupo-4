@@ -8,9 +8,13 @@ from datetime import datetime, timedelta
 import jwt
 from dotenv import load_dotenv
 from src.example.schemas import *
+from fastapi import Security, Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
 
-# Cargo las variabels del env
+# Cargo las variables del env
 load_dotenv()
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 ENV = os.getenv("ENV")
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -66,7 +70,7 @@ def modificar_usuario(db: Session, db_usuario: Usuario, datos: ModificarUsuario)
     return db_usuario  # Devolvemos el usuario modificado
 
 def modificar_password_service(usuario: str, datos: ModificarContrasena, db: Session) -> RespuestaUsuario:
-    db_usuario = get_usuario(db, usuario)  # Asegúrate de que esta función esté disponible
+    db_usuario = get_usuario(db, usuario)  
     if db_usuario is None:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     
@@ -81,6 +85,17 @@ def modificar_password_service(usuario: str, datos: ModificarContrasena, db: Ses
     db.refresh(db_usuario)
 
     return db_usuario
+
+def verificar_rol(rol_requerido: str):
+    def verificar_rol_internal(token: str = Depends(oauth2_scheme)):
+        payload = verificar_token(token)
+        rol = payload.get("rol")
+        #verifica el rol del usuario con el que necesita el endpoint
+        if rol != rol_requerido: 
+            raise HTTPException(status_code=403, detail="No tienes permiso para acceder a este recurso")
+        return rol
+    return verificar_rol_internal
+
 
 
 
