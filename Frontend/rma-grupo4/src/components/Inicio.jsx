@@ -1,9 +1,11 @@
 import { Box, Grid, GridItem } from '@chakra-ui/react';
-import ResumenVariable from '../pages/ResumenVariable'; // Importa el componente
+import ResumenVariable from '../pages/ResumenVariable'; 
 import GraficoLinea from '../pages/GraficoLinea';
 import GraficoBarra from '../pages/GraficoBarra';
 import TablaPage from '../pages/TablaPage';
 import GraficoArea from '../pages/GraficoArea';
+import GraficoRosa from '../pages/GraficoRosa';
+import GraficoMedidor from '../pages/GraficoMedidor';
 
 export default function Inicio() {
   return (
@@ -46,20 +48,31 @@ export default function Inicio() {
         </Grid>
       </Box>
       <Box p={{ base: 2, md: 4 }}>
-        <GridItem colSpan={2} bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
-          <Grid 
-            templateColumns={{ base: '1fr', md: '1fr 1fr' }} 
-            gap={4}
-            maxWidth="100%"
-            overflow="hidden"  // Evita desbordamiento en contenedor padre
-          >
-            {/* Grafico Linea */}
-            <GridItem maxWidth="100%" overflowX="auto">  {/* Ajustar tamaño máximo y desbordamiento */}
-              <GraficoLinea title="Temperatura" url="http://localhost:8000/api/v1/clima/temperatura" />
+      <Grid
+        templateColumns={{ base: '1fr', md: '2fr 1fr' }}
+        gap={4}
+        maxWidth="100%"
+      >
+        {/* Gráfico Lineas - Temperatura */}
+        <GridItem bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
+          <GraficoLinea title="Temperatura" url="http://localhost:8000/api/v1/clima/temperatura" />
+        </GridItem>
+
+        {/* Columna derecha con dos gráficos */}
+        <GridItem>
+          <Grid templateRows="1fr 1fr" gap={4}>
+              {/* Gráfico medidor o gauge-chart - Presión */}
+            <GridItem bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
+              <GraficoMedidor title="Presión" url="http://localhost:8000/api/v1/clima/presion" />
+            </GridItem>
+            {/* Gráfico rosa de viento */}
+            <GridItem bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
+              <GraficoRosa title="V. de Viento" url="http://localhost:8000/api/v1/clima/viento" />
             </GridItem>
           </Grid>
         </GridItem>
-      </Box>
+      </Grid>
+    </Box>
       {/* Sección de gráficos lineales y de barras */}
       <Box p={{ base: 2, md: 4 }}>
         <Grid
@@ -69,16 +82,12 @@ export default function Inicio() {
           bg="gray.900"
           borderRadius="md"
         >
-         
-
           <GridItem colSpan={{ base: 1, md: 1 }} bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md">
             <GraficoArea url="http://localhost:8000/api/v1/clima/humedad" />
           </GridItem>
           <GridItem colSpan={{ base: 1, md: 1 }} bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md" >
             <GraficoBarra url="http://localhost:8000/api/v1/clima/precipitacion"/>
           </GridItem>
-
-
         </Grid>
       </Box>
     </Box>

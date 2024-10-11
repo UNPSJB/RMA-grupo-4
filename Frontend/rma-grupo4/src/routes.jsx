@@ -10,6 +10,8 @@ import HistoricosPage from './pages/HistoricosPage';
 import GraficoLinea from './pages/GraficoLinea';   
 import GraficoBarra from './pages/GraficoBarra';  
 import GraficoArea from './pages/GraficoArea';
+import GraficoRosa from './pages/GraficoRosa';
+import GraficoMedidor from './pages/GraficoMedidor';
 import ModificarDatos from './components/ModificarDatos';
 import ModificarPassword from './components/ModificarPassword';
 import EliminarUsuario from './components/EliminarUsuario';
@@ -83,6 +85,26 @@ function AppRoutes() {
             <App>
               <PrivateRoute>
                 <GraficoBarra />
+              </PrivateRoute>
+            </App>
+          } 
+        />
+        <Route 
+          path="/graficoRosa" 
+          element={
+            <App>
+              <PrivateRoute>
+                <GraficoRosa />
+              </PrivateRoute>
+            </App>
+          } 
+        />
+        <Route 
+          path="/graficoMedidor" 
+          element={
+            <App>
+              <PrivateRoute>
+                <GraficoMedidor />
               </PrivateRoute>
             </App>
           } 

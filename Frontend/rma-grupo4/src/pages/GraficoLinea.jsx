@@ -59,7 +59,7 @@ const GraficoLinea = ({ title, url }) => {
       },
       title: {
         display: true,
-        text: `Gráfico de Línea - ${title}`,
+        text: `Gráfico de Línea`,
         font: { size: 16, weight: 'bold' },
         color: 'white',
         padding: { top: 10, bottom: 10 },
@@ -88,7 +88,7 @@ const GraficoLinea = ({ title, url }) => {
       overflowX="auto"
     >
       {chartData ? (
-        <Box height={{ base: '300px', md: '400px' }}>
+        <Box height={{ base: '300px', md: '500px' }}>
           <Line data={chartData} options={chartOptions} />
         </Box>
       ) : (
