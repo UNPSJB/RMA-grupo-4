@@ -17,9 +17,15 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-def crear_usuario(db: Session, usuario: CrearUsuario): 
+def crear_usuario(db: Session, usuario: CrearUsuario):
     hashed_password = bcrypt.hashpw(usuario.password.encode('utf-8'), bcrypt.gensalt())
-    db_usuario = Usuario(usuario=usuario.usuario, email=usuario.email, edad=usuario.edad, password=hashed_password.decode('utf-8'))
+    db_usuario = Usuario(
+        usuario=usuario.usuario,
+        email=usuario.email,
+        edad=usuario.edad,
+        password=hashed_password.decode('utf-8'),
+        rol=usuario.rol  # Asignar el rol
+    )
     db.add(db_usuario)
     db.commit()
     db.refresh(db_usuario)
@@ -28,10 +34,11 @@ def crear_usuario(db: Session, usuario: CrearUsuario):
 def get_usuario(db: Session, usuario: str):
     return db.query(Usuario).filter(Usuario.usuario == usuario).first()
 
-def crear_token(usuario: str):
+def crear_token(usuario: str, rol: str):
     expiration = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {
         "sub": usuario,
+        "rol": rol,  # Incluimos el rol en el payload del token
         "exp": expiration,
     }
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)

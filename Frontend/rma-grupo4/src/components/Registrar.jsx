@@ -1,14 +1,14 @@
-// Registrar.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Box, Input, Button, FormControl, FormLabel, Heading, Text, useToast } from '@chakra-ui/react';
+import { Box, Input, Button, FormControl, FormLabel, Heading, Text, Select, useToast } from '@chakra-ui/react';
 
 function Registrar() {
     const [usuario, setUsuario] = useState('');
     const [email, setEmail] = useState('');
     const [edad, setEdad] = useState('');
     const [password, setPassword] = useState('');
+    const [rol, setRol] = useState('estudiante');  // Nuevo estado para el rol
     const navigate = useNavigate();
     const toast = useToast();
 
@@ -20,6 +20,7 @@ function Registrar() {
                 email,
                 edad: parseInt(edad),
                 password,
+                rol  // Agregar el rol en la solicitud
             });
             toast({
                 title: "Usuario registrado.",
@@ -145,6 +146,25 @@ function Registrar() {
                         />
                     </FormControl>
 
+                    <FormControl id="rol" mb={6} isRequired>
+                        <FormLabel color="gray.300">Rol</FormLabel>
+                        <Select
+                            value={rol}
+                            onChange={(e) => setRol(e.target.value)}
+                            bg="gray.900"
+                            color="white"
+                            borderRadius="xl"
+                            boxShadow="inset 8px 8px 15px rgba(0,0,0,0.2), inset -8px -8px 15px rgba(255,255,255,0.1)"
+                            _focus={{
+                                boxShadow: 'inset 4px 4px 10px rgba(0,0,0,0.3), inset -4px -4px 10px rgba(255,255,255,0.1)',
+                                outline: 'none',
+                            }}
+                        >
+                            <option value="estudiante">Estudiante</option>
+                            <option value="profesional">Profesional</option>
+                        </Select>
+                    </FormControl>
+
                     <Button 
                         type="submit" 
                         colorScheme="orange" 
@@ -159,20 +179,15 @@ function Registrar() {
                         _hover={{
                             bg: 'orange.600',
                             boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)',
-                            transform: 'scale(1.05)',
                         }}
                         _active={{
                             bg: 'orange.700',
-                            transform: 'translateY(2px)',
-                            boxShadow: '10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)',
+                            boxShadow: 'inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)',
                         }}
                     >
                         Registrarse
                     </Button>
                 </form>
-                <Text mt={4} color="gray.400" textAlign="center">
-                    ¿Ya tienes cuenta? <Button variant="link" color="orange.300" onClick={() => navigate('/login')}>Inicia sesión aquí</Button>
-                </Text>
             </Box>
         </Box>
     );

@@ -1,6 +1,6 @@
-// Login.js
 import React, { useState } from 'react';
 import axios from 'axios';
+import { jwtDecode } from 'jwt-decode'
 import { useNavigate } from 'react-router-dom';
 import { Box, Input, Button, FormControl, FormLabel, Heading, Text, useToast } from '@chakra-ui/react';
 import { useAuth } from './AuthContext';
@@ -19,17 +19,30 @@ function Login() {
                 usuario,
                 password
             });
-            if (response.data.token) {  
-                const tokenKey = `token_${usuario}`;  
+            if (response.data.token) {
+                const tokenKey = `token_${usuario}`;
                 localStorage.setItem(tokenKey, response.data.token);
+    
+                // Decodificar el token
+                const decodedToken = jwtDecode(response.data.token);
+                const rol = decodedToken.rol;
+    
                 toast({
                     title: "Inicio de sesión exitoso.",
+                    description: `Rol: ${rol}`,
                     status: "success",
                     duration: 2000,
                     isClosable: true,
                 });
-                login(usuario); 
-                navigate('/inicio');
+    
+                login(usuario, rol); // Pasar el rol al contexto
+    
+                // Redirigir basado en el rol
+                if (rol === 'profesional') {
+                    navigate('/inicio');
+                } else if (rol === 'estudiante') {
+                    navigate('/historicos');
+                }
             }
         } catch (error) {
             toast({

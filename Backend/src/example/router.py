@@ -24,7 +24,7 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     if not bcrypt.checkpw(request.password.encode('utf-8'), db_usuario.password.encode('utf-8')):
         raise HTTPException(status_code=401, detail="Credenciales incorrectas")
 
-    token = crear_token(request.usuario)  # Crear el token JWT
+    token = crear_token(request.usuario, db_usuario.rol)  # Pasamos el rol al crear el token
     return {"token": token}  # Devuelve el token al frontend
 
 @router.get("/usuarios/{usuario}", response_model=RespuestaUsuario)

@@ -9,11 +9,18 @@ from typing import Optional
 # Podemos crear atributos con ciertas reglas mediante el uso de un "Field" adecuado.
 # https://docs.pydantic.dev/latest/concepts/fields/
 
-class CrearUsuario (BaseModel): 
-    usuario:str
-    email:str
+class CrearUsuario(BaseModel):
+    usuario: str
+    email: str
     edad: int
     password: str
+    rol: str  # Añadido para seleccionar "estudiante" o "profesional"
+    
+    @field_validator('rol')
+    def validar_rol(cls, v):
+        if v not in ["estudiante", "profesional"]:
+            raise ValueError("El rol debe ser 'estudiante' o 'profesional'")
+        return v
 
 class RespuestaUsuario(BaseModel): 
     id:int
