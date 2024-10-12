@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text, useColorMode } from '@chakra-ui/react';
+import { Box, Text, useColorMode ,  Modal, ModalOverlay, ModalContent, ModalBody, ModalCloseButton, } from '@chakra-ui/react';
 import { Radar } from 'react-chartjs-2'; // Cambiamos PolarArea por Radar
 import axios from 'axios';
 
@@ -7,6 +7,10 @@ const GraficoRosa = ({ title, url, nodeId }) => {
   const [chartData, setChartData] = useState(null);
   const [summary, setSummary] = useState(null);  
   const { colorMode } = useColorMode();
+  const [isOpen, setIsOpen] = useState(false);
+  const handleOpen = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -91,15 +95,17 @@ const chartOptions = {
 };
 
   return (
+  <>
     <Box 
       bg={colorMode === 'light' ? 'gray.100' : 'gray.700'}
       color={colorMode === 'light' ? 'black' : 'white'} 
       p={{ base: 2, md: 4 }}
       borderRadius="md" 
       boxShadow="lg"
+      onClick={handleOpen} 
     >
       {chartData ? (
-        <Box height={{ base: '250px', md: '310px' }}>
+        <Box height={{ base: '250px', md: '310px' } }  >
           <Radar data={chartData} options={chartOptions} /> {/* Radar en lugar de PolarArea */}
         </Box>
       ) : (
@@ -108,6 +114,26 @@ const chartOptions = {
         </Text>
       )}
     </Box>
+    <Modal isOpen={isOpen} onClose={handleClose} size="x1">
+      <ModalOverlay />
+      <ModalContent>
+        <ModalCloseButton />
+          <ModalBody p={0}>
+            <Box height="500px" width="100%" bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
+              {chartData ? (
+                <Box height={{ base: '450px', md: '450px' }} bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
+                  <Radar data={chartData} options={chartOptions} /> {/* Radar en lugar de PolarArea */}
+                </Box>
+              ) : (
+                <Text fontSize={{ base: 'sm', md: 'md' }}>
+                  Cargando gráfico...
+                </Text>
+              )}
+            </Box>
+          </ModalBody>
+        </ModalContent>
+    </Modal>
+  </>
   );
 }
 
