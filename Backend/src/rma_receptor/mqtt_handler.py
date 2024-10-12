@@ -1,6 +1,6 @@
 import json
 import paho.mqtt.client as mqtt
-from datetime import datetime
+from datetime import datetime, timedelta
 from src.database import SessionLocal
 from src.models import Mensaje, MensajeIncorrecto
 
@@ -29,21 +29,28 @@ def validar_mensaje(mensaje_json):
     else:
         return False  # Tipo no válido
     
-
+def validar_fecha_hora_actual(timestamp_str):
+    """Valida si el timestamp está en UTC y es cercano a la hora actual (dentro de 5 minutos)."""
+    try:
+        timestamp = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S.%f")
+        ahora = datetime.utcnow() - timedelta(hours=3)
+        diferencia = timedelta(minutes=5)
+        return ahora - diferencia <= timestamp <= ahora + diferencia
+    except ValueError:
+        return False
+    
 def mensaje_recibido(client, userdata, msg):
     """Callback para procesar los mensajes recibidos en los tópicos suscritos."""
-
     try:
-        print(f"Mensaje crudo recibido: {msg.payload}")
         # Decodificar el mensaje JSON
         mensaje_str = msg.payload.decode().replace("'", '"')
         mensaje_json = json.loads(mensaje_str)
-        print(f"Mensaje recibido en el tópico {msg.topic}: {mensaje_json}")
+        print(f"Mensaje recibido en {msg.topic}: {mensaje_json}")
 
         # Crear una sesión de base de datos
         db = SessionLocal()
         try:
-            if validar_mensaje(mensaje_json):
+            if validar_mensaje(mensaje_json) and validar_fecha_hora_actual(mensaje_json['time']):
             # Crear un nuevo objeto Mensaje
                 nuevo_mensaje = Mensaje(
                     id_nodo=mensaje_json['id'],
@@ -57,7 +64,7 @@ def mensaje_recibido(client, userdata, msg):
                     type=mensaje_json['type'],
                     data=mensaje_json['data'],
                     time=datetime.strptime(mensaje_json['time'], "%Y-%m-%d %H:%M:%S.%f")
-                )                           
+                )                         
             db.add(nuevo_mensaje)
             db.commit()
         finally:
