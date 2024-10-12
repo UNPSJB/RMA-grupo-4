@@ -21,7 +21,7 @@ const ModificarPassword = () => {
     });
     const [loading, setLoading] = useState(false);
     const toast = useToast();
-    const { colorMode, toggleColorMode } = useColorMode(); // Para manejar el modo de color
+    const { colorMode } = useColorMode(); // Para manejar el modo de color
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -37,19 +37,43 @@ const ModificarPassword = () => {
 
             if (!response.ok) throw new Error('Error al modificar la contraseña');
 
+            // Toast de éxito
             toast({
-                title: "Contraseña modificada exitosamente.",
-                status: "success",
+                render: () => (
+                    <Box 
+                        color="white" 
+                        bg="green.600" 
+                        borderRadius="md" 
+                        p={5} 
+                        mb={4}
+                        boxShadow="md"
+                        fontSize="lg" // Tamaño de letra más grande
+                    >
+                        Modificación de datos exitosa.
+                    </Box>
+                ),
                 duration: 2000,
                 isClosable: true,
             });
 
+            // Limpiar campos después de éxito
             setPasswordData({ password: '', repetir_password: '' });
         } catch (error) {
+            // Toast de error
             toast({
-                title: "Error.",
-                description: error.message,
-                status: "error",
+                render: () => (
+                    <Box 
+                        color="white" 
+                        bg="red.600" 
+                        borderRadius="md" 
+                        p={5} 
+                        mb={4}
+                        boxShadow="md"
+                        fontSize="lg" // Tamaño de letra más grande
+                    >
+                        Error al modificar los datos. {error.message}
+                    </Box>
+                ),
                 duration: 2000,
                 isClosable: true,
             });
@@ -128,22 +152,22 @@ const ModificarPassword = () => {
                     </FormControl>
                     <Button 
                         type="submit" 
-                        colorScheme="orange" 
+                        colorScheme={colorMode === 'light' ? "orange" : undefined} // Cambiar colorScheme en modo claro
                         size="lg" 
                         w="full"
-                        bg="orange.500"
+                        bg={colorMode === 'light' ? "rgb(0, 31, 63)" : "orange.500"} // Cambiar fondo según modo
                         borderRadius="30px"
                         border="none"
                         zIndex="10"
                         position="relative"
                         boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), inset 4px 4px 10px rgba(0,0,0,0.3)"
                         _hover={{
-                            bg: 'orange.600',
+                            bg: colorMode === 'light' ? "rgb(0, 51, 80)" : 'orange.600', // Cambiar color en hover según modo
                             boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), inset 6px 6px 12px rgba(0,0,0,0.3)',
                             transform: 'scale(1.05)',
                         }}
                         _active={{
-                            bg: 'orange.700',
+                            bg: colorMode === 'light' ? "rgb(0, 71, 100)" : 'orange.700', // Cambiar color en active según modo
                             transform: 'translateY(2px)',
                             boxShadow: 'inset 6px 6px 12px rgba(0,0,0,0.2)',
                         }}

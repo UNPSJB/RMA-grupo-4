@@ -12,11 +12,14 @@ import {
   Text, 
   Heading, 
   Stack, 
-  useColorMode // Importar useColorMode
+  useColorMode 
 } from '@chakra-ui/react';
 
 const HelpModal = ({ isOpen, onClose }) => {
-  const { colorMode } = useColorMode(); // Obtener el estado del color mode
+  const { colorMode } = useColorMode(); 
+
+  // Cambiar color según el modo
+  const customColor = colorMode === 'light' ? 'rgb(0, 31, 63)' : 'orange.300'; 
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={{ base: 'sm', md: 'lg', lg: 'xl' }}>
@@ -27,26 +30,36 @@ const HelpModal = ({ isOpen, onClose }) => {
         maxH="80vh"
         height="auto"
         borderRadius="2xl"
-        bg={colorMode === 'light' ? 'white' : 'gray.800'} // Cambiar fondo según el tema
+        bg={colorMode === 'light' ? 'white' : 'gray.800'}
         boxShadow="10px 10px 20px rgba(0, 0, 0, 0.7)"
       >
-        <ModalHeader textAlign="center" bg={colorMode === 'light' ? 'gray.200' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'} borderTopRadius="2xl">
+        <ModalHeader 
+          textAlign="center" 
+          bg={colorMode === 'light' ? 'gray.200' : 'gray.900'} 
+          color={colorMode === 'light' ? 'black' : 'white'} 
+          borderTopRadius="2xl"
+        >
           Ayuda
         </ModalHeader>
         <ModalCloseButton color={colorMode === 'light' ? 'black' : 'white'} />
 
-        <ModalBody p={6} bg={colorMode === 'light' ? 'white' : 'gray.800'} color={colorMode === 'light' ? 'black' : 'white'} overflowY="auto">
+        <ModalBody 
+          p={6} 
+          bg={colorMode === 'light' ? 'white' : 'gray.800'} 
+          color={colorMode === 'light' ? 'black' : 'white'} 
+          overflowY="auto"
+        >
           <Stack spacing={6}>
             <Box>
-              <Heading size="md" mb={2} color="orange.300">¿Cómo usar la aplicación?</Heading>
+              <Heading size="md" mb={2} color={customColor}>¿Cómo usar la aplicación?</Heading>
               <Text fontSize="md">
                 Esta aplicación te permite acceder a datos históricos y realizar análisis. Para comenzar, simplemente navega a la sección deseada utilizando el menú.
               </Text>
             </Box>
 
             <Box>
-              <Heading size="md" mb={2} color="orange.300">Preguntas Frecuentes</Heading>
-              <Stack spacing={4} pl={4} borderLeft="4px solid orange.300">
+              <Heading size="md" mb={2} color={customColor}>Preguntas Frecuentes</Heading>
+              <Stack spacing={4} pl={4} borderLeft={`4px solid ${customColor}`}>
                 <Box>
                   <Text fontWeight="bold">1. ¿Cómo puedo modificar mis datos?</Text>
                   <Text fontSize="sm">
@@ -71,7 +84,7 @@ const HelpModal = ({ isOpen, onClose }) => {
             </Box>
 
             <Box>
-              <Heading size="md" mb={2} color="orange.300">Contactar Soporte</Heading>
+              <Heading size="md" mb={2} color={customColor}>Contactar Soporte</Heading>
               <Text fontSize="md">
                 Si tienes alguna pregunta o necesitas asistencia, no dudes en contactarnos en{' '}
                 <Box as="span" fontWeight="bold">support@example.com</Box> o llama al{' '}
@@ -86,18 +99,18 @@ const HelpModal = ({ isOpen, onClose }) => {
             colorScheme="orange" 
             onClick={onClose} 
             mr={3}
-            bg="orange.500"
+            bg={colorMode === 'light' ? 'rgb(0, 31, 63)' : 'orange.500'} // Cambiar fondo según el modo
             borderRadius="30px"
             boxShadow="10px 10px 20px rgba(0, 0, 0, 0.7)"
             _hover={{
-              bg: 'orange.600',
+              bg: colorMode === 'light' ? 'rgb(0, 45, 80)' : 'orange.600',
               transform: 'scale(1.05)',
             }}
             _active={{
-              bg: 'orange.700',
+              bg: colorMode === 'light' ? 'rgb(0, 20, 50)' : 'orange.700',
               transform: 'translateY(2px)',
             }}
-            color={colorMode === 'light' ? 'black' : 'white'} // Cambiar color de texto según el tema
+            color={colorMode === 'light' ? 'white' : 'white'} // Cambiar color del texto del botón
           >
             Cerrar
           </Button>

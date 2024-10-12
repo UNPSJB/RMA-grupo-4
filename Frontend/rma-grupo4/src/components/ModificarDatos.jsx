@@ -8,13 +8,13 @@ import {
     Text,
     Spinner,
     useToast,
-    useColorMode, // Importar useColorMode
+    useColorMode,
 } from '@chakra-ui/react';
 import { useAuth } from './AuthContext';
 
 const ModificarDatos = () => {
     const { user } = useAuth();
-    const { colorMode, toggleColorMode } = useColorMode(); // Obtener el estado del tema
+    const { colorMode } = useColorMode();
     const [userData, setUserData] = useState({
         email: '',
         edad: '',
@@ -52,18 +52,41 @@ const ModificarDatos = () => {
 
             if (!response.ok) throw new Error('Error al modificar los datos');
 
+            // Toast de éxito
             toast({
-                title: "Modificación de datos exitosa.",
-                status: "success",
+                render: () => (
+                    <Box
+                        color="white"
+                        bg="green.600"
+                        borderRadius="md"
+                        p={5}
+                        mb={4}
+                        boxShadow="md"
+                        fontSize="lg"
+                    >
+                        Modificación de datos exitosa.
+                    </Box>
+                ),
                 duration: 2000,
                 isClosable: true,
             });
-            setError(null);
+            setError(null); // Limpiar el error
         } catch (error) {
+            // Toast de error
             toast({
-                title: "Error.",
-                description: error.message,
-                status: "error",
+                render: () => (
+                    <Box
+                        color="white"
+                        bg="red.600"
+                        borderRadius="md"
+                        p={5}
+                        mb={4}
+                        boxShadow="md"
+                        fontSize="lg"
+                    >
+                        Error al modificar los datos. {error.message}
+                    </Box>
+                ),
                 duration: 2000,
                 isClosable: true,
             });
@@ -84,8 +107,8 @@ const ModificarDatos = () => {
 
     return (
         <Box
-            bgGradient={colorMode === 'light' ? "linear(to-r, gray.200, gray.100)" : "linear(to-r, gray.900, gray.800)"} // Cambiar fondo según tema
-            color={colorMode === 'light' ? "black" : "white"} // Cambiar color de texto
+            bgGradient={colorMode === 'light' ? "linear(to-r, gray.200, gray.100)" : "linear(to-r, gray.900, gray.800)"}
+            color={colorMode === 'light' ? "black" : "white"}
             minH="100vh"
             px={4}
             pt={10}
@@ -94,7 +117,7 @@ const ModificarDatos = () => {
             alignItems="flex-start"
         >
             <Box
-                bg={colorMode === 'light' ? "white" : "gray.800"} // Cambiar fondo del cuadro según tema
+                bg={colorMode === 'light' ? "white" : "gray.800"}
                 p={8}
                 rounded="2xl"
                 maxW="400px"
@@ -114,12 +137,12 @@ const ModificarDatos = () => {
                             value={userData.email}
                             onChange={(e) => setUserData({ ...userData, email: e.target.value })}
                             placeholder="Introduce tu nuevo email"
-                            bg={colorMode === 'light' ? "gray.100" : "gray.900"} // Cambiar color de fondo del input
-                            color={colorMode === 'light' ? "black" : "white"} // Cambiar color del texto del input
+                            bg={colorMode === 'light' ? "gray.100" : "gray.900"}
+                            color={colorMode === 'light' ? "black" : "white"}
                             borderRadius="xl"
                             border="none"
                             boxShadow="inset 8px 8px 15px rgba(0,0,0,0.2), inset -8px -8px 15px rgba(255,255,255,0.1)"
-                            _placeholder={{ color: colorMode === 'light' ? 'gray.500' : 'gray.400' }} // Cambiar color del placeholder
+                            _placeholder={{ color: colorMode === 'light' ? 'gray.500' : 'gray.400' }}
                             _focus={{
                                 boxShadow: 'inset 4px 4px 10px rgba(0,0,0,0.3), inset -4px -4px 10px rgba(255,255,255,0.1)',
                                 outline: 'none',
@@ -145,24 +168,24 @@ const ModificarDatos = () => {
                             }}
                         />
                     </FormControl>
-                    <Button 
-                        type="submit" 
-                        colorScheme="orange" 
-                        size="lg" 
+                    <Button
+                        type="submit"
+                        size="lg"
                         w="full"
-                        bg="orange.500"
+                        bg={colorMode === 'light' ? "rgb(0, 31, 63)" : "orange.500"} // Cambiar color de fondo según tema
+                        color={colorMode === 'light' ? "white" : "black"} // Cambiar color del texto del botón
                         borderRadius="30px"
                         border="none"
                         zIndex="10"
                         position="relative"
                         boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), inset 4px 4px 10px rgba(0,0,0,0.3)"
                         _hover={{
-                            bg: 'orange.600',
+                            bg: colorMode === 'light' ? "rgb(0, 41, 73)" : 'orange.600',
                             boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), inset 6px 6px 12px rgba(0,0,0,0.3)',
                             transform: 'scale(1.05)',
                         }}
                         _active={{
-                            bg: 'orange.700',
+                            bg: colorMode === 'light' ? "rgb(0, 51, 93)" : 'orange.700',
                             transform: 'translateY(2px)',
                             boxShadow: 'inset 6px 6px 12px rgba(0,0,0,0.2)',
                         }}

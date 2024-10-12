@@ -24,17 +24,38 @@ function Registrar() {
                 rol
             });
             toast({
-                title: "Usuario registrado.",
-                status: "success",
+                render: () => (
+                    <Box 
+                        color="white" 
+                        bg="green.600" 
+                        borderRadius="md" 
+                        p={5} 
+                        mb={4}
+                        boxShadow="md"
+                        fontSize="lg" // Tamaño de letra más grande
+                    >
+                        Usuario registrado.
+                    </Box>
+                ),
                 duration: 2000,
                 isClosable: true,
             });
-            navigate('/login');
+            navigate('/login'); // Redirige a la página de inicio de sesión
         } catch (error) {
             toast({
-                title: "Error al registrar.",
-                description: "Intenta nuevamente.",
-                status: "error",
+                  render: () => (
+                    <Box 
+                        color="white" 
+                        bg="red.600" 
+                        borderRadius="md" 
+                        p={5} 
+                        mb={4}
+                        boxShadow="md"
+                        fontSize="lg" // Tamaño de letra más grande
+                    >
+                        Error al Registrarse. Intente nuevamente.
+                    </Box>
+                ),
                 duration: 2000,
                 isClosable: true,
             });
@@ -168,27 +189,28 @@ function Registrar() {
 
                     <Button 
                         type="submit" 
-                        colorScheme="orange" 
                         size="lg" 
                         w="full"
-                        bg="orange.500"
+                        bg={colorMode === 'light' ? "rgb(0, 31, 63)" : "orange.500"} 
+                        color="white"
                         borderRadius="30px" 
                         border="none" 
                         zIndex="10" 
                         position="relative" 
                         boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
                         _hover={{
-                            bg: 'orange.600',
+                            bg: colorMode === 'light' ? "rgb(0, 31, 63)" : 'orange.600',
                             boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)',
                         }}
                         _active={{
-                            bg: 'orange.700',
+                            bg: colorMode === 'light' ? "rgb(0, 31, 63)" : 'orange.700',
                             boxShadow: 'inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)',
                         }}
                     >
                         Registrarse
                     </Button>
                 </form>
+                
             </Box>
         </Box>
     );

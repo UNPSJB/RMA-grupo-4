@@ -40,27 +40,40 @@ function Login() {
                 const rol = decodedToken.rol;
 
                 toast({
-                    title: 'Inicio de sesión exitoso.',
-                    description: `Rol: ${rol}`,
-                    status: 'success',
+                    render: () => (
+                        <Box 
+                            color="white" 
+                            bg="green.600" 
+                            borderRadius="md" 
+                            p={5} 
+                            mb={4}
+                            boxShadow="md"
+                            fontSize="lg" // Tamaño de letra más grande
+                        >
+                            Inicio de sesión exitoso.
+                        </Box>
+                    ),
                     duration: 2000,
                     isClosable: true,
                 });
-
-                login(usuario, rol); // Pasar el rol al contexto
-
-                // Redirigir basado en el rol
-                if (rol === 'profesional') {
-                    navigate('/inicio');
-                } else if (rol === 'estudiante') {
-                    navigate('/historicos');
-                }
+                login(usuario);
+                navigate('/inicio');
             }
         } catch (error) {
             toast({
-                title: 'Error de inicio de sesión.',
-                description: 'Verifica tus credenciales.',
-                status: 'error',
+                render: () => (
+                    <Box 
+                        color="white" 
+                        bg="red.600" 
+                        borderRadius="md" 
+                        p={5} 
+                        mb={4}
+                        boxShadow="md"
+                        fontSize="lg" // Tamaño de letra más grande
+                    >
+                        Error de inicio de sesión. Verifica tus credenciales.
+                    </Box>
+                ),
                 duration: 2000,
                 isClosable: true,
             });
@@ -136,19 +149,19 @@ function Login() {
                         colorScheme="orange" 
                         size="lg" 
                         w="full"
-                        bg="orange.500"
+                        bg={useColorModeValue('rgb(0, 31, 63)', 'orange.500')} // Cambia el color en modo claro
                         borderRadius="30px"
                         border="none"
                         zIndex="10"
                         position="relative"
                         boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
                         _hover={{
-                            bg: 'orange.600',
+                            bg: useColorModeValue('rgb(0, 31, 63)', 'orange.600'),
                             boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)',
                             transform: 'scale(1.05)',
                         }}
                         _active={{
-                            bg: 'orange.700',
+                            bg: useColorModeValue('rgb(0, 31, 63)', 'orange.700'),
                             transform: 'translateY(2px)',
                             boxShadow: '10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)',
                         }}
@@ -157,7 +170,7 @@ function Login() {
                     </Button>
                 </form>
                 <Text mt={4} color={useColorModeValue('gray.600', 'gray.400')} textAlign="center">
-                    ¿No tienes cuenta? <Button variant="link" color="orange.300" onClick={() => navigate('/registrar')}>Regístrate aquí</Button>
+                    ¿No tienes cuenta? <Button variant="link" color={useColorModeValue('rgb(0, 31, 63)', 'orange.300')} onClick={() => navigate('/registrar')}>Regístrate aquí</Button>
                 </Text>
             </Box>
         </Box>

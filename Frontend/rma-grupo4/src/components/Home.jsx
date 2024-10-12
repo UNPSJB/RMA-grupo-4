@@ -54,17 +54,17 @@ export default function Home() {
                 <Button
                     leftIcon={<FaLock />}
                     size="lg"
-                    bg="orange.500"
+                    bg={colorMode === 'dark' ? 'orange.500' : 'rgb(0, 31, 63)'} // Cambiar a rgb(0, 31, 63) en modo claro
                     color="white"
                     borderRadius="30px"
                     boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1)"
                     _hover={{
-                        bg: 'orange.600',
+                        bg: colorMode === 'dark' ? 'orange.600' : 'rgb(0, 31, 63)',
                         boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1)',
                         transform: 'scale(1.05)',
                     }}
                     _active={{
-                        bg: 'orange.700',
+                        bg: colorMode === 'dark' ? 'orange.700' : 'rgb(0, 31, 63)',
                         transform: 'translateY(2px)',
                         boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.5)',
                     }}
@@ -76,17 +76,17 @@ export default function Home() {
                     leftIcon={<FaUserPlus />}
                     size="lg"
                     variant="outline"
-                    borderColor="orange.500"
-                    color="orange.500"
+                    borderColor={colorMode === 'dark' ? 'orange.500' : 'rgb(0, 31, 63)'} // Cambiar a rgb(0, 31, 63) en modo claro
+                    color={colorMode === 'dark' ? 'orange.500' : 'rgb(0, 31, 63)'} // Cambiar a rgb(0, 31, 63) en modo claro
                     borderRadius="30px"
                     _hover={{
-                        borderColor: 'orange.600',
-                        color: 'orange.600',
+                        borderColor: colorMode === 'dark' ? 'orange.600' : 'rgb(0, 31, 63)',
+                        color: colorMode === 'dark' ? 'orange.600' : 'rgb(0, 31, 63)',
                         boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1)',
                         transform: 'scale(1.05)',
                     }}
                     _active={{
-                        borderColor: 'orange.700',
+                        borderColor: colorMode === 'dark' ? 'orange.700' : 'rgb(0, 31, 63)',
                         transform: 'translateY(2px)',
                         boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.5)',
                     }}
@@ -125,10 +125,10 @@ export default function Home() {
                         _hover={{ transform: 'scale(1.05)', bg: 'rgba(255, 255, 255, 0.15)' }}
                     >
                         <Icon as={feature.icon} w={12} h={12} mb={4} color="orange.400" />
-                        <Heading as="h3" size="lg" mb={4} color={colorMode === 'dark' ? 'white' : 'black'}> {/* Color del título de la característica */}
+                        <Heading as="h3" size="lg" mb={4} color={colorMode === 'dark' ? 'white' : 'black'}>
                             {feature.title}
                         </Heading>
-                        <Text fontSize="md" color={colorMode === 'dark' ? 'gray.300' : 'gray.600'} textAlign="justify"> {/* Color del texto según el modo */}
+                        <Text fontSize="md" color={colorMode === 'dark' ? 'gray.300' : 'gray.600'} textAlign="justify">
                             {feature.description}
                         </Text>
                     </Flex>
