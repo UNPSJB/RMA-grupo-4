@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Text, useColorMode } from '@chakra-ui/react';
 import { Radar } from 'react-chartjs-2'; // Cambiamos PolarArea por Radar
 import axios from 'axios';
 
-const GraficoRosa = ({ title, url, nodeId}) => {
+const GraficoRosa = ({ title, url, nodeId }) => {
   const [chartData, setChartData] = useState(null);
   const [summary, setSummary] = useState(null);  
-
+  const { colorMode } = useColorMode();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -33,8 +33,8 @@ const GraficoRosa = ({ title, url, nodeId}) => {
             datasets: [{
               label: `${title}`,
               data: processedData.map(item => item.data), // Datos de viento
-              backgroundColor: 'rgba(54, 162, 235, 0.2)',
-              borderColor: 'rgba(54, 162, 235, 1)',
+              backgroundColor: colorMode === 'light' ? 'rgba(54, 162, 235, 0.2)' : 'rgba(54, 162, 235, 0.4)', 
+              borderColor: colorMode === 'light' ? 'rgba(54, 162, 235, 1)' : 'rgba(75, 192, 192, 1)', 
               borderWidth: 1,
               pointBackgroundColor: 'rgba(54, 162, 235, 1)',
               pointBorderColor: '#fff',
@@ -52,51 +52,54 @@ const GraficoRosa = ({ title, url, nodeId}) => {
       }
     };
     fetchData();
-  }, [url, title, nodeId]);
+  }, [url, title, nodeId, colorMode]); 
 
-  const chartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { 
-        position: 'top',
-        labels: { color: 'white', font: { size: 12 } }
-      },
-      title: {
-        display: true,
-        text: `Gráfico de Radar`,
-        font: { size: 16, weight: 'bold' },
-        color: 'white',
-        padding: { top: 10, bottom: 10 },
-      },
-    },
-    scales: {
-      r: { // Para la escala radial del gráfico Radar
-        angleLines: {
-          display: true,
-          color: 'rgba(255, 255, 255, 0.1)', // Líneas angulares del gráfico
-        },
-        ticks: { 
-          color: 'white', 
-          font: { size: 12 } 
-        },
-        grid: { 
-          color: 'rgba(255, 255, 255, 0.1)' 
-        }
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { 
+      position: 'top',
+      labels: { 
+        color: colorMode === 'light' ? 'black' : 'white', 
+        font: { size: 12 } 
       }
     },
-  };
+    title: {
+      display: true,
+      text: `Gráfico de Rosa`,
+      font: { size: 16, weight: 'bold' },
+      color: colorMode === 'light' ? 'black' : 'white', 
+      padding: { top: 10, bottom: 10 },
+    },
+  },
+  scales: {
+    r: { // Para la escala radial del gráfico Radar
+      angleLines: {
+        display: true,
+        color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)', 
+      },
+      ticks: { 
+        color: colorMode === 'light' ? 'black' : 'white', 
+        font: { size: 12 } 
+      },
+      grid: { 
+        color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)' 
+      }
+    }
+  },
+};
 
   return (
     <Box 
-      bg="gray.700" 
-      color="white" 
+      bg={colorMode === 'light' ? 'gray.100' : 'gray.700'}
+      color={colorMode === 'light' ? 'black' : 'white'} 
       p={{ base: 2, md: 4 }}
       borderRadius="md" 
       boxShadow="lg"
     >
       {chartData ? (
-        <Box height={{ base: '150px', md: '210px' }}>
+        <Box height={{ base: '250px', md: '310px' }}>
           <Radar data={chartData} options={chartOptions} /> {/* Radar en lugar de PolarArea */}
         </Box>
       ) : (

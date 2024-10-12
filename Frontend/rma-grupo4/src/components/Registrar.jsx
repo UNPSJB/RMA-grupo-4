@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Box, Input, Button, FormControl, FormLabel, Heading, Text, Select, useToast } from '@chakra-ui/react';
+import { Box, Input, Button, FormControl, FormLabel, Heading, Text, Select, useToast, useColorMode, Switch } from '@chakra-ui/react';
 
 function Registrar() {
     const [usuario, setUsuario] = useState('');
     const [email, setEmail] = useState('');
     const [edad, setEdad] = useState('');
     const [password, setPassword] = useState('');
-    const [rol, setRol] = useState('estudiante');  // Nuevo estado para el rol
+    const [rol, setRol] = useState('estudiante');
     const navigate = useNavigate();
     const toast = useToast();
+    const { colorMode, toggleColorMode } = useColorMode(); // Para manejar el modo de color
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -20,7 +21,7 @@ function Registrar() {
                 email,
                 edad: parseInt(edad),
                 password,
-                rol  // Agregar el rol en la solicitud
+                rol
             });
             toast({
                 title: "Usuario registrado.",
@@ -28,7 +29,7 @@ function Registrar() {
                 duration: 2000,
                 isClosable: true,
             });
-            navigate('/login'); // Redirige a la página de inicio de sesión
+            navigate('/login');
         } catch (error) {
             toast({
                 title: "Error al registrar.",
@@ -42,8 +43,8 @@ function Registrar() {
 
     return (
         <Box
-            bgGradient="linear(to-r, gray.900, gray.800)" 
-            color="white" 
+            bgGradient={colorMode === 'dark' ? "linear(to-r, gray.900, gray.800)" : "linear(to-r, white, gray.100)"} 
+            color={colorMode === 'dark' ? "white" : "black"} 
             minH="100vh" 
             px={4}
             pt={10} 
@@ -52,7 +53,7 @@ function Registrar() {
             alignItems="flex-start" 
         >
             <Box
-                bg="gray.800"
+                bg={colorMode === 'dark' ? "gray.800" : "white"}
                 p={8}
                 rounded="2xl"
                 maxW="400px"
@@ -62,23 +63,23 @@ function Registrar() {
                 boxShadow="20px 20px 40px rgba(0, 0, 0, 0.5), -20px -20px 40px rgba(255, 255, 255, 0.1), inset 10px 10px 20px rgba(0, 0, 0, 0.2), inset -10px -10px 20px rgba(255, 255, 255, 0.1)"
                 mt={10} 
             >
-                <Heading as="h2" size="xl" mb={6} textAlign="center" color="white" fontWeight="extrabold">
+                <Heading as="h2" size="xl" mb={6} textAlign="center" fontWeight="extrabold">
                     Registro
                 </Heading>
                 <form onSubmit={handleSubmit}>
                     <FormControl id="usuario" mb={4} isRequired>
-                        <FormLabel color="gray.300">Usuario</FormLabel>
+                        <FormLabel color={colorMode === 'light' ? "gray.800" : "gray.300"}>Usuario</FormLabel>
                         <Input
                             type="text"
                             value={usuario}
                             onChange={(e) => setUsuario(e.target.value)}
-                            bg="gray.900"
-                            color="white"
+                            bg={colorMode === 'light' ? "gray.100" : "gray.900"}
+                            color={colorMode === 'light' ? "black" : "white"}
                             placeholder="Ingresa tu usuario"
                             borderRadius="xl"
                             border="none"
                             boxShadow="inset 8px 8px 15px rgba(0,0,0,0.2), inset -8px -8px 15px rgba(255,255,255,0.1)"
-                            _placeholder={{ color: 'gray.500' }}
+                            _placeholder={{ color: colorMode === 'light' ? 'gray.500' : 'gray.500' }}
                             _focus={{
                                 boxShadow: 'inset 4px 4px 10px rgba(0,0,0,0.3), inset -4px -4px 10px rgba(255,255,255,0.1)',
                                 outline: 'none',
@@ -87,18 +88,18 @@ function Registrar() {
                     </FormControl>
 
                     <FormControl id="email" mb={4} isRequired>
-                        <FormLabel color="gray.300">Email</FormLabel>
+                        <FormLabel color={colorMode === 'light' ? "gray.800" : "gray.300"}>Email</FormLabel>
                         <Input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            bg="gray.900"
-                            color="white"
+                            bg={colorMode === 'light' ? "gray.100" : "gray.900"}
+                            color={colorMode === 'light' ? "black" : "white"}
                             placeholder="Ingresa tu email"
                             borderRadius="xl"
                             border="none"
                             boxShadow="inset 8px 8px 15px rgba(0,0,0,0.2), inset -8px -8px 15px rgba(255,255,255,0.1)"
-                            _placeholder={{ color: 'gray.500' }}
+                            _placeholder={{ color: colorMode === 'light' ? 'gray.500' : 'gray.500' }}
                             _focus={{
                                 boxShadow: 'inset 4px 4px 10px rgba(0,0,0,0.3), inset -4px -4px 10px rgba(255,255,255,0.1)',
                                 outline: 'none',
@@ -107,18 +108,18 @@ function Registrar() {
                     </FormControl>
 
                     <FormControl id="edad" mb={4} isRequired>
-                        <FormLabel color="gray.300">Edad</FormLabel>
+                        <FormLabel color={colorMode === 'light' ? "gray.800" : "gray.300"}>Edad</FormLabel>
                         <Input
                             type="number"
                             value={edad}
                             onChange={(e) => setEdad(e.target.value)}
-                            bg="gray.900"
-                            color="white"
+                            bg={colorMode === 'light' ? "gray.100" : "gray.900"}
+                            color={colorMode === 'light' ? "black" : "white"}
                             placeholder="Ingresa tu edad"
                             borderRadius="xl"
                             border="none"
                             boxShadow="inset 8px 8px 15px rgba(0,0,0,0.2), inset -8px -8px 15px rgba(255,255,255,0.1)"
-                            _placeholder={{ color: 'gray.500' }}
+                            _placeholder={{ color: colorMode === 'light' ? 'gray.500' : 'gray.500' }}
                             _focus={{
                                 boxShadow: 'inset 4px 4px 10px rgba(0,0,0,0.3), inset -4px -4px 10px rgba(255,255,255,0.1)',
                                 outline: 'none',
@@ -127,18 +128,18 @@ function Registrar() {
                     </FormControl>
 
                     <FormControl id="password" mb={6} isRequired>
-                        <FormLabel color="gray.300">Contraseña</FormLabel>
+                        <FormLabel color={colorMode === 'light' ? "gray.800" : "gray.300"}>Contraseña</FormLabel>
                         <Input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            bg="gray.900"
-                            color="white"
+                            bg={colorMode === 'light' ? "gray.100" : "gray.900"}
+                            color={colorMode === 'light' ? "black" : "white"}
                             placeholder="Ingresa tu contraseña"
                             borderRadius="xl"
                             border="none"
                             boxShadow="inset 8px 8px 15px rgba(0,0,0,0.2), inset -8px -8px 15px rgba(255,255,255,0.1)"
-                            _placeholder={{ color: 'gray.500' }}
+                            _placeholder={{ color: colorMode === 'light' ? 'gray.500' : 'gray.500' }}
                             _focus={{
                                 boxShadow: 'inset 4px 4px 10px rgba(0,0,0,0.3), inset -4px -4px 10px rgba(255,255,255,0.1)',
                                 outline: 'none',
@@ -147,12 +148,12 @@ function Registrar() {
                     </FormControl>
 
                     <FormControl id="rol" mb={6} isRequired>
-                        <FormLabel color="gray.300">Rol</FormLabel>
+                        <FormLabel color={colorMode === 'light' ? "gray.800" : "gray.300"}>Rol</FormLabel>
                         <Select
                             value={rol}
                             onChange={(e) => setRol(e.target.value)}
-                            bg="gray.900"
-                            color="white"
+                            bg={colorMode === 'light' ? "gray.100" : "gray.900"}
+                            color={colorMode === 'light' ? "black" : "white"}
                             borderRadius="xl"
                             boxShadow="inset 8px 8px 15px rgba(0,0,0,0.2), inset -8px -8px 15px rgba(255,255,255,0.1)"
                             _focus={{

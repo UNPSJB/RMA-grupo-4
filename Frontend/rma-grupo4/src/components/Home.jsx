@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Box, Heading, Text, Button, Stack, Flex, Icon } from '@chakra-ui/react';
+import { Box, Heading, Text, Button, Stack, Flex, Icon, useColorMode } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { FaLock, FaUserPlus, FaArrowRight } from 'react-icons/fa';
 import { useAuth } from './AuthContext'; // Importar el contexto de autenticación
@@ -7,6 +7,7 @@ import { useAuth } from './AuthContext'; // Importar el contexto de autenticaci�
 export default function Home() {
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth(); // Obtener estado de autenticación
+    const { colorMode } = useColorMode(); // Hook para obtener el modo de color actual
 
     // Redirigir al usuario a /inicio si ya está autenticado
     useEffect(() => {
@@ -25,6 +26,7 @@ export default function Home() {
             alignItems="center"
             textAlign="center"
             overflow="hidden"
+            bg={colorMode === 'dark' ? 'gray.800' : 'white'} // Fondo según el modo
         >
             <Heading
                 as="h1"
@@ -33,12 +35,18 @@ export default function Home() {
                 letterSpacing="tight"
                 textShadow="2px 2px 10px rgba(0, 0, 0, 0.8)"
                 mb={6}
-                color="white"
+                color={colorMode === 'dark' ? 'white' : 'black'} // Color del título según el modo
             >
                 Bienvenido a Nuestra Plataforma
             </Heading>
 
-            <Text fontSize="2xl" mb={12} maxW="800px" color="white" textShadow="1px 1px 10px rgba(0, 0, 0, 0.7)">
+            <Text 
+                fontSize="2xl" 
+                mb={12} 
+                maxW="800px" 
+                color={colorMode === 'dark' ? 'white' : 'black'} // Color del texto según el modo
+                textShadow="1px 1px 10px rgba(0, 0, 0, 0.7)"
+            >
                 Explora nuestras funcionalidades. Inicia sesión o regístrate para comenzar a disfrutar de todo lo que tenemos para ofrecer.
             </Text>
 
@@ -98,7 +106,7 @@ export default function Home() {
                 w="100%"
             >
                 {[
-                    { title: 'Monitoreo en Tiempo Real', description: 'Mantén un control constante de las condiciones climáticas ', icon: FaArrowRight },
+                    { title: 'Monitoreo en Tiempo Real', description: 'Mantén un control constante de las condiciones climáticas', icon: FaArrowRight },
                     { title: 'Análisis de Datos Históricos', description: 'Accede a los registros históricos para realizar análisis detallados', icon: FaArrowRight },
                     { title: 'Alertas Personalizadas', description: 'Recibe notificaciones automáticas cuando las condiciones superen los límites establecidos', icon: FaArrowRight }
                 ].map((feature, index) => (
@@ -117,10 +125,10 @@ export default function Home() {
                         _hover={{ transform: 'scale(1.05)', bg: 'rgba(255, 255, 255, 0.15)' }}
                     >
                         <Icon as={feature.icon} w={12} h={12} mb={4} color="orange.400" />
-                        <Heading as="h3" size="lg" mb={4}>
+                        <Heading as="h3" size="lg" mb={4} color={colorMode === 'dark' ? 'white' : 'black'}> {/* Color del título de la característica */}
                             {feature.title}
                         </Heading>
-                        <Text fontSize="md" color="gray.300" textAlign="justify">
+                        <Text fontSize="md" color={colorMode === 'dark' ? 'gray.300' : 'gray.600'} textAlign="justify"> {/* Color del texto según el modo */}
                             {feature.description}
                         </Text>
                     </Flex>

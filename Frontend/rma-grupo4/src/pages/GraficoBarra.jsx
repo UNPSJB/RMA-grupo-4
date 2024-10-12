@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Text, useColorMode } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { Bar } from 'react-chartjs-2'; // Cambiar a Bar para gráficos de barras
 import axios from 'axios';
@@ -9,6 +9,7 @@ ChartJS.register(...registerables);
 const GraficoBarra = ({ title, url, nodeId }) => {
   const [chartData, setChartData] = useState(null);
   const [summary, setSummary] = useState(null);  // Para almacenar el resumen
+  const { colorMode } = useColorMode();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,8 +37,8 @@ const GraficoBarra = ({ title, url, nodeId }) => {
             datasets: [{
               label: `Precipitación`,
               data: processedData.map(item => item.data), // Datos de precipitación
-              backgroundColor: 'rgba(255, 0, 0, 0.5)', // Cambiar a rojo con opacidad
-              borderColor: 'rgba(255, 0, 0, 1)', // Cambiar el borde a rojo
+              backgroundColor: colorMode === 'light' ? 'rgba(255, 0, 0, 0.5)' : 'rgba(200, 0, 0, 0.5)',
+              borderColor: colorMode === 'light' ? 'rgba(255, 0, 0, 1)' : 'rgba(200, 0, 0, 1)', 
               borderWidth: 2,
             }]
           };
@@ -51,7 +52,7 @@ const GraficoBarra = ({ title, url, nodeId }) => {
       }
     };
     fetchData();
-  }, [url, title, nodeId]);
+  }, [url, title, nodeId, colorMode]);
 
   const chartOptions = {
     responsive: true,
@@ -59,32 +60,45 @@ const GraficoBarra = ({ title, url, nodeId }) => {
     plugins: {
       legend: { 
         position: 'top',
-        labels: { color: 'white', font: { size: 12 } }
+        labels: { 
+          color: colorMode === 'light' ? 'black' : 'white',
+          font: { size: 12 } 
+        }
       },
       title: {
         display: true,
-        text: `Gráfico de Barras - Precipitación`,
+        text: `Gráfico de Barra`,
         font: { size: 16, weight: 'bold' },
-        color: 'white',
+        color: colorMode === 'light' ? 'black' : 'white',
         padding: { top: 10, bottom: 10 },
       },
     },
     scales: {
       x: { 
-        ticks: { color: 'white', font: { size: 12 } },
-        grid: { color: 'rgba(255, 255, 255, 0.1)' } 
+        ticks: { 
+          color: colorMode === 'light' ? 'black' : 'white',
+          font: { size: 12 } 
+        },
+        grid: { 
+          color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)' 
+        }
       },
       y: { 
-        ticks: { color: 'white', font: { size: 12 } },
-        grid: { color: 'rgba(255, 255, 255, 0.1)' } 
+        ticks: { 
+          color: colorMode === 'light' ? 'black' : 'white',  
+          font: { size: 12 } 
+        },
+        grid: { 
+          color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'  
+        }
       },
     },
   };
 
   return (
     <Box 
-      bg="gray.700" 
-      color="white" 
+      bg={colorMode === 'light' ? 'gray.100' : 'gray.700'}
+      color={colorMode === 'light' ? 'black' : 'white'}
       p={{ base: 2, md: 4 }}
       borderRadius="md" 
       boxShadow="lg"

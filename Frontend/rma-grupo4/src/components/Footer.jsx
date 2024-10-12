@@ -1,21 +1,23 @@
 import React from 'react';
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text, useColorMode } from "@chakra-ui/react";
 
 function Footer() {
+  const { colorMode } = useColorMode(); // Obtener el estado del color mode
+
   return (
     <Box
       as="footer"
-      bg="gray.900" // Cambiado para combinar con el NavBar
-      color="white"
+      bg={colorMode === 'light' ? "gray.100" : "gray.900"} // Cambiar fondo según el tema
+      color={colorMode === 'light' ? "black" : "white"} // Cambiar color de texto según el tema
       p={4}
       textAlign="center"
-      position="absolute" // Asegúrate de que esté fijo en la parte inferior
+      position="absolute"
       bottom="0"
       left="0"
       right="0"
       width="100%"
-      mt="2" // Asegura que el footer ocupe todo el ancho
-      boxShadow="10px -10px 30px rgba(0, 0, 0, 0.5), -10px 10px 30px rgba(255, 255, 255, 0.1)" // Añadir sombra para continuidad
+      mt="2"
+      boxShadow="10px -10px 30px rgba(0, 0, 0, 0.5), -10px 10px 30px rgba(255, 255, 255, 0.1)" // Sombra para continuidad
     >
       <Text>© {new Date().getFullYear()} Red de Monitoreo Ambiental. Todos los derechos reservados.</Text>
     </Box>

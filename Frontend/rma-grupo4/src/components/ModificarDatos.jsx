@@ -7,21 +7,22 @@ import {
     Input,
     Text,
     Spinner,
-    useToast, // Importar useToast
+    useToast,
+    useColorMode, // Importar useColorMode
 } from '@chakra-ui/react';
-import { useAuth } from './AuthContext'; // Importa el contexto
+import { useAuth } from './AuthContext';
 
 const ModificarDatos = () => {
-    const { user } = useAuth(); // Obtener el usuario del contexto
+    const { user } = useAuth();
+    const { colorMode, toggleColorMode } = useColorMode(); // Obtener el estado del tema
     const [userData, setUserData] = useState({
         email: '',
         edad: '',
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const toast = useToast(); // Inicializa el hook useToast
+    const toast = useToast();
 
-    // Función para obtener los datos del usuario
     const fetchUserData = async () => {
         try {
             const response = await fetch(`http://localhost:8000/usuarios/${user}`);
@@ -38,7 +39,6 @@ const ModificarDatos = () => {
         }
     };
 
-    // Función para manejar el envío del formulario
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -52,17 +52,17 @@ const ModificarDatos = () => {
 
             if (!response.ok) throw new Error('Error al modificar los datos');
 
-            toast({ // Mostrar el toast de éxito
+            toast({
                 title: "Modificación de datos exitosa.",
                 status: "success",
                 duration: 2000,
                 isClosable: true,
             });
-            setError(null); // Limpiar el error
+            setError(null);
         } catch (error) {
-            toast({ // Mostrar el toast de error
+            toast({
                 title: "Error.",
-                description: error.message, // Usar el mensaje de error
+                description: error.message,
                 status: "error",
                 duration: 2000,
                 isClosable: true,
@@ -70,7 +70,6 @@ const ModificarDatos = () => {
         }
     };
 
-    // Cargar los datos del usuario al montar el componente
     useEffect(() => {
         fetchUserData();
     }, [user]);
@@ -85,9 +84,9 @@ const ModificarDatos = () => {
 
     return (
         <Box
-            bgGradient="linear(to-r, gray.900, gray.800)" 
-            color="white" 
-            minH="100vh" 
+            bgGradient={colorMode === 'light' ? "linear(to-r, gray.200, gray.100)" : "linear(to-r, gray.900, gray.800)"} // Cambiar fondo según tema
+            color={colorMode === 'light' ? "black" : "white"} // Cambiar color de texto
+            minH="100vh"
             px={4}
             pt={10}
             display="flex"
@@ -95,16 +94,16 @@ const ModificarDatos = () => {
             alignItems="flex-start"
         >
             <Box
-                bg="gray.800"
+                bg={colorMode === 'light' ? "white" : "gray.800"} // Cambiar fondo del cuadro según tema
                 p={8}
                 rounded="2xl"
                 maxW="400px"
                 w="full"
                 position="relative"
                 overflow="hidden"
-                boxShadow="inset 10px 10px 20px rgba(0, 0, 0, 0.2), inset -10px -10px 20px rgba(255, 255, 255, 0.1)" // Ajustado para quitar sombra exterior
+                boxShadow="inset 10px 10px 20px rgba(0, 0, 0, 0.2), inset -10px -10px 20px rgba(255, 255, 255, 0.1)"
                 mt={10}
-                ml={2} // Mover el componente más a la izquierda
+                ml={2}
             >
                 <Text fontSize="2xl" mb={4} textAlign="center">Modificar Datos del Usuario</Text>
                 <form onSubmit={handleSubmit}>
@@ -115,12 +114,12 @@ const ModificarDatos = () => {
                             value={userData.email}
                             onChange={(e) => setUserData({ ...userData, email: e.target.value })}
                             placeholder="Introduce tu nuevo email"
-                            bg="gray.900"
-                            color="white"
+                            bg={colorMode === 'light' ? "gray.100" : "gray.900"} // Cambiar color de fondo del input
+                            color={colorMode === 'light' ? "black" : "white"} // Cambiar color del texto del input
                             borderRadius="xl"
                             border="none"
                             boxShadow="inset 8px 8px 15px rgba(0,0,0,0.2), inset -8px -8px 15px rgba(255,255,255,0.1)"
-                            _placeholder={{ color: 'gray.500' }}
+                            _placeholder={{ color: colorMode === 'light' ? 'gray.500' : 'gray.400' }} // Cambiar color del placeholder
                             _focus={{
                                 boxShadow: 'inset 4px 4px 10px rgba(0,0,0,0.3), inset -4px -4px 10px rgba(255,255,255,0.1)',
                                 outline: 'none',
@@ -134,12 +133,12 @@ const ModificarDatos = () => {
                             value={userData.edad}
                             onChange={(e) => setUserData({ ...userData, edad: parseInt(e.target.value) || '' })}
                             placeholder="Introduce tu edad"
-                            bg="gray.900"
-                            color="white"
+                            bg={colorMode === 'light' ? "gray.100" : "gray.900"}
+                            color={colorMode === 'light' ? "black" : "white"}
                             borderRadius="xl"
                             border="none"
                             boxShadow="inset 8px 8px 15px rgba(0,0,0,0.2), inset -8px -8px 15px rgba(255,255,255,0.1)"
-                            _placeholder={{ color: 'gray.500' }}
+                            _placeholder={{ color: colorMode === 'light' ? 'gray.500' : 'gray.400' }}
                             _focus={{
                                 boxShadow: 'inset 4px 4px 10px rgba(0,0,0,0.3), inset -4px -4px 10px rgba(255,255,255,0.1)',
                                 outline: 'none',
@@ -156,7 +155,7 @@ const ModificarDatos = () => {
                         border="none"
                         zIndex="10"
                         position="relative"
-                        boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), inset 4px 4px 10px rgba(0,0,0,0.3)" // Sombra ajustada
+                        boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), inset 4px 4px 10px rgba(0,0,0,0.3)"
                         _hover={{
                             bg: 'orange.600',
                             boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), inset 6px 6px 12px rgba(0,0,0,0.3)',

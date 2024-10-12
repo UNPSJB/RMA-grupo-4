@@ -16,7 +16,7 @@ function App({ children }) { // Cambia para aceptar children
   return (
     <ChakraProvider theme={theme}>
       <AuthProvider>
-        <Flex direction="column" minH="100vh" bg="gray.800" color="white" flexDirection="column">
+        <Flex direction="column" minH="100vh"color="white" flexDirection="column">
           <NavBar />
           <Box flex="1" paddingBottom="100px">
             {children} {/* Renderiza los children pasados por las rutas */}

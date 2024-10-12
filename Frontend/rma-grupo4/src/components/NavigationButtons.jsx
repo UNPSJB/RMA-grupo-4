@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Box, Button, Flex, IconButton } from "@chakra-ui/react";
+import { Box, Button, Flex, IconButton, useColorMode } from "@chakra-ui/react";
 import { FaBars, FaTimes } from 'react-icons/fa';
 
 function NavigationButtons() {
   const [isVisible, setIsVisible] = useState(false);
+  const { colorMode } = useColorMode(); // Obtener el estado del color mode
 
   const toggleVisibility = () => {
     setIsVisible((prev) => !prev);
@@ -23,9 +24,9 @@ function NavigationButtons() {
         zIndex="1000"
         icon={isVisible ? <FaTimes /> : <FaBars />}
         colorScheme="gray"
-        bg="gray.800"
+        bg={colorMode === 'light' ? 'gray.800' : 'gray.600'} // Cambiar fondo según el tema
         color="white"
-        _hover={{ bg: "gray.700" }}
+        _hover={{ bg: colorMode === 'light' ? 'gray.700' : 'gray.500' }}
         onClick={toggleVisibility}
         aria-label="Toggle Navigation"
       />
@@ -35,8 +36,8 @@ function NavigationButtons() {
         align="center"
         justify="flex-start"
         wrap="wrap"
-        bg="rgba(26, 32, 44, 0.9)"
-        color="white"
+        bg={colorMode === 'light' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(26, 32, 44, 0.9)'} // Fondo del nav
+        color={colorMode === 'light' ? 'black' : 'white'} // Color del texto
         position="fixed"
         top={20}
         left={isVisible ? 0 : "-280px"}
@@ -54,9 +55,9 @@ function NavigationButtons() {
             as={Link}
             to={item.route}
             variant="ghost"
-            color="white"
-            _hover={{ bg: "gray.700" }}
-            _active={{ bg: "gray.600" }}
+            color={colorMode === 'light' ? 'black' : 'white'} // Color del texto según el tema
+            _hover={{ bg: colorMode === 'light' ? 'gray.200' : 'gray.700' }} // Hover según el tema
+            _active={{ bg: colorMode === 'light' ? 'gray.300' : 'gray.600' }} // Active según el tema
             width="100%"
             mb={3}
             fontSize="lg"

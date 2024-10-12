@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Text, useColorMode } from '@chakra-ui/react';
 import { Doughnut } from 'react-chartjs-2'; 
 import axios from 'axios';
 
 const GraficoMedidor = ({ title, url, nodeId }) => {
   const [chartData, setChartData] = useState(null);
   const [summary, setSummary] = useState(null);  
+  const { colorMode } = useColorMode();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -28,7 +29,6 @@ const GraficoMedidor = ({ title, url, nodeId }) => {
           }))
           .slice(-1)[0]; 
 
-
         if (lastPressureData) {
           const newData = {
             labels: ['Presión', 'Máximo', 'Mínimo'],
@@ -36,12 +36,12 @@ const GraficoMedidor = ({ title, url, nodeId }) => {
               label: `${title}`,
               data: [lastPressureData.data, 1050 - lastPressureData.data, lastPressureData.data - 950], // Simula un medidor entre 950 y 1050 hPa
               backgroundColor: [
-                'rgba(75, 192, 192, 1)', // Color de la presión actual
-                'rgba(255, 255, 255, 0.2)', // Parte del medidor que no se llena
-                'rgba(255, 99, 132, 0.2)', // Zona mínima
+                colorMode === 'light' ? 'rgba(75, 192, 192, 1)' : 'rgba(54, 162, 235, 1)', // Color de la presión actual
+                'rgba(255, 200, 150, 0.5)', // Parte del medidor que no se llena
+                'rgba(255, 99, 132, 0.5)', // Zona mínima
               ],
               borderColor: [
-                'rgba(75, 192, 192, 1)', // Borde del medidor actual
+                colorMode === 'light' ? 'rgba(75, 192, 192, 1)' : 'rgba(54, 162, 235, 1)', // Borde del medidor actual
                 'rgba(255, 255, 255, 0.2)', // Borde del resto
                 'rgba(255, 99, 132, 0.2)', // Borde de la zona mínima
               ],
@@ -58,20 +58,27 @@ const GraficoMedidor = ({ title, url, nodeId }) => {
       }
     };
     fetchData();
-  }, [url, title, nodeId]);
+  }, [url, title, nodeId, colorMode]);
+
 
   const chartOptions = {
-    responsive: true,
     maintainAspectRatio: false,
     rotation: -90, // Inicia en el ángulo superior
     circumference: 180, // Hace que sea semicircular
+    responsive: true,
     plugins: {
-      legend: { display: false },
+      legend: { 
+        position: 'top',
+        labels: { 
+          color: colorMode === 'light' ? 'black' : 'white',
+          font: { size: 12 } 
+        }
+      },
       title: {
         display: true,
-        text: `Gráfico de Medidor de Presión`,
+        text: `Gráfico de Línea`,
         font: { size: 16, weight: 'bold' },
-        color: 'white',
+        color: colorMode === 'light' ? 'black' : 'white',
         padding: { top: 10, bottom: 10 },
       },
     },
@@ -79,14 +86,14 @@ const GraficoMedidor = ({ title, url, nodeId }) => {
 
   return (
     <Box 
-      bg="gray.700" 
-      color="white" 
+      bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} 
+      color={colorMode === 'light' ? 'black' : 'white'} 
       p={{ base: 2, md: 4 }}
       borderRadius="md" 
       boxShadow="lg"
     >
       {chartData ? (
-        <Box height={{ base: '150px', md: '210px' }}>
+        <Box height={{ base: '100px', md: '180px' }}>
           <Doughnut data={chartData} options={chartOptions} /> {/* Gráfico tipo Doughnut para el medidor */}
         </Box>
       ) : (

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Text, useColorMode } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import axios from 'axios';
@@ -9,6 +9,7 @@ ChartJS.register(...registerables);
 const GraficoArea = ({ title, url, nodeId }) => {
   const [chartData, setChartData] = useState(null);
   const [summary, setSummary] = useState(null);  // Para almacenar el resumen
+  const { colorMode } = useColorMode();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -63,32 +64,45 @@ const GraficoArea = ({ title, url, nodeId }) => {
     plugins: {
       legend: { 
         position: 'top',
-        labels: { color: 'white', font: { size: 12 } }
+        labels: { 
+          color: colorMode === 'light' ? 'black' : 'white',
+          font: { size: 12 } 
+        }
       },
       title: {
         display: true,
-        text: `Gráfico de Área - Humedad`,
+        text: `Gráfico de Area`,
         font: { size: 16, weight: 'bold' },
-        color: 'white',
+        color: colorMode === 'light' ? 'black' : 'white', 
         padding: { top: 10, bottom: 10 },
       },
     },
     scales: {
       x: { 
-        ticks: { color: 'white', font: { size: 12 } },
-        grid: { color: 'rgba(255, 255, 255, 0.1)' } 
+        ticks: { 
+          color: colorMode === 'light' ? 'black' : 'white', 
+          font: { size: 12 } 
+        },
+        grid: { 
+          color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)' 
+        }
       },
       y: { 
-        ticks: { color: 'white', font: { size: 12 } },
-        grid: { color: 'rgba(255, 255, 255, 0.1)' } 
+        ticks: { 
+          color: colorMode === 'light' ? 'black' : 'white',
+          font: { size: 12 } 
+        },
+        grid: { 
+          color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'
+        }
       },
     },
   };
 
   return (
     <Box 
-      bg="gray.700" 
-      color="white" 
+      bg={colorMode === 'light' ? 'gray.100' : 'gray.700'}
+      color={colorMode === 'light' ? 'black' : 'white'}
       p={{ base: 2, md: 4 }}
       borderRadius="md" 
       boxShadow="lg"

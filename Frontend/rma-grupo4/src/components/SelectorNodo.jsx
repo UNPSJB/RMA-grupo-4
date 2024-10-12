@@ -1,8 +1,9 @@
-import { Select } from '@chakra-ui/react';
+import { Select, useColorMode } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function SelectorNodo({ onChange }) {
+  const { colorMode } = useColorMode(); // Obtener el estado del color mode
   const [nodos, setNodos] = useState([]); 
   const [selectedNode, setSelectedNode] = useState(0); 
 
@@ -22,7 +23,6 @@ function SelectorNodo({ onChange }) {
         console.error("Error fetching nodes from resumen", error);
       });
   }, []);
-   
 
   const handleNodeChange = (e) => {
     const nodeId = parseInt(e.target.value);
@@ -36,17 +36,18 @@ function SelectorNodo({ onChange }) {
       onChange={handleNodeChange}
       placeholder="Seleccione un nodo"
       size="md"  
-      bg="gray.800" 
-      color="white" 
-      borderColor="gray.600"  
+      bg={colorMode === 'light' ? 'white' : 'gray.800'}
+      color={colorMode === 'light' ? 'black' : 'white'} 
+      borderColor={colorMode === 'light' ? 'gray.300' : 'gray.600'}
       _hover={{ borderColor: 'teal.300' }}  
       _focus={{ borderColor: 'teal.500', boxShadow: '0 0 0 1px teal.500' }}  
       borderRadius="md"  
-      ml={10}
+      ml="42%"
       w="300px"
       sx={{
         option: {
-          backgroundColor: 'gray.900',
+          backgroundColor: colorMode === 'light' ? 'white' : 'gray.900',
+          color: colorMode === 'light' ? 'black' : 'white',
         },
       }}
     >

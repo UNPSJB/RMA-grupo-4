@@ -7,23 +7,25 @@ import {
     Input,
     Text,
     Spinner,
-    useToast, // Importar useToast
+    useToast,
+    Switch,
+    useColorMode, // Importar useColorMode
 } from '@chakra-ui/react';
-import { useAuth } from './AuthContext'; // Importa el contexto
+import { useAuth } from './AuthContext';
 
 const ModificarPassword = () => {
-    const { user } = useAuth(); // Obtener el usuario del contexto
+    const { user } = useAuth();
     const [passwordData, setPasswordData] = useState({
         password: '',
         repetir_password: '',
     });
     const [loading, setLoading] = useState(false);
-    const toast = useToast(); // Inicializa el hook useToast
+    const toast = useToast();
+    const { colorMode, toggleColorMode } = useColorMode(); // Para manejar el modo de color
 
-    // Función para manejar el envío del formulario
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true); // Iniciar el loading
+        setLoading(true);
         try {
             const response = await fetch(`http://localhost:8000/modificar_password/${user}`, {
                 method: 'PUT',
@@ -35,33 +37,32 @@ const ModificarPassword = () => {
 
             if (!response.ok) throw new Error('Error al modificar la contraseña');
 
-            toast({ // Mostrar el toast de éxito
+            toast({
                 title: "Contraseña modificada exitosamente.",
                 status: "success",
                 duration: 2000,
                 isClosable: true,
             });
 
-            // Limpiar campos después de éxito
             setPasswordData({ password: '', repetir_password: '' });
         } catch (error) {
-            toast({ // Mostrar el toast de error
+            toast({
                 title: "Error.",
-                description: error.message, // Usar el mensaje de error
+                description: error.message,
                 status: "error",
                 duration: 2000,
                 isClosable: true,
             });
         } finally {
-            setLoading(false); // Detener el loading
+            setLoading(false);
         }
     };
 
     return (
         <Box
-            bgGradient="linear(to-r, gray.900, gray.800)" 
-            color="white" 
-            minH="100vh" 
+            bgGradient={colorMode === 'light' ? "linear(to-r, gray.200, gray.100)" : "linear(to-r, gray.900, gray.800)"} // Cambiar fondo según tema
+            color={colorMode === 'light' ? "black" : "white"} // Cambiar color de texto
+            minH="100vh"
             px={4}
             pt={10}
             display="flex"
@@ -69,7 +70,7 @@ const ModificarPassword = () => {
             alignItems="flex-start"
         >
             <Box
-                bg="gray.800"
+                bg={colorMode === 'light' ? "white" : "gray.800"}
                 p={8}
                 rounded="2xl"
                 maxW="400px"
@@ -78,7 +79,7 @@ const ModificarPassword = () => {
                 overflow="hidden"
                 boxShadow="inset 10px 10px 20px rgba(0, 0, 0, 0.2), inset -10px -10px 20px rgba(255, 255, 255, 0.1)"
                 mt={10}
-                ml={2} // Mover el componente más a la izquierda
+                ml={2}
             >
                 <Text fontSize="2xl" mb={4} textAlign="center">Modificar Contraseña</Text>
                 {loading && (
@@ -94,8 +95,8 @@ const ModificarPassword = () => {
                             value={passwordData.password}
                             onChange={(e) => setPasswordData({ ...passwordData, password: e.target.value })}
                             placeholder="Introduce tu nueva contraseña"
-                            bg="gray.900"
-                            color="white"
+                            bg={colorMode === 'light' ? "gray.100" : "gray.900"}
+                            color={colorMode === 'light' ? "black" : "white"}
                             borderRadius="xl"
                             border="none"
                             boxShadow="inset 8px 8px 15px rgba(0,0,0,0.2), inset -8px -8px 15px rgba(255,255,255,0.1)"
@@ -113,8 +114,8 @@ const ModificarPassword = () => {
                             value={passwordData.repetir_password}
                             onChange={(e) => setPasswordData({ ...passwordData, repetir_password: e.target.value })}
                             placeholder="Repite tu nueva contraseña"
-                            bg="gray.900"
-                            color="white"
+                            bg={colorMode === 'light' ? "gray.100" : "gray.900"}
+                            color={colorMode === 'light' ? "black" : "white"}
                             borderRadius="xl"
                             border="none"
                             boxShadow="inset 8px 8px 15px rgba(0,0,0,0.2), inset -8px -8px 15px rgba(255,255,255,0.1)"

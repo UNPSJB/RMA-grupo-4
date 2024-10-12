@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, Stack, Select, Table, Thead, Tbody, Tr, Th, Td, useMediaQuery, Flex } from '@chakra-ui/react';
+import { Box, Heading, Stack, Select, Table, Thead, Tbody, Tr, Th, Td, useMediaQuery, Flex, useColorMode } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { Chart } from 'react-chartjs-2';
 import axios from 'axios';
@@ -41,10 +41,10 @@ const years = [
   {value : '2027'},
   {value : '2028'},
   {value : '2029'}
-
 ];
 
 function HistoricosPage() {
+  const { colorMode } = useColorMode(); // Obtener el estado del color mode
   const [isMobile] = useMediaQuery("(max-width: 48em)");
   const [selectedCharts, setSelectedCharts] = useState(['line']);
   const [selectedVariable, setSelectedVariable] = useState('temperatura');
@@ -192,79 +192,49 @@ function HistoricosPage() {
       },
     };
 
-    return <Box height="400px" maxHeight="400px" overflow="hidden"> {/* Ajusta la altura aquí */}
-    <Chart type="bar" data={{ ...chartData, datasets: visibleDatasets }} options={chartOptions} />
-  </Box>
+    return (
+      <Box height="400px" maxHeight="400px" overflow="hidden">
+        <Chart type="bar" data={{ ...chartData, datasets: visibleDatasets }} options={chartOptions} />
+      </Box>
+    );
   };
 
   return (
-    <Box p={4}>
+    <Box p={4} bg={colorMode === 'light' ? 'white' : 'gray.800'} color={colorMode === 'light' ? 'black' : 'white'}>
       <Heading as="h1" m={7} textAlign="center">Históricos de variables</Heading>
-      <Flex justify="center" mb={4} mt={5} wrap="wrap" gap={4}>
-        <Select 
-          value={selectedVariable} 
-          onChange={(e) => setSelectedVariable(e.target.value)} 
-          width="150px"
-          variant="outline"
-          focusBorderColor="teal.500"
-          _hover={{ borderColor: "teal.300" }}
-          _selected={{ bg: "teal.100" }}
-        >
-          {variables.map((v) => (
-            <option key={v.name} value={v.name}>{v.name}</option>
+      <Flex justify="center" mb={4} mt={4}>
+        <Select value={selectedVariable} onChange={(e) => setSelectedVariable(e.target.value)} width="150px" marginX={2}>
+          {variables.map(variable => (
+            <option key={variable.name} value={variable.name}>{variable.name}</option>
           ))}
         </Select>
-        <Select 
-          value={selectedYear} 
-          onChange={(e) => setSelectedYear(e.target.value)} 
-          width="100px"
-          variant="outline"
-          focusBorderColor="teal.500"
-          _hover={{ borderColor: "teal.300" }}
-          _selected={{ bg: "teal.100" }}
-        
-        >
-        {years.map((m) => (
-            <option key={m.value} value={m.value}>{m.value}</option>
+        <Select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} width="100px" marginX={2}>
+          {years.map(year => (
+            <option key={year.value} value={year.value}>{year.value}</option>
           ))}
         </Select>
-        <Select 
-          value={selectedMonth} 
-          onChange={(e) => setSelectedMonth(e.target.value)} 
-          width="120px"
-          variant="outline"
-          focusBorderColor="teal.500"
-          _hover={{ borderColor: "teal.300" }}
-          _selected={{ bg: "teal.100" }}
-        >
-          {months.map((m) => (
-            <option key={m.value} value={m.value}>{m.name}</option>
+        <Select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} width="150px" marginX={2}>
+          {months.map(month => (
+            <option key={month.value} value={month.value}>{month.name}</option>
           ))}
         </Select>
-        <Select 
-          value={selectedDay} 
-          onChange={(e) => setSelectedDay(e.target.value)} 
-          width="80px"
-          variant="outline"
-          focusBorderColor="teal.500"
-          _hover={{ borderColor: "teal.300" }}
-          _selected={{ bg: "teal.100" }}
-        >
-          <option value="">Seleccione un día</option>
-          {days.map((d) => (
-            <option key={d} value={d}>{d}</option>
+        <Select value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)} width="100px" marginX={2}>
+          {days.map(day => (
+            <option key={day} value={day}>{day}</option>
           ))}
         </Select>
       </Flex>
+      <Stack direction={isMobile ? "column" : "row"} justify="center" align="center" spacing={4}>
+        <Select value={selectedCharts.includes('line') ? 'line' : 'bar'} onChange={(e) => handleChartTypeChange(e.target.value)} width="150px" marginX={2}>
+          <option value="line">Línea</option>
+          <option value="bar">Barra</option>
+        </Select>
+      </Stack>
       {renderCombinedChart()}
-      <Heading as="h2" size="md" mt={4}>Datos históricos</Heading>
-      <Table variant="striped" mt={4}>
+      <Table variant="simple" marginTop={4}>
         <Thead>
           <Tr>
-            <Th>Año</Th>
-            <Th>Mes</Th>
-            <Th>Día</Th>
-            <Th>Hora</Th>
+            <Th>Fecha</Th>
             <Th>Temperatura</Th>
             <Th>Humedad</Th>
             <Th>Presión</Th>
@@ -274,10 +244,7 @@ function HistoricosPage() {
         <Tbody>
           {historicalData.map((row, index) => (
             <Tr key={index}>
-              <Td>{row.year}</Td>
-              <Td>{row.month}</Td>
-              <Td>{row.day}</Td>
-              <Td>{row.hora}</Td>
+              <Td>{`${row.year}/${row.month}/${row.day} ${row.hora}`}</Td>
               <Td>{row.temperatura}</Td>
               <Td>{row.humedad}</Td>
               <Td>{row.presion}</Td>
@@ -291,4 +258,3 @@ function HistoricosPage() {
 }
 
 export default HistoricosPage;
-

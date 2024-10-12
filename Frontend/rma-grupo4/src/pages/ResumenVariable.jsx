@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Text, useColorMode } from '@chakra-ui/react'; // Importar useColorMode
 import axios from 'axios';
 
 const ResumenVariable = ({ title, url, nodeId }) => {
+  const { colorMode } = useColorMode();
   const [summary, setSummary] = useState({
     max_value: null,
     min_value: null,
@@ -27,23 +28,24 @@ const ResumenVariable = ({ title, url, nodeId }) => {
   return (
     <Box
       p={6}
-      bg="gray.800"
+      bg={colorMode === 'light' ? 'gray.100' : 'gray.800'}
+      color={colorMode === 'light' ? 'black' : 'white'}
       borderRadius="md"
       textAlign="center"
       boxShadow="lg"
       transition="all 0.4s ease"
-      _hover={{ boxShadow: 'xl', bg: 'gray.500', fontWeight: "bold" }} // Agregar efecto hover
+      _hover={{ boxShadow: 'xl', bg: colorMode === 'dark' ? 'gray.600' : 'gray.300', fontWeight: "bold" }}
     >
       <Text fontSize="1.25rem" fontWeight="bold" color="teal.300" mb={2}>
         {title}:
       </Text>
-      <Text fontSize="lm" color="white" mb="1" textAlign="center">
+      <Text fontSize="lg" color={colorMode === 'dark' ? 'white' : 'black'} mb="1" textAlign="center">
         Máximo: {summary.max_value !== null ? summary.max_value.toFixed(2) : 'N/A'}
       </Text>
-      <Text fontSize="lm" color="white" mb="1" textAlign="center">
+      <Text fontSize="lg" color={colorMode === 'dark' ? 'white' : 'black'} mb="1" textAlign="center">
         Mínimo: {summary.min_value !== null ? summary.min_value.toFixed(2) : 'N/A'}
       </Text>
-      <Text fontSize="lm" color="white" mb="1" textAlign="center">
+      <Text fontSize="lg" color={colorMode === 'dark' ? 'white' : 'black'} mb="1" textAlign="center">
         Promedio: {summary.average_value !== null ? summary.average_value.toFixed(2) : 'N/A'}
       </Text>
     </Box>

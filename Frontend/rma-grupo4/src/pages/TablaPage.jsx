@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Box, Table, Thead, Tr, Th, Tbody, Td, Button, Flex, Text, Center, useMediaQuery } from "@chakra-ui/react";
+import { Box, Table, Thead, Tr, Th, Tbody, Td, Button, Flex, Text, Center, useMediaQuery, useColorMode } from "@chakra-ui/react";
 import { FaTemperatureHigh, FaTint, FaWind, FaClock } from "react-icons/fa";
 import { GiWaterDrop, GiSpeedometer } from "react-icons/gi";
-import axios from 'axios';  // Asegúrate de que axios esté importado
+import axios from 'axios';
 
 function TablaPage({ onRowSelection }) {
   const [data, setData] = useState([]);
@@ -13,6 +13,7 @@ function TablaPage({ onRowSelection }) {
   const [isMtsXSegundo, setIsMtsXSegundo] = useState(false);
   const [isCm, setIsCm] = useState(false);
   const [isMobile] = useMediaQuery("(max-width: 48em)");
+  const { colorMode } = useColorMode();  // Hook para el modo de color
   const rowsPerPage = isMobile ? 5 : 8;
 
   useEffect(() => {
@@ -98,15 +99,21 @@ function TablaPage({ onRowSelection }) {
     return (mm / 10).toFixed(2);  // Conversión de mm a cm
   };
 
-
   return (
-    <Box bg="gray.700" color="white" p={isMobile ? 1 : 2} borderRadius="md" boxShadow="md" width="100%">
+    <Box 
+      bg={colorMode === 'light' ? 'gray.100' : 'gray.700'}  // Fondo dinámico según el tema
+      color={colorMode === 'light' ? 'black' : 'white'}
+      p={isMobile ? 1 : 2} 
+      borderRadius="md" 
+      boxShadow="md" 
+      width="100%"
+    >
       <Box overflowX="auto">
         <Table variant="simple" colorScheme="whiteAlpha" size={isMobile ? "xs" : "md"}>
           <Thead>
             <Tr>
               <Th onClick={() => handleSort("Nodo")}>
-                <Center color="white">
+                <Center color={colorMode === 'light' ? 'black' : 'white'}>
                   Nodo
                   {sortConfig.key === "Nodo" && (
                     <span style={{ marginLeft: "5px" }}>
@@ -116,13 +123,13 @@ function TablaPage({ onRowSelection }) {
                 </Center>
               </Th>
               <Th>
-                <Center color="white">
+                <Center color={colorMode === 'light' ? 'black' : 'white'}>
                   <FaTint size="1.5em" style={{ marginRight: "5px" }} />
                   Humedad
                 </Center>
               </Th>
               <Th>
-                <Center color="white">
+                <Center color={colorMode === 'light' ? 'black' : 'white'}>
                   <FaTemperatureHigh size="1.5em" style={{ marginRight: "5px" }} />
                   Temperatura
                   <Button
@@ -136,13 +143,13 @@ function TablaPage({ onRowSelection }) {
                 </Center>
               </Th>
               <Th display={{ base: "none", md: "table-cell" }}>
-                <Center color="white">
+                <Center color={colorMode === 'light' ? 'black' : 'white'}>
                   <GiSpeedometer size="1.5em" style={{ marginRight: "5px" }} />
                   Presión
                 </Center>
               </Th>
               <Th>
-                <Center color="white">
+                <Center color={colorMode === 'light' ? 'black' : 'white'}>
                   <FaWind size="1.5em" style={{ marginRight: "5px" }} />
                   Viento
                   <Button
@@ -156,7 +163,7 @@ function TablaPage({ onRowSelection }) {
                 </Center>
               </Th>
               <Th>
-                <Center color="white">
+                <Center color={colorMode === 'light' ? 'black' : 'white'}>
                   <GiWaterDrop size="1.5em" style={{ marginRight: "5px" }} />
                   Precipitación
                   <Button
@@ -170,7 +177,7 @@ function TablaPage({ onRowSelection }) {
                 </Center>
               </Th>
               <Th>
-                <Center color="white">
+                <Center color={colorMode === 'light' ? 'black' : 'white'}>
                   <FaClock size="1.5em" style={{ marginRight: "5px" }} />
                   Fecha
                 </Center>
@@ -180,7 +187,7 @@ function TablaPage({ onRowSelection }) {
           <Tbody>
             {paginatedData.length === 0 ? (
               <Tr>
-                <Td colSpan={6} textAlign="center" color="white">
+                <Td colSpan={6} textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>
                   No hay datos para mostrar
                 </Td>
               </Tr>
@@ -189,8 +196,8 @@ function TablaPage({ onRowSelection }) {
                 <Tr
                   key={index}
                   onClick={() => handleRowClick(index)}
-                  bg={selectedRowIndex === index ? "gray.600" : "transparent"}
-                  _hover={{ backgroundColor: "gray.600" }}
+                  bg={selectedRowIndex === index ? (colorMode === 'light' ? "gray.100" : "gray.700") : "transparent"}
+                  _hover={{ backgroundColor: colorMode === 'light' ? "gray.100" : "gray.700" }}
                 >
                   <Td textAlign="center">{row.Nodo}</Td>
                   <Td textAlign="center">{formatNumber(row.Humedad)} %</Td>

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Text, useColorMode } from '@chakra-ui/react';
 import { Line } from 'react-chartjs-2'; 
 import axios from 'axios';
 
 const GraficoLinea = ({ title, url, nodeId }) => {
   const [chartData, setChartData] = useState(null);
-  const [summary, setSummary] = useState(null);  // Para almacenar el resumen
+  const [summary, setSummary] = useState(null);  
+  const { colorMode } = useColorMode();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,8 +32,8 @@ const GraficoLinea = ({ title, url, nodeId }) => {
             datasets: [{
               label: `${title}`,
               data: processedData.map(item => item.data), 
-              borderColor: 'rgba(75,192,192,1)',
-              backgroundColor: 'rgba(75,192,192,0.2)',
+              borderColor: colorMode === 'light' ? 'rgba(75,192,192,1)' : 'rgba(255,99,132,1)',
+              backgroundColor: colorMode === 'light' ? 'rgba(75,192,192,0.2)' : 'rgba(255,99,132,0.2)',
               borderWidth: 2,
               fill: false,
               tension: 0.4
@@ -48,7 +49,7 @@ const GraficoLinea = ({ title, url, nodeId }) => {
       }
     };
     fetchData();
-  }, [url, title, nodeId]); 
+  }, [url, title, nodeId, colorMode]);
 
   const chartOptions = {
     responsive: true,
@@ -56,32 +57,45 @@ const GraficoLinea = ({ title, url, nodeId }) => {
     plugins: {
       legend: { 
         position: 'top',
-        labels: { color: 'white', font: { size: 12 } }
+        labels: { 
+          color: colorMode === 'light' ? 'black' : 'white',
+          font: { size: 12 } 
+        }
       },
       title: {
         display: true,
         text: `Gráfico de Línea`,
         font: { size: 16, weight: 'bold' },
-        color: 'white',
+        color: colorMode === 'light' ? 'black' : 'white',
         padding: { top: 10, bottom: 10 },
       },
     },
     scales: {
       x: { 
-        ticks: { color: 'white', font: { size: 12 } },
-        grid: { color: 'rgba(255, 255, 255, 0.1)' } 
+        ticks: { 
+          color: colorMode === 'light' ? 'black' : 'white', 
+          font: { size: 12 } 
+        },
+        grid: { 
+          color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)' 
+        }
       },
       y: { 
-        ticks: { color: 'white', font: { size: 12 } },
-        grid: { color: 'rgba(255, 255, 255, 0.1)' } 
+        ticks: { 
+          color: colorMode === 'light' ? 'black' : 'white',
+          font: { size: 12 } 
+        },
+        grid: { 
+          color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'
+        }
       },
     },
   };
 
   return (
     <Box 
-      bg="gray.700" 
-      color="white" 
+      bg={colorMode === 'light' ? 'gray.100' : 'gray.700'}  // Fondo dinámico según el tema
+      color={colorMode === 'light' ? 'black' : 'white'} 
       p={{ base: 2, md: 4 }}
       borderRadius="md" 
       boxShadow="lg"
@@ -89,7 +103,7 @@ const GraficoLinea = ({ title, url, nodeId }) => {
       overflowX="auto"
     >
       {chartData ? (
-        <Box height={{ base: '300px', md: '500px' }}>
+        <Box height={{ base: '300px', md: '550px' }}>
           <Line data={chartData} options={chartOptions} />
         </Box>
       ) : (
