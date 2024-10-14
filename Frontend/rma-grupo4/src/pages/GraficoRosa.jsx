@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text, useColorMode ,  Modal, ModalOverlay, ModalContent, ModalBody, ModalCloseButton, } from '@chakra-ui/react';
+import { Box, Text, useColorMode ,  Modal, ModalOverlay, ModalContent, ModalBody, ModalCloseButton,Button } from '@chakra-ui/react';
 import { Radar } from 'react-chartjs-2'; // Cambiamos PolarArea por Radar
 import axios from 'axios';
+import { MdZoomOutMap } from "react-icons/md";
 
 const GraficoRosa = ({ title, url, nodeId }) => {
   const [chartData, setChartData] = useState(null);
@@ -102,10 +103,10 @@ const chartOptions = {
       p={{ base: 2, md: 4 }}
       borderRadius="md" 
       boxShadow="lg"
-      onClick={handleOpen} 
     >
+      <Button onClick={handleOpen} display="flex"><MdZoomOutMap /></Button>
       {chartData ? (
-        <Box height={{ base: '250px', md: '310px' } }  >
+        <Box height={{ base: '250px', md: '280px' } }  >
           <Radar data={chartData} options={chartOptions} /> {/* Radar en lugar de PolarArea */}
         </Box>
       ) : (

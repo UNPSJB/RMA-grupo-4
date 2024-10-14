@@ -1,4 +1,4 @@
-import { Select, useColorMode } from '@chakra-ui/react';
+import { Box, Select, useColorMode } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -31,6 +31,7 @@ function SelectorNodo({ onChange }) {
   };
 
   return (
+  <Box display="flex" justifyContent="center">
     <Select
       value={selectedNode}
       onChange={handleNodeChange}
@@ -42,7 +43,6 @@ function SelectorNodo({ onChange }) {
       _hover={{ borderColor: 'teal.300' }}  
       _focus={{ borderColor: 'teal.500', boxShadow: '0 0 0 1px teal.500' }}  
       borderRadius="md"  
-      ml="42%"
       w="300px"
       sx={{
         option: {
@@ -60,6 +60,7 @@ function SelectorNodo({ onChange }) {
         </option>
       ))}
     </Select>
+  </Box>
   );
 }
 

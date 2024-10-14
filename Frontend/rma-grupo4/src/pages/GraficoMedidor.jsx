@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text, useColorMode } from '@chakra-ui/react';
 import { Doughnut } from 'react-chartjs-2'; 
 import axios from 'axios';
+import { MdZoomOutMap } from "react-icons/md";
+import { Box,Text,useColorMode ,  Modal, ModalOverlay, ModalContent, ModalBody, ModalCloseButton,Button } from '@chakra-ui/react';
+
 
 const GraficoMedidor = ({ title, url, nodeId }) => {
   const [chartData, setChartData] = useState(null);
   const [summary, setSummary] = useState(null);  
   const { colorMode } = useColorMode();
+  const [isOpen, setIsOpen] = useState(false);
+  const handleOpen = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,7 +82,7 @@ const GraficoMedidor = ({ title, url, nodeId }) => {
       },
       title: {
         display: true,
-        text: `Gráfico de Línea`,
+        text: `Gráfico Medidor`,
         font: { size: 16, weight: 'bold' },
         color: colorMode === 'light' ? 'black' : 'white',
         padding: { top: 10, bottom: 10 },
@@ -85,6 +91,7 @@ const GraficoMedidor = ({ title, url, nodeId }) => {
   };
 
   return (
+  <>
     <Box 
       bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} 
       color={colorMode === 'light' ? 'black' : 'white'} 
@@ -92,6 +99,7 @@ const GraficoMedidor = ({ title, url, nodeId }) => {
       borderRadius="md" 
       boxShadow="lg"
     >
+    <Button onClick={handleOpen} display="flex"><MdZoomOutMap /></Button>
       {chartData ? (
         <Box height={{ base: '100px', md: '180px' }}>
           <Doughnut data={chartData} options={chartOptions} /> {/* Gráfico tipo Doughnut para el medidor */}
@@ -102,6 +110,27 @@ const GraficoMedidor = ({ title, url, nodeId }) => {
         </Text>
       )}
     </Box>
+    <Modal isOpen={isOpen} onClose={handleClose} size="x1">
+      <ModalOverlay />
+      <ModalContent>
+        <ModalCloseButton />
+          <ModalBody p={0}>
+            <Box height="500px" width="100%" bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
+              {chartData ? (
+                <Box height={{ base: '450px', md: '450px' }} bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
+                  <Doughnut data={chartData} options={chartOptions} /> {/* Gráfico tipo Doughnut para el medidor */}
+                </Box>
+              ) : (
+                <Text fontSize={{ base: 'sm', md: 'md' }}>
+                  Cargando gráfico...
+                </Text>
+              )}
+            </Box>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+
+  </>  
   );
 }
 

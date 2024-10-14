@@ -24,12 +24,12 @@ function TablaPage({ onRowSelection }) {
 
         const formattedData = resumenData.map((item) => ({
           Nodo: item.id_nodo,
-          Temperatura: item.last_temperature ?? 'N/A',
-          Humedad: item.last_humidity ?? 'N/A',
-          Presion: item.last_pressure ?? 'N/A',
-          Precipitacion: item.last_precipitation ?? 'N/A',
-          Viento: item.last_wind ?? 'N/A',
-          Timestamp: item.last_update ? new Date(item.last_update) : 'N/A'
+          Temperatura: item.last_temperature ?? '--',
+          Humedad: item.last_humidity ?? '--',
+          Presion: item.last_pressure ?? '--',
+          Precipitacion: item.last_precipitation ?? '--',
+          Viento: item.last_wind ?? '--',
+          Timestamp: item.last_update ? new Date(item.last_update) : '--'
         }));
 
         setData(formattedData);
@@ -78,24 +78,29 @@ function TablaPage({ onRowSelection }) {
     }
   };
 
-  const formatNumber = (number) => new Intl.NumberFormat("es-AR", { maximumFractionDigits: 2 }).format(number);
-  const formatTime = (timestamp) => {
-    if (!timestamp || isNaN(timestamp.getTime())) return "N/A";
+  const formatNumber = (number) => {
+    if (number === null || isNaN(number)) {
+      return '--';
+    }
+    return new Intl.NumberFormat("es-AR", { maximumFractionDigits: 2 }).format(number);
+  };
+    const formatTime = (timestamp) => {
+    if (!timestamp || isNaN(timestamp.getTime())) return "--";
     return timestamp.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
   };
 
   const convertToFahrenheit = (celsius) => {
-    if (celsius === 'N/A') return 'N/A';
+    if (celsius === '--') return '--';
     return (celsius * 9/5 + 32).toFixed(2);
   };
 
   const convertToMetroXSeg = (kmh) => {
-    if (kmh === 'N/A') return 'N/A';
+    if (kmh === '--') return '--';
     return (kmh / 3.6).toFixed(2);  // Conversión de km/h a m/s
   };
 
   const convertToCentimeters = (mm) => {
-    if (mm === 'N/A') return 'N/A';
+    if (mm === '--') return '--';
     return (mm / 10).toFixed(2);  // Conversión de mm a cm
   };
 
@@ -200,19 +205,27 @@ function TablaPage({ onRowSelection }) {
                   _hover={{ backgroundColor: colorMode === 'light' ? "gray.100" : "gray.700" }}
                 >
                   <Td textAlign="center">{row.Nodo}</Td>
-                  <Td textAlign="center">{formatNumber(row.Humedad)} %</Td>
+                  <Td textAlign="center">{formatNumber(row.Humedad)} {row.Humedad == "--" ? '' : '%'}</Td>
                   <Td textAlign="center">
-                    {isFahrenheit ? formatNumber(convertToFahrenheit(row.Temperatura)) + " °F" : formatNumber(row.Temperatura) + " °C"}
+                    {isFahrenheit 
+                      ? formatNumber(convertToFahrenheit(row.Temperatura)) + (row.Temperatura == "--" ? '' : '°F') 
+                      : formatNumber(row.Temperatura) + (row.Temperatura == "--" ?  '' : "°C"
+                      )}
                   </Td>
-                  <Td textAlign="center" display={{ base: "none", md: "table-cell" }}>{formatNumber(row.Presion)} hPa</Td>
+                  <Td textAlign="center" display={{ base: "none", md: "table-cell" }}>
+                    {formatNumber(row.Presion)} {row.Presion == "--" ? '' : 'hPa'}
+                  </Td>
                   <Td textAlign="center">
-                    {isMtsXSegundo ? formatNumber(convertToMetroXSeg(row.Viento)) + " m/s" : formatNumber(row.Viento) + " km/h"}
+                    {isMtsXSegundo 
+                      ? formatNumber(convertToMetroXSeg(row.Viento)) + (row.Viento == "--" ? '' : 'm/s') 
+                      : formatNumber(row.Viento) + (row.Viento == "--" ? '' : 'km/h')}
                   </Td>
                   <Td textAlign="center">
                     {isCm 
-                      ? formatNumber(convertToCentimeters(parseFloat(row.Precipitacion))) + " cm" 
-                      : formatNumber(row.Precipitacion) + " mm"}
+                      ? formatNumber(convertToCentimeters(parseFloat(row.Precipitacion))) + (row.Precipitacion == "--" ? '' : 'cm') 
+                      : formatNumber(row.Precipitacion) + (row.Precipitacion == "--" ? '' : 'mm')}
                   </Td>
+
                   <Td textAlign="center">{formatTime(row.Timestamp)}</Td>
                 </Tr>
               ))

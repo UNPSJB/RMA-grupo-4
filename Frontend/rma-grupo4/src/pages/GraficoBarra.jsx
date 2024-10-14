@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text, useColorMode } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { Bar } from 'react-chartjs-2'; // Cambiar a Bar para gráficos de barras
 import axios from 'axios';
+import { MdZoomOutMap } from "react-icons/md";
+import { Box,Text,useColorMode ,  Modal, ModalOverlay, ModalContent, ModalBody, ModalCloseButton,Button } from '@chakra-ui/react';
 
 ChartJS.register(...registerables);
 
@@ -10,6 +11,9 @@ const GraficoBarra = ({ title, url, nodeId }) => {
   const [chartData, setChartData] = useState(null);
   const [summary, setSummary] = useState(null);  // Para almacenar el resumen
   const { colorMode } = useColorMode();
+  const [isOpen, setIsOpen] = useState(false);
+  const handleOpen = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -96,6 +100,7 @@ const GraficoBarra = ({ title, url, nodeId }) => {
   };
 
   return (
+  <>
     <Box 
       bg={colorMode === 'light' ? 'gray.100' : 'gray.700'}
       color={colorMode === 'light' ? 'black' : 'white'}
@@ -105,6 +110,7 @@ const GraficoBarra = ({ title, url, nodeId }) => {
       width={{ base: '100%', md: 'auto' }}
       overflowX="auto"
     >
+    <Button onClick={handleOpen} display="flex"><MdZoomOutMap /></Button>
       {chartData ? (
         <Box height={{ base: '300px', md: '400px' }}>
           <Bar data={chartData} options={chartOptions} /> {/* Cambiar a Bar */}
@@ -115,6 +121,26 @@ const GraficoBarra = ({ title, url, nodeId }) => {
         </Text>
       )}
     </Box>
+    <Modal isOpen={isOpen} onClose={handleClose} size="x1">
+      <ModalOverlay />
+      <ModalContent>
+        <ModalCloseButton />
+          <ModalBody p={0}>
+            <Box height="500px" width="100%" bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
+              {chartData ? (
+                <Box height={{ base: '450px', md: '450px' }} bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
+                      <Bar data={chartData} options={chartOptions} /> {/* Cambiar a Bar */}
+                </Box>
+              ) : (
+                <Text fontSize={{ base: 'sm', md: 'md' }}>
+                  Cargando gráfico...
+                </Text>
+              )}
+            </Box>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
+  </>
   );
 };
 

@@ -1,4 +1,4 @@
-import { Box, Grid, GridItem, useColorMode } from '@chakra-ui/react';
+import { Box, Grid, GridItem, useColorMode, Heading } from '@chakra-ui/react';
 import { useState } from 'react';
 import SelectorNodo from './SelectorNodo';
 import ResumenVariable from '../pages/ResumenVariable'; 
@@ -8,6 +8,7 @@ import TablaPage from '../pages/TablaPage';
 import GraficoArea from '../pages/GraficoArea';
 import GraficoRosa from '../pages/GraficoRosa';
 import GraficoMedidor from '../pages/GraficoMedidor';
+
 
 export default function Inicio() {
   const [selectedNode, setSelectedNode] = useState(0);
@@ -27,6 +28,7 @@ export default function Inicio() {
 
       {/* Sección de Tabla y Gráficos adicionales */}
       <Box mt={0} p={{ base: 2, md: 4 }}>
+      <Heading as="h1" m={7} textAlign="center">Datos Actualizados</Heading>
         <Grid
           templateColumns="1fr" // Ajustar la tabla para que use todo el ancho disponible
           gap={4}
@@ -47,9 +49,9 @@ export default function Inicio() {
           </GridItem>
         </Grid>
       </Box>
-      
+      <Heading as="h1" m={7} textAlign="center">Ultimos Diez Actualizados</Heading>  
       {/* Seleccionar Nodo */}
-      <SelectorNodo onChange={(nodeId) => setSelectedNode(nodeId)} />
+      <SelectorNodo  onChange={(nodeId) => setSelectedNode(nodeId)} />
 
       {/* Sección de Resumen de Variables */}
       <Box p={{ base: 2, md: 4 }}>
@@ -61,11 +63,11 @@ export default function Inicio() {
           p={{ base: 2, md: 6 }}
           borderRadius="md"
         >
-          <ResumenVariable title="Temperatura" url="http://localhost:8000/api/v1/clima/temperatura" nodeId={selectedNode}/>
-          <ResumenVariable title="Humedad" url="http://localhost:8000/api/v1/clima/humedad" nodeId={selectedNode}/>
-          <ResumenVariable title="Precipitación" url="http://localhost:8000/api/v1/clima/precipitacion" nodeId={selectedNode}/>
-          <ResumenVariable title="Viento" url="http://localhost:8000/api/v1/clima/viento" nodeId={selectedNode}/>
-          <ResumenVariable title="Presión" url="http://localhost:8000/api/v1/clima/presion" nodeId={selectedNode}/>
+          <ResumenVariable title="Temperatura" url="http://localhost:8000/api/v1/clima/temperatura" nodeId={selectedNode} unidad="C°"/>
+          <ResumenVariable title="Humedad" url="http://localhost:8000/api/v1/clima/humedad" nodeId={selectedNode} unidad="%"/>
+          <ResumenVariable title="Precipitación" url="http://localhost:8000/api/v1/clima/precipitacion" nodeId={selectedNode} unidad="mm"/>
+          <ResumenVariable title="Viento" url="http://localhost:8000/api/v1/clima/viento" nodeId={selectedNode} unidad="km/h"/>
+          <ResumenVariable title="Presión" url="http://localhost:8000/api/v1/clima/presion" nodeId={selectedNode} unidad="hPa"/>
         </Grid>
       </Box>
 

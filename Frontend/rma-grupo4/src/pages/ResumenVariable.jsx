@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Text, useColorMode } from '@chakra-ui/react'; // Importar useColorMode
 import axios from 'axios';
 
-const ResumenVariable = ({ title, url, nodeId }) => {
+const ResumenVariable = ({ title, url, nodeId, unidad }) => {
   const { colorMode } = useColorMode();
   const [summary, setSummary] = useState({
     max_value: null,
@@ -40,13 +40,16 @@ const ResumenVariable = ({ title, url, nodeId }) => {
         {title}:
       </Text>
       <Text fontSize="lg" color={colorMode === 'dark' ? 'white' : 'black'} mb="1" textAlign="center">
-        Máximo: {summary.max_value !== null ? summary.max_value.toFixed(2) : 'N/A'}
+        Máximo: {summary.max_value !== null ? summary.max_value.toFixed(2) : '--'}
+        {summary.average_value !== null ? ` ${unidad}` : ''}
       </Text>
       <Text fontSize="lg" color={colorMode === 'dark' ? 'white' : 'black'} mb="1" textAlign="center">
-        Mínimo: {summary.min_value !== null ? summary.min_value.toFixed(2) : 'N/A'}
+        Mínimo: {summary.min_value !== null ? summary.min_value.toFixed(2) : '--'}
+        {summary.average_value !== null ? ` ${unidad}` : ''}
       </Text>
       <Text fontSize="lg" color={colorMode === 'dark' ? 'white' : 'black'} mb="1" textAlign="center">
-        Promedio: {summary.average_value !== null ? summary.average_value.toFixed(2) : 'N/A'}
+        Promedio: {summary.average_value !== null ? summary.average_value.toFixed(2) : '--'}
+        {summary.average_value !== null ? ` ${unidad}` : ''}
       </Text>
     </Box>
   );
