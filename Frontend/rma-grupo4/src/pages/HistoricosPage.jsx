@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, Stack, Select, Table, Thead, Tbody, Tr, Th, Td, useMediaQuery, Flex, useColorMode } from '@chakra-ui/react';
+import { Box, Heading, Select, Table, Thead, Tbody, Tr, Th, Td, useMediaQuery, Flex, useColorMode } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables } from 'chart.js';
-import { Chart } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 import axios from 'axios';
 
 ChartJS.register(...registerables);
 
 const variables = [
-  { name: 'temperatura', color: 'rgba(255, 99, 132, 1)' },
-  { name: 'humedad', color: 'rgba(54, 162, 235, 1)' },
-  { name: 'presion', color: 'rgba(255, 206, 86, 1)' },
-  { name: 'viento', color: 'rgba(75, 192, 192, 1)' },
+  { name: 'temperatura', color: 'rgba(255, 99, 132, 0.5)' },
+  { name: 'humedad', color: 'rgba(54, 162, 235, 0.5)' },
+  { name: 'presion', color: 'rgba(100, 206, 86, 0.5)' },
+  { name: 'viento', color: 'rgba(75, 192, 192, 0.5)' },
 ];
+
 const variableMapping = {
   temperatura: 'temperature',
   humedad: 'humidity',
@@ -35,28 +36,23 @@ const months = [
 ];
 
 const years = [
-  {value : '2024'},
-  {value : '2025'},
-  {value : '2026'},
-  {value : '2027'},
-  {value : '2028'},
-  {value : '2029'}
+  { value: '2023' },
+  { value: '2024' },
 ];
 
 function HistoricosPage() {
   const { colorMode } = useColorMode(); // Obtener el estado del color mode
   const [isMobile] = useMediaQuery("(max-width: 48em)");
-  const [selectedCharts, setSelectedCharts] = useState(['line']);
   const [selectedVariable, setSelectedVariable] = useState('temperatura');
-  const [selectedYear, setSelectedYear] = useState('2024');
-  const [selectedMonth, setSelectedMonth] = useState('10');
-  const [selectedDay, setSelectedDay] = useState('10');
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
+  const [selectedMonth, setSelectedMonth] = useState((new Date().getMonth() + 1).toString().padStart(2, '0'));
+  const [selectedDay, setSelectedDay] = useState(new Date().getDate().toString());
   const [chartData, setChartData] = useState(null);
   const [days, setDays] = useState([]);
   const [historicalData, setHistoricalData] = useState([]);
+  const [selectedNode, setSelectedNode] = useState(null);
 
   const getDias = (year, month) => Array.from({ length: new Date(year, month, 0).getDate() }, (_, i) => i + 1);
-  const getHoras = () => Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, '0')}:00`);
 
   useEffect(() => {
     if (selectedYear && selectedMonth) {
@@ -70,109 +66,84 @@ function HistoricosPage() {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:8000/api/v1/clima/nodos/historico');
-        console.log('Datos obtenidos:', response.data);
-    
+  
         const nodes = response.data;
         let processedData = [];
-    
+  
         nodes.forEach(node => {
-          const mappedVariable = variableMapping[selectedVariable];
-          const variableData = node[mappedVariable] || [];
-          variableData.forEach(item => {
-            const date = new Date(item.timestamp);
-            processedData.push({
-              id_nodo: node.id_nodo,
-              year: date.getFullYear(),
-              month: date.getMonth() + 1,
-              day: date.getDate(),
-              hour: date.getHours(),
-              value: parseFloat(item.value) || 0,
+          const entry = {};
+          entry.id_nodo = node.id_nodo;
+          
+          variables.forEach(({ name }) => {
+            const mappedVariable = variableMapping[name];
+            const variableData = node[mappedVariable] || [];
+            
+            variableData.forEach(item => {
+              const date = new Date(item.timestamp);
+              const timeKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:00`;
+              if (!entry[timeKey]) {
+                entry[timeKey] = {
+                  id: node.id_nodo,
+                  year: date.getFullYear(),
+                  month: date.getMonth() + 1,
+                  day: date.getDate(),
+                  hour: date.getHours(),
+                  temperatura: '-',
+                  humedad: '-',
+                  presion: '-',
+                  viento: '-',
+                };
+              }
+              entry[timeKey][name] = parseFloat(item.value) || 0;
             });
           });
+  
+          Object.values(entry).forEach(e => processedData.push(e));
         });
-    
-        console.log('Datos procesados:', processedData);
-    
+  
+        // Filtrar los datos según el año, mes, día seleccionado
         processedData = processedData.filter(item => {
           if (selectedYear && item.year !== parseInt(selectedYear)) return false;
           if (selectedMonth && item.month !== parseInt(selectedMonth)) return false;
           if (selectedDay && item.day !== parseInt(selectedDay)) return false;
-          return true;
+          return item[selectedVariable] !== '-';  // Solo mostrar filas donde la variable seleccionada tenga valores
         });
-    
-        let labels, data;
-        if (selectedYear && !selectedMonth && !selectedDay) {
-          labels = months.map(m => m.name);
-          data = months.map(m => {
-            const monthData = processedData.filter(item => item.month === parseInt(m.value));
-            return monthData.length ? monthData.reduce((sum, item) => sum + item.value, 0) / monthData.length : 0;
-          });
-        } else if (selectedYear && selectedMonth && !selectedDay) {
-          labels = getDias(selectedYear, parseInt(selectedMonth));
-          data = labels.map(day => {
-            const dayData = processedData.filter(item => item.day === day);
-            return dayData.length ? dayData.reduce((sum, item) => sum + item.value, 0) / dayData.length : 0;
-          });
-        } else if (selectedYear && selectedMonth && selectedDay) {
-          labels = getHoras();
-          data = labels.map((_, hour) => {
-            const hourData = processedData.filter(item => item.hour === hour);
-            return hourData.length ? hourData.reduce((sum, item) => sum + item.value, 0) / hourData.length : 0;
-          });
-        }
-        setChartData({
-          labels: labels,
-          datasets: [
-            {
-              type: 'line',
-              label: `${selectedVariable} (Línea) - ${selectedYear}/${selectedMonth}/${selectedDay}`,
-              data: data,
-              borderColor: variables.find(v => v.name === selectedVariable)?.color || 'rgba(75, 192, 192, 1)',
-              backgroundColor: variables.find(v => v.name === selectedVariable)?.color.replace('1)', '0.2)'),
-              borderWidth: 2,
-              fill: true,
-            },
-            {
-              type: 'bar',
-              label: `${selectedVariable} (Barra) - ${selectedYear}/${selectedMonth}/${selectedDay}`,
-              data: data,
-              backgroundColor: 'rgba(53, 162, 235, 0.5)',
-            }
-          ]
-        });
-    
-        const historicalValues = labels.map((label, index) => ({
-          year: selectedYear,
-          month: selectedMonth,
-          day: selectedDay || '-',
-          hora: selectedDay ? getHoras()[index % 24] : '-',
-          temperatura: selectedVariable === 'temperatura' ? data[index] : '-',
-          humedad: selectedVariable === 'humedad' ? data[index] : '-',
-          presion: selectedVariable === 'presion' ? data[index] : '-',
-          viento: selectedVariable === 'viento' ? data[index] : '-',
-        }));
-    
-        setHistoricalData(historicalValues);
+        
+        setHistoricalData(processedData);
+        setSelectedNode(nodes[0]?.id_nodo); // Seleccionamos el nodo actual
       } catch (error) {
         console.error('Error al obtener los datos:', error);
       }
     };
+  
+    fetchData();
+  }, [selectedYear, selectedMonth, selectedDay, selectedVariable]);
 
-    if (selectedVariable) {
-      fetchData();
-    }
-  }, [selectedVariable, selectedYear, selectedMonth, selectedDay]);
+  useEffect(() => {
+    if (historicalData.length === 0) return;
 
-  const handleChartTypeChange = (type) => {
-    setSelectedCharts((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
-    );
-  };
+    const labels = historicalData.map(row => `${row.year}-${row.month}-${row.day} ${row.hour}:00`);
+    const data = historicalData.map(row => row[selectedVariable]);
+    const newChartData = {
+      labels,
+      datasets: [
+        {
+          label: selectedVariable,
+          data,
+          backgroundColor: variables.find(v => v.name === selectedVariable).color,
+          borderColor: variables.find(v => v.name === selectedVariable).color,
+          borderWidth: 4,
+          fill: false,
+          tension: 0.4
+        },
+      ],
+    };
 
-  const renderCombinedChart = () => {
+    setChartData(newChartData);
+  }, [historicalData, selectedVariable]);
+
+  const renderBarChart = () => {
     if (!chartData) return null;
-
-    const visibleDatasets = chartData.datasets.filter((ds) => selectedCharts.includes(ds.type));
 
     const chartOptions = {
       responsive: true,
@@ -182,77 +153,145 @@ function HistoricosPage() {
         easing: 'easeInOutQuad',
       },
       plugins: {
-        legend: {
+        legend: { 
           position: isMobile ? 'bottom' : 'top',
+          labels: { 
+            color: colorMode === 'light' ? 'black' : 'white',
+            font: { size: 12 } 
+          }
+        },
+        title: {
+          display: true,
+          font: { size: 16, weight: 'bold' },
+          color: colorMode === 'light' ? 'black' : 'white',
+          padding: { top: 10, bottom: 10 },
         },
       },
+
       scales: {
-        x: { title: { display: true, text: 'Período' } },
-        y: { title: { display: true, text: 'Valores' } },
+        x: { 
+          title: { display: true, text: 'Período' },
+          ticks: { 
+            color: colorMode === 'light' ? 'black' : 'white',
+            font: { size: 12 } 
+          },
+          grid: { 
+            color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)' 
+          }
+        },
+        y: { 
+          title: { display: true, text: 'Valores' },
+          ticks: { 
+            color: colorMode === 'light' ? 'black' : 'white',  
+            font: { size: 12 } 
+          },
+          grid: { 
+            color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'  
+          }
+        },
       },
     };
-
     return (
-      <Box height="400px" maxHeight="400px" overflow="hidden">
-        <Chart type="bar" data={{ ...chartData, datasets: visibleDatasets }} options={chartOptions} />
+      <Box borderRadius="md" boxShadow="md" height="400px" maxHeight="400px" overflow="hidden" bg={colorMode === 'light' ? 'white' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
+        <Line data={chartData} options={chartOptions} />
       </Box>
     );
   };
 
   return (
-    <Box p={4} bg={colorMode === 'light' ? 'white' : 'gray.800'} color={colorMode === 'light' ? 'black' : 'white'}>
+    <Box p={4} bg={colorMode === 'light' ? 'white' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'}>
       <Heading as="h1" m={7} textAlign="center">Históricos de variables</Heading>
-      <Flex justify="center" mb={4} mt={4}>
-        <Select value={selectedVariable} onChange={(e) => setSelectedVariable(e.target.value)} width="150px" marginX={2}>
-          {variables.map(variable => (
-            <option key={variable.name} value={variable.name}>{variable.name}</option>
+      <Flex justify="center" mb={4} mt={5} wrap="wrap" gap={4}>
+        <Select 
+          value={selectedVariable} 
+          onChange={(e) => setSelectedVariable(e.target.value)} 
+          width="150px"
+          variant="outline"
+        >
+          {variables.map((v) => (
+            <option key={v.name} value={v.name}>{v.name}</option>
           ))}
         </Select>
-        <Select value={selectedYear} onChange={(e) => setSelectedYear(e.target.value)} width="100px" marginX={2}>
-          {years.map(year => (
-            <option key={year.value} value={year.value}>{year.value}</option>
+        <Select 
+          value={selectedYear} 
+          onChange={(e) => setSelectedYear(e.target.value)} 
+          width="100px"
+          variant="outline"
+        >
+          {years.map((m) => (
+            <option key={m.value} value={m.value}>{m.value}</option>
           ))}
         </Select>
-        <Select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)} width="150px" marginX={2}>
-          {months.map(month => (
-            <option key={month.value} value={month.value}>{month.name}</option>
+        <Select 
+          value={selectedMonth} 
+          onChange={(e) => setSelectedMonth(e.target.value)} 
+          width="120px"
+          variant="outline"
+        >
+          {months.map((m) => (
+            <option key={m.value} value={m.value}>{m.name}</option>
           ))}
         </Select>
-        <Select value={selectedDay} onChange={(e) => setSelectedDay(e.target.value)} width="100px" marginX={2}>
+        <Select 
+          value={selectedDay} 
+          onChange={(e) => setSelectedDay(e.target.value)} 
+          width="90px"
+          variant="outline"
+        >
           {days.map(day => (
             <option key={day} value={day}>{day}</option>
           ))}
         </Select>
       </Flex>
-      <Stack direction={isMobile ? "column" : "row"} justify="center" align="center" spacing={4}>
-        <Select value={selectedCharts.includes('line') ? 'line' : 'bar'} onChange={(e) => handleChartTypeChange(e.target.value)} width="150px" marginX={2}>
-          <option value="line">Línea</option>
-          <option value="bar">Barra</option>
-        </Select>
-      </Stack>
-      {renderCombinedChart()}
-      <Table variant="simple" marginTop={4}>
-        <Thead>
-          <Tr>
-            <Th>Fecha</Th>
-            <Th>Temperatura</Th>
-            <Th>Humedad</Th>
-            <Th>Presión</Th>
-            <Th>Viento</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {historicalData.map((row, index) => (
-            <Tr key={index}>
-              <Td>{`${row.year}/${row.month}/${row.day} ${row.hora}`}</Td>
-              <Td>{row.temperatura}</Td>
-              <Td>{row.humedad}</Td>
-              <Td>{row.presion}</Td>
-              <Td>{row.viento}</Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
+      <Box
+        bg={colorMode === 'light' ? 'gray.200' : 'gray.800'}  // Fondo dinámico según el tema
+        color={colorMode === 'light' ? 'black' : 'white'}
+        p={isMobile ? 1 : 4} 
+        borderRadius="md" 
+        boxShadow="md" 
+        width="100%"
+      >
+        <Box 
+          bg={colorMode === 'light' ? 'gray.200' : 'gray.700'}  // Fondo dinámico según el tema
+          color={colorMode === 'light' ? 'black' : 'white'}
+          p={isMobile ? 1 : 4} 
+          borderRadius="md" 
+          boxShadow="md" 
+          width="100%"
+          mb="4"
+        >
+          {renderBarChart()}
+        </Box>
+        <Box
+          bg={colorMode === 'light' ? 'gray.100' : 'gray.700'}  // Fondo dinámico según el tema
+          color={colorMode === 'light' ? 'black' : 'white'}
+          p={isMobile ? 1 : 4} 
+          borderRadius="md" 
+          boxShadow="md" 
+          width="100%"
+        >
+          <Table variant="striped" colorScheme="teal" mt={4}>
+            <Thead>
+              <Tr>
+                <Th>Nodo</Th>
+                <Th>Año</Th>
+                <Th>Hora</Th>
+                <Th>{selectedVariable}</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {historicalData.map((row, index) => (
+                <Tr key={index}>
+                  <Td>{row.id}</Td>
+                  <Td>{`${row.year}-${row.month}-${row.day}`}</Td>
+                  <Td>{row.hour}</Td>
+                  <Td>{typeof row[selectedVariable] === 'number' ? row[selectedVariable].toFixed(2) : row[selectedVariable]}</Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Box>
+      </Box>
     </Box>
   );
 }

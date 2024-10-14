@@ -1,15 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Button, Flex, IconButton, useColorMode } from "@chakra-ui/react";
 import { FaBars, FaTimes } from 'react-icons/fa';
 
 function NavigationButtons() {
   const [isVisible, setIsVisible] = useState(false);
-  const { colorMode } = useColorMode(); // Obtener el estado del color mode
+  const { colorMode } = useColorMode(); 
+  const menuRef = useRef(); 
 
   const toggleVisibility = () => {
     setIsVisible((prev) => !prev);
   };
+
+  const handleClickOutside = (event) => {
+    if (menuRef.current && !menuRef.current.contains(event.target)) {
+      setIsVisible(false); 
+    }
+  };
+
+  useEffect(() => {
+    if (isVisible) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isVisible]);
 
   const navItems = [
     { text: "Datos Históricos", route: "/historicos" },
@@ -32,22 +51,26 @@ function NavigationButtons() {
       />
       
       <Flex
+        ref={menuRef} 
         as="nav"
         align="center"
         justify="flex-start"
         wrap="wrap"
-        bg={colorMode === 'light' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(26, 32, 44, 0.9)'} // Fondo del nav
-        color={colorMode === 'light' ? 'black' : 'white'} // Color del texto
+        bg={colorMode === 'light' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(26, 32, 44, 0.9)'} 
+        color={colorMode === 'light' ? 'black' : 'white'} 
         position="fixed"
         top={20}
         left={isVisible ? 0 : "-280px"}
-        height="100vh"
+        height="auto" 
         width="280px"
         transition="all 0.3s ease-in-out"
         flexDirection="column"
         zIndex="999"
         overflowY="auto"
         backdropFilter="blur(5px)"
+        boxShadow={isVisible ? 'lg' : 'none'}
+        paddingTop={4} 
+        borderRadius={5}
       >
         {navItems.map((item, index) => (
           <Button

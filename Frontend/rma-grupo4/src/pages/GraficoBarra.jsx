@@ -123,9 +123,9 @@ const GraficoBarra = ({ title, url, nodeId }) => {
     </Box>
     <Modal isOpen={isOpen} onClose={handleClose} size="x1">
       <ModalOverlay />
-      <ModalContent>
+      <ModalContent m={10}>
         <ModalCloseButton />
-          <ModalBody p={0}>
+          <ModalBody p={4}>
             <Box height="500px" width="100%" bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
               {chartData ? (
                 <Box height={{ base: '450px', md: '450px' }} bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
