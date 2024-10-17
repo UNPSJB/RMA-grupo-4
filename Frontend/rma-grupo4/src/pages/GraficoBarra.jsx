@@ -16,6 +16,7 @@ const GraficoBarra = ({ title, url, nodeId }) => {
   const handleClose = () => setIsOpen(false);
 
   useEffect(() => {
+    let timeoutId;
     const fetchData = async () => {
       try {
         const finalUrl = nodeId !== undefined ? `${url}?node_id=${nodeId}` : url;
@@ -37,7 +38,7 @@ const GraficoBarra = ({ title, url, nodeId }) => {
         // Preparar los datos para el gráfico si hay datos procesados
         if (processedData.length > 0) {
           const newData = {
-            labels: processedData.map(item => new Date(item.timestamp).toLocaleTimeString()), // Etiquetas con el timestamp formateado
+            labels: processedData.map(item => new Date(item.timestamp).toLocaleTimeString()).reverse(), // Etiquetas con el timestamp formateado
             datasets: [{
               label: `Precipitación`,
               data: processedData.map(item => item.data), // Datos de precipitación
@@ -56,6 +57,16 @@ const GraficoBarra = ({ title, url, nodeId }) => {
       }
     };
     fetchData();
+    const setupTimeout = () => {
+      timeoutId = setTimeout(() => {
+        fetchData();
+        setupTimeout(); 
+      }, 10000); 
+    };
+
+    setupTimeout();
+
+    return () => clearTimeout(timeoutId);
   }, [url, title, nodeId, colorMode]);
 
   const chartOptions = {

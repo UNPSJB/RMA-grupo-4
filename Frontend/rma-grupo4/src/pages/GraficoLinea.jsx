@@ -15,6 +15,7 @@ const GraficoLinea = ({ title, url, nodeId }) => {
 
 
   useEffect(() => {
+    let timeoutId;
     const fetchData = async () => {
       try {
         const finalUrl = nodeId !== undefined ? `${url}?node_id=${nodeId}` : url;
@@ -34,7 +35,7 @@ const GraficoLinea = ({ title, url, nodeId }) => {
 
         if (processedData.length > 0) {
           const newData = {
-            labels: processedData.map(item => new Date(item.timestamp).toLocaleDateString()), 
+            labels: processedData.map(item => new Date(item.timestamp).toLocaleTimeString()).reverse(), 
             datasets: [{
               label: `${title}`,
               data: processedData.map(item => item.data), 
@@ -55,6 +56,16 @@ const GraficoLinea = ({ title, url, nodeId }) => {
       }
     };
     fetchData();
+    const setupTimeout = () => {
+      timeoutId = setTimeout(() => {
+        fetchData();
+        setupTimeout(); 
+      }, 10000); 
+    };
+
+    setupTimeout();
+
+    return () => clearTimeout(timeoutId);
   }, [url, title, nodeId, colorMode]);
 
   const chartOptions = {

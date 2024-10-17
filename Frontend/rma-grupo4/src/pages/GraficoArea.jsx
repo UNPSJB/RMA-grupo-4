@@ -19,6 +19,7 @@ const GraficoArea = ({ title, url, nodeId }) => {
 
 
   useEffect(() => {
+    let timeoutId;
     const fetchData = async () => {
       try {
         const finalUrl = nodeId !== undefined ? `${url}?node_id=${nodeId}` : url;
@@ -42,7 +43,7 @@ const GraficoArea = ({ title, url, nodeId }) => {
         // Preparar los datos para el gráfico si hay datos procesados
         if (processedData.length > 0) {
           const newData = {
-            labels: processedData.map(item => new Date(item.timestamp).toLocaleTimeString()), // Etiquetas con el timestamp formateado
+            labels: processedData.map(item => new Date(item.timestamp).toLocaleTimeString()).reverse(), // Etiquetas con el timestamp formateado
             datasets: [{
               label: `Humedad`,
               data: processedData.map(item => item.data), // Datos de humedad
@@ -63,6 +64,16 @@ const GraficoArea = ({ title, url, nodeId }) => {
       }
     };
     fetchData();
+    const setupTimeout = () => {
+      timeoutId = setTimeout(() => {
+        fetchData();
+        setupTimeout(); 
+      }, 10000); 
+    };
+
+    setupTimeout();
+
+    return () => clearTimeout(timeoutId);
   }, [url, title, nodeId]);
 
   const chartOptions = {

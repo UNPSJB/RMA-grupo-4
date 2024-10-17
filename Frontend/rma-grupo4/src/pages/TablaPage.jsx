@@ -17,6 +17,7 @@ function TablaPage({ onRowSelection }) {
   const rowsPerPage = isMobile ? 5 : 8;
 
   useEffect(() => {
+    let timeoutId;
     const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:8000/api/v1/clima/nodos/resumen');
@@ -38,6 +39,16 @@ function TablaPage({ onRowSelection }) {
       }
     };
     fetchData();
+    const setupTimeout = () => {
+      timeoutId = setTimeout(() => {
+        fetchData();
+        setupTimeout(); 
+      }, 10000); 
+    };
+
+    setupTimeout();
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const handleSort = (columnKey) => {

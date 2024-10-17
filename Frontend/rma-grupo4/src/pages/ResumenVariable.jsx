@@ -11,6 +11,7 @@ const ResumenVariable = ({ title, url, nodeId, unidad }) => {
   });
 
   useEffect(() => {
+    let timeoutId;
     const fetchData = async () => {
       try {
         const finalUrl = nodeId !== undefined ? `${url}?node_id=${nodeId}` : url;
@@ -23,6 +24,16 @@ const ResumenVariable = ({ title, url, nodeId, unidad }) => {
       }
     };
     fetchData();
+    const setupTimeout = () => {
+      timeoutId = setTimeout(() => {
+        fetchData();
+        setupTimeout(); 
+      }, 10000); 
+    };
+
+    setupTimeout();
+
+    return () => clearTimeout(timeoutId);
   }, [url, title, nodeId]);
 
   return (

@@ -273,19 +273,19 @@ function HistoricosPage() {
           <Table variant="striped" colorScheme="teal" mt={4}>
             <Thead>
               <Tr>
-                <Th>Nodo</Th>
-                <Th>Año</Th>
-                <Th>Hora</Th>
-                <Th>{selectedVariable}</Th>
+                <Th textAlign="center">Nodo</Th>
+                <Th textAlign="center">Año</Th>
+                <Th textAlign="center">Hora</Th>
+                <Th textAlign="center">{selectedVariable}</Th>
               </Tr>
             </Thead>
             <Tbody>
               {historicalData.map((row, index) => (
                 <Tr key={index}>
-                  <Td>{row.id}</Td>
-                  <Td>{`${row.year}-${row.month}-${row.day}`}</Td>
-                  <Td>{row.hour}</Td>
-                  <Td>{typeof row[selectedVariable] === 'number' ? row[selectedVariable].toFixed(2) : row[selectedVariable]}</Td>
+                  <Td textAlign="center">{row.id}</Td>
+                  <Td textAlign="center">{`${row.year}-${row.month}-${row.day}`}</Td>
+                  <Td textAlign="center">{row.hour}</Td>
+                  <Td textAlign="center">{typeof row[selectedVariable] === 'number' ? row[selectedVariable].toFixed(2) : row[selectedVariable]}</Td>
                 </Tr>
               ))}
             </Tbody>

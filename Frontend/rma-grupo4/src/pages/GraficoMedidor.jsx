@@ -8,17 +8,17 @@ import { Box,Text,useColorMode ,  Modal, ModalOverlay, ModalContent, ModalBody, 
 const GraficoMedidor = ({ title, url, nodeId }) => {
   const [chartData, setChartData] = useState(null);
   const [summary, setSummary] = useState(null);  
+  const [lastPressureValue, setLastPressureValue] = useState(null); // Estado para el valor más reciente
   const { colorMode } = useColorMode();
   const [isOpen, setIsOpen] = useState(false);
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
 
-
   useEffect(() => {
+    let timeoutId;
     const fetchData = async () => {
       try {
         const finalUrl = nodeId !== undefined ? `${url}?node_id=${nodeId}` : url;
-
         const response = await axios.get(finalUrl);
 
         const dataArray = response.data.data;
@@ -36,6 +36,7 @@ const GraficoMedidor = ({ title, url, nodeId }) => {
           .slice(-1)[0]; 
 
         if (lastPressureData) {
+          setLastPressureValue(lastPressureData.data); 
           const newData = {
             labels: ['Presión', 'Máximo', 'Mínimo'],
             datasets: [{
@@ -64,8 +65,17 @@ const GraficoMedidor = ({ title, url, nodeId }) => {
       }
     };
     fetchData();
-  }, [url, title, nodeId, colorMode]);
+    const setupTimeout = () => {
+      timeoutId = setTimeout(() => {
+        fetchData();
+        setupTimeout(); 
+      }, 10000); 
+    };
 
+    setupTimeout();
+
+    return () => clearTimeout(timeoutId);
+  }, [url, title, nodeId, colorMode]);
 
   const chartOptions = {
     maintainAspectRatio: false,

@@ -32,7 +32,7 @@ def get_temperature_data(
     start_time: Optional[datetime] = Query(None, description="Inicio del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
     end_time: Optional[datetime] = Query(None, description="Fin del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
     limit: Optional[int] = Query(10, description="Número máximo de registros a devolver"),
-    sort: Optional[str] = Query("asc", description="Orden de los resultados (asc o desc)"),
+    sort: Optional[str] = Query("desc", description="Orden de los resultados (asc o desc)"),
     db: Session = Depends(get_db)  
 ):
     """
@@ -98,7 +98,7 @@ def get_humidity_data(
     start_time: Optional[datetime] = Query(None, description="Inicio del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
     end_time: Optional[datetime] = Query(None, description="Fin del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
     limit: Optional[int] = Query(10, description="Número máximo de registros a devolver"),
-    sort: Optional[str] = Query("asc", description="Orden de los resultados (asc o desc)"),
+    sort: Optional[str] = Query("desc", description="Orden de los resultados (asc o desc)"),
     db: Session = Depends(get_db)  
 ):
     """
@@ -156,7 +156,7 @@ def get_pressure_data(
     start_time: Optional[datetime] = Query(None, description="Inicio del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
     end_time: Optional[datetime] = Query(None, description="Fin del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
     limit: Optional[int] = Query(10, description="Número máximo de registros a devolver"),
-    sort: Optional[str] = Query("asc", description="Orden de los resultados (asc o desc)"),
+    sort: Optional[str] = Query("desc", description="Orden de los resultados (asc o desc)"),
     db: Session = Depends(get_db)  
 ):
     """
@@ -214,7 +214,7 @@ def get_precipitation_data(
     start_time: Optional[datetime] = Query(None, description="Inicio del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
     end_time: Optional[datetime] = Query(None, description="Fin del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
     limit: Optional[int] = Query(10, description="Número máximo de registros a devolver"),
-    sort: Optional[str] = Query("asc", description="Orden de los resultados (asc o desc)"),
+    sort: Optional[str] = Query("desc", description="Orden de los resultados (asc o desc)"),
     db: Session = Depends(get_db)  
 ):
     """
@@ -272,7 +272,7 @@ def get_wind_data(
     start_time: Optional[datetime] = Query(None, description="Inicio del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
     end_time: Optional[datetime] = Query(None, description="Fin del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
     limit: Optional[int] = Query(10, description="Número máximo de registros a devolver"),
-    sort: Optional[str] = Query("asc", description="Orden de los resultados (asc o desc)"),
+    sort: Optional[str] = Query("desc", description="Orden de los resultados (asc o desc)"),
     db: Session = Depends(get_db)  
 ):
     """
