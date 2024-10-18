@@ -7,17 +7,17 @@ import axios from 'axios';
 ChartJS.register(...registerables);
 
 const variables = [
-  { name: 'temperatura', color: 'rgba(255, 99, 132, 0.5)' },
-  { name: 'humedad', color: 'rgba(54, 162, 235, 0.5)' },
-  { name: 'presion', color: 'rgba(100, 206, 86, 0.5)' },
-  { name: 'viento', color: 'rgba(75, 192, 192, 0.5)' },
+  { name: 'Temperatura', color: 'rgba(255, 99, 132, 0.5)' },
+  { name: 'Humedad', color: 'rgba(54, 162, 235, 0.5)' },
+  { name: 'Presión', color: 'rgba(100, 206, 86, 0.5)' },
+  { name: 'Viento', color: 'rgba(75, 192, 192, 0.5)' },
 ];
 
 const variableMapping = {
-  temperatura: 'temperature',
-  humedad: 'humidity',
-  presion: 'pressure',
-  viento: 'wind',
+  Temperatura: 'temperature',
+  Humedad: 'humidity',
+  Presión: 'pressure',
+  Viento: 'wind',
 };
 
 const months = [
@@ -43,7 +43,7 @@ const years = [
 function HistoricosPage() {
   const { colorMode } = useColorMode(); // Obtener el estado del color mode
   const [isMobile] = useMediaQuery("(max-width: 48em)");
-  const [selectedVariable, setSelectedVariable] = useState('temperatura');
+  const [selectedVariable, setSelectedVariable] = useState('Temperatura');
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
   const [selectedMonth, setSelectedMonth] = useState((new Date().getMonth() + 1).toString().padStart(2, '0'));
   const [selectedDay, setSelectedDay] = useState(new Date().getDate().toString());
@@ -285,7 +285,22 @@ function HistoricosPage() {
                   <Td textAlign="center">{row.id}</Td>
                   <Td textAlign="center">{`${row.year}-${row.month}-${row.day}`}</Td>
                   <Td textAlign="center">{row.hour}</Td>
-                  <Td textAlign="center">{typeof row[selectedVariable] === 'number' ? row[selectedVariable].toFixed(2) : row[selectedVariable]}</Td>
+                  
+                  <Td textAlign="center">
+                    {typeof row[selectedVariable] === 'number'
+                    ? `${row[selectedVariable].toFixed(2)} ${
+                    selectedVariable === 'Temperatura'
+                    ? '°C'
+                    : selectedVariable === 'Viento'
+                    ? 'km/h'
+                    : selectedVariable === 'Humedad'
+                    ? '%'
+                    : selectedVariable === 'Presión'
+                    ? 'hPa'
+                    : ''
+                    }`
+                    : row[selectedVariable]}
+                  </Td>
                 </Tr>
               ))}
             </Tbody>
