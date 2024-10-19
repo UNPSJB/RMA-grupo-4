@@ -32,6 +32,7 @@ function NavigationButtons() {
 
   const navItems = [
     { text: "Datos Históricos", route: "/historicos" },
+    { text: "Analisis Avanzado", route: "/comparativo" },
   ];
 
   return (

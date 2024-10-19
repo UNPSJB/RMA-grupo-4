@@ -16,6 +16,7 @@ import ModificarDatos from './components/ModificarDatos';
 import ModificarPassword from './components/ModificarPassword';
 import EliminarUsuario from './components/EliminarUsuario';
 import HelpModal from './components/HelpModal';
+import PantallaComparativa from './analisis/PantallaComparativa';
 
 function AppRoutes() {
   return (
@@ -65,6 +66,16 @@ function AppRoutes() {
             <App>
               <PrivateRoute>
                 <HistoricosPage />
+              </PrivateRoute>
+            </App>
+          } 
+        />
+        <Route 
+          path="/comparativo" 
+          element={
+            <App>
+              <PrivateRoute>
+                <PantallaComparativa />
               </PrivateRoute>
             </App>
           } 

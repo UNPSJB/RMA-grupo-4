@@ -14,7 +14,7 @@ function TablaPage({ onRowSelection }) {
   const [isCm, setIsCm] = useState(false);
   const [isMobile] = useMediaQuery("(max-width: 48em)");
   const { colorMode } = useColorMode();  // Hook para el modo de color
-  const rowsPerPage = isMobile ? 5 : 8;
+  const rowsPerPage = isMobile ? 3 : 3;
 
   useEffect(() => {
     let timeoutId;
@@ -195,7 +195,7 @@ function TablaPage({ onRowSelection }) {
               <Th>
                 <Center color={colorMode === 'light' ? 'black' : 'white'}>
                   <FaClock size="1.5em" style={{ marginRight: "5px" }} />
-                  Fecha
+                  Hora
                 </Center>
               </Th>
             </Tr>
