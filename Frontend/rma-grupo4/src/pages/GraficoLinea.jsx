@@ -100,8 +100,9 @@ const GraficoLinea = ({ title, url, nodeId }) => {
       y: { 
         ticks: { 
           color: colorMode === 'light' ? 'black' : 'white',
-          font: { size: 12 } 
+          font: { size: 12 }
         },
+        title: { display: true, text: 'Temperatura (°C)', color: 'white' },
         grid: { 
           color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'
         }

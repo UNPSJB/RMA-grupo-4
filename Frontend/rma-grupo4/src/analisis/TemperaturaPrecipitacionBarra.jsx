@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Bar } from 'react-chartjs-2';
-import { Box } from '@chakra-ui/react';
 import axios from 'axios';
+import { Box,Text,useColorMode ,  Modal, ModalOverlay, ModalContent, ModalBody, ModalCloseButton,Button } from '@chakra-ui/react';
+import { MdZoomOutMap } from 'react-icons/md';
 
 const TemperaturaPrecipitacionBarra = ({ nodeId1, nodeId2 }) => {
     const [chartData, setChartData] = useState(null);
+    const [isOpen, setIsOpen] = useState(false);
+    const { colorMode } = useColorMode();
+    const handleOpen = () => setIsOpen(true);
+    const handleClose = () => setIsOpen(false);
 
     const fetchChartData = async () => {
         try {
@@ -67,9 +72,19 @@ const TemperaturaPrecipitacionBarra = ({ nodeId1, nodeId2 }) => {
     };
 
     useEffect(() => {
+        let timeoutId;
         fetchChartData();
+        const setupTimeout = () => {
+          timeoutId = setTimeout(() => {
+            fetchChartData();
+            setupTimeout(); 
+          }, 10000); 
+        };
+    
+        setupTimeout();
+        return () => clearTimeout(timeoutId);
     }, [nodeId1, nodeId2]);
-
+    
     const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -91,21 +106,43 @@ const TemperaturaPrecipitacionBarra = ({ nodeId1, nodeId2 }) => {
     };
 
     return (
+    <>
         <Box 
-        bg="gray.700" 
-        color="white" 
-        p={{ base: 2, md: 4 }}
-        borderRadius="md" 
-        boxShadow="lg"
-        width={{ base: '100%', md: 'auto' }}
-        overflowX="auto"
-        > 
-        {chartData ? (
-            <Box height={{ base: '300px', md: '400px' }}>
-                <Bar data={chartData} options={chartOptions} />
-            </Box>
-        ) : <p>Loading...</p>}  
-    </Box>
+            bg="gray.700" 
+            color="white" 
+            p={{ base: 2, md: 4 }}
+            borderRadius="md" 
+            boxShadow="lg"
+            width={{ base: '100%', md: 'auto' }}
+            overflowX="auto"
+            > 
+            <Button onClick={handleOpen} display="flex" mb="3"><MdZoomOutMap /></Button>
+            {chartData ? (
+                <Box height={{ base: '300px', md: '400px' }}>
+                    <Bar data={chartData} options={chartOptions} />
+                </Box>
+            ) : <p>Loading...</p>}  
+        </Box>
+        <Modal isOpen={isOpen} onClose={handleClose} size="x1">
+            <ModalOverlay />
+            <ModalContent m={10}>
+                <ModalCloseButton />
+                <ModalBody p={4}>
+                    <Box height="500px" width="100%" bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
+                    {chartData ? (
+                        <Box height={{ base: '450px', md: '450px' }} bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
+                            <Bar data={chartData} options={chartOptions} /> {/* Cambiar a Bar */}
+                        </Box>
+                    ) : (
+                        <Text fontSize={{ base: 'sm', md: 'md' }}>
+                        Cargando gráfico...
+                        </Text>
+                    )}
+                    </Box>
+                </ModalBody>
+            </ModalContent>
+        </Modal>
+    </>
     );
 };
 

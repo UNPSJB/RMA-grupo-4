@@ -45,7 +45,7 @@ const GraficoRosa = ({ title, url, nodeId }) => {
               pointBackgroundColor: 'rgba(54, 162, 235, 1)',
               pointBorderColor: '#fff',
               pointHoverBackgroundColor: '#fff',
-              pointHoverBorderColor: 'rgba(54, 162, 235, 1)'
+              pointHoverBorderColor: 'rgba(54, 162, 235, 1)',
             }]
           };
           setChartData(newData);
@@ -91,16 +91,21 @@ const chartOptions = {
   },
   scales: {
     r: { // Para la escala radial del gráfico Radar
+      pointLabels: { // Controla las etiquetas de las horas alrededor del gráfico
+        color: colorMode === 'light' ? 'black' : 'white',  // Cambia este valor para ajustar el color de las etiquetas
+        font: { size: 12
+         } // Tamaño de las etiquetas de las horas
+      },
       angleLines: {
         display: true,
-        color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)', 
+        color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'white', 
       },
       ticks: { 
-        color: colorMode === 'light' ? 'black' : 'white', 
+        color: colorMode === 'light' ? 'black' : 'black', 
         font: { size: 12 } 
       },
       grid: { 
-        color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)' 
+        color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'white' 
       }
     }
   },

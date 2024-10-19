@@ -103,6 +103,7 @@ const GraficoBarra = ({ title, url, nodeId }) => {
           color: colorMode === 'light' ? 'black' : 'white',  
           font: { size: 12 } 
         },
+        title: { display: true, text: 'Precipitacion (mm)', color: 'white' },
         grid: { 
           color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'  
         }

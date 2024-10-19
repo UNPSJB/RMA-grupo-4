@@ -56,7 +56,7 @@ const TablaSummary = ({ nodeId1, nodeId2 }) => {
             width="100%" 
             overflowX="auto" 
             >
-            <Table variant="striped" colorScheme="blackAlpha" size={{ base: "sm", md: "md" }} height={{ base: '300px', md: '400px' }}>
+            <Table variant="striped" colorScheme="teal" size={{ base: "sm", md: "md" }} height={{ base: '300px', md: '400px' }}>
                 <Thead>
                 <Tr>
                     <Th color="gray.300">Variable</Th>
