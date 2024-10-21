@@ -114,7 +114,7 @@ const VientoRosa = ({ nodeId1, nodeId2 }) => {
         > 
         <Button onClick={handleOpen} display="flex" mb="3"><MdZoomOutMap /></Button>
             {vientoData ? (
-                <Box height={{ base: '300px', md: '400px'}}>
+                <Box height={{ base: '300px', md: '350px'}}>
                     <Radar data={vientoData} options={radarOptions} />
                 </Box>
             ) : <p>Loading...</p>}

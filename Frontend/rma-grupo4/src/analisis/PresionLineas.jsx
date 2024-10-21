@@ -77,11 +77,12 @@ const PresionLineas = ({ nodeId1, nodeId2 }) => {
         scales: {
             x: { 
                 ticks: { color: 'white' },
-                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                grid: { color: 'rgba(255, 255, 255, 0.3)' }
             },
             y: { 
+                title: { display: true, text: 'Presión (hPa)', color: 'white' },
                 ticks: { color: 'white' },
-                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                grid: { color: 'rgba(255, 255, 255, 0.3)' }
             },
         },
         plugins: {

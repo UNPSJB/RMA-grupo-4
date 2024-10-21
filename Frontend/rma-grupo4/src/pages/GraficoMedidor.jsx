@@ -111,7 +111,7 @@ const GraficoMedidor = ({ title, url, nodeId }) => {
     >
     <Button onClick={handleOpen} display="flex"><MdZoomOutMap /></Button>
       {chartData ? (
-        <Box height={{ base: '100px', md: '180px' }}>
+        <Box height={{ base: '100px', md: '150px' }}>
           <Doughnut data={chartData} options={chartOptions} /> {/* Gráfico tipo Doughnut para el medidor */}
         </Box>
       ) : (

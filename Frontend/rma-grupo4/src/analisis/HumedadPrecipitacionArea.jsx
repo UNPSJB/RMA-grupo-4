@@ -13,65 +13,81 @@ const HumedadPrecipitacionArea = ({ nodeId1, nodeId2 }) => {
 
     const fetchChartData = async () => {
         try {
-            const variables = ['humedad', 'precipitacion'];
+            const [humedadResponse1, humedadResponse2, precipitacionResponse1, precipitacionResponse2] = await Promise.all([
+                axios.get('http://localhost:8000/api/v1/clima/humedad', { params: { node_id: nodeId1 } }),
+                axios.get('http://localhost:8000/api/v1/clima/humedad', { params: { node_id: nodeId2 } }),
+                axios.get('http://localhost:8000/api/v1/clima/precipitacion', { params: { node_id: nodeId1 } }),
+                axios.get('http://localhost:8000/api/v1/clima/precipitacion', { params: { node_id: nodeId2 } })
+            ]);
 
-            // Hacer las solicitudes para cada variable y nodo
-            const datasets = await Promise.all(variables.map(async (variable) => {
-                const response1 = await axios.get(`http://localhost:8000/api/v1/clima/${variable}`, {
-                    params: { node_id: nodeId1 }
-                });
-                const response2 = await axios.get(`http://localhost:8000/api/v1/clima/${variable}`, {
-                    params: { node_id: nodeId2 }
-                });
+            const extractData = (response) => {
+                if (response.data.data && Array.isArray(response.data.data)) {
+                    const timestamps = response.data.data.map(item => new Date(item.timestamp));
+                    const values = response.data.data.map(item => parseFloat(item.data));
+                    return { timestamps, values };
+                } else {
+                    console.error("Data format unexpected:", response.data);
+                    return { timestamps: [], values: [] };
+                }
+            };
 
-                const processedData1 = response1.data.data.map(item => ({
-                    ...item,
-                    data: parseFloat(item.data),
-                    timestamp: new Date(item.timestamp)
-                }));
+            const humedad1 = extractData(humedadResponse1);
+            const humedad2 = extractData(humedadResponse2);
+            const precipitacion1 = extractData(precipitacionResponse1);
+            const precipitacion2 = extractData(precipitacionResponse2);
 
-                const processedData2 = response2.data.data.map(item => ({
-                    ...item,
-                    data: parseFloat(item.data),
-                    timestamp: new Date(item.timestamp)
-                }));
+            const chartData = {
+                labels: humedad1.timestamps.map(item => item.toLocaleTimeString()), 
+                datasets: [
+                    {
+                        label: `Humedad Nodo ${nodeId1}`,
+                        data: humedad1.values,
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        fill: true,
+                        yAxisID: 'y1',
+                        tension: 0.4,
+                    },
+                    {
+                        label: `Humedad Nodo ${nodeId2}`,
+                        data: humedad2.values,
+                        backgroundColor: 'rgba(153,102,255, 0.5)',
+                        borderColor: 'rgba(153,102,255,1)',
+                        borderWidth: 1,
+                        fill: true,
+                        yAxisID: 'y1',
+                        tension: 0.4,
+                    },
+                    {
+                        label: `Precipitacion Nodo ${nodeId1}`,
+                        data: precipitacion1.values,
+                        backgroundColor: 'rgba(255,159,64, 0.5)',
+                        borderColor: 'rgba(255,159,64,1)',
+                        borderWidth: 1,
+                        fill: true,
+                        yAxisID: 'y2',
+                        tension: 0.4,
+                    },
+                    {
+                        label: `Precipitacion Nodo ${nodeId2}`,
+                        data: precipitacion2.values,
+                        backgroundColor: 'rgba(54,162,235, 0.5)',
+                        borderColor: 'rgba(54,162,235,1)',
+                        borderWidth: 1,
+                        fill: true,
+                        yAxisID: 'y2',
+                        tension: 0.4,
+                    }
+                ]
+            };
 
-                const labels = processedData1.map(item => item.timestamp.toLocaleTimeString());
-
-                return {
-                    variable,
-                    labels,
-                    datasets: [
-                        {
-                            label: `${variable} Nodo ${nodeId1}`,
-                            data: processedData1.map(item => item.data),
-                            backgroundColor: 'rgba(75, 192, 192, 0.5)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1,
-                            fill: true,
-                            tension: 0.4
-                        },
-                        {
-                            label: `${variable} Nodo ${nodeId2}`,
-                            data: processedData2.map(item => item.data),
-                            backgroundColor: 'rgba(192, 75, 192, 0.5)',
-                            borderColor: 'rgba(192, 75, 192, 1)',
-                            borderWidth: 1,
-                            fill: true,
-                            tension: 0.4 
-                        }
-                    ]
-                };
-            }));
-
-            setChartData({
-                labels: datasets[0].labels,
-                datasets: datasets.flatMap(item => item.datasets)
-            });
-
+            // Establecemos los datos del gráfico
+            setChartData(chartData);
         } catch (error) {
-            console.error('Error al obtener los datos del gráfico:', error);
+            console.error('Error fetching chart data:', error);
         }
+        
     };
     useEffect(() => {
         let timeoutId;
@@ -91,13 +107,21 @@ const HumedadPrecipitacionArea = ({ nodeId1, nodeId2 }) => {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-            x: { 
+            x: {
                 ticks: { color: 'white' },
-                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                grid: { color: 'rgba(255, 255, 255, 0.3)' }
             },
-            y: { 
+            y1: { 
                 ticks: { color: 'white' },
-                grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                grid: { color: 'rgba(255, 255, 255, 0.3)' },
+                position: 'left',
+                title: { display: true, text: 'Precipitacion (mm)', color: 'white' }
+            },
+            y2: { 
+                ticks: { color: 'white' },
+                grid: { color: 'rgba(255, 255, 255, 0.3)' },
+                position: 'right',
+                title: { display: true, text: 'Humedad (%)', color: 'white' }
             }
         },
         plugins: {

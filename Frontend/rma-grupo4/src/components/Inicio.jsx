@@ -84,7 +84,7 @@ export default function Inicio() {
 
           <GridItem>
             <Grid templateRows="0,5fr 0,5fr" gap={4}>
-              <GridItem bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} p={{ base: 1, md: 2 }} borderRadius="md" boxShadow="lg">
+              <GridItem bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
                 <GraficoMedidor title="Presión" url="http://localhost:8000/api/v1/clima/presion" nodeId={selectedNode}/>
               </GridItem>
               <GridItem bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
