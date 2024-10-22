@@ -21,10 +21,25 @@ from src.mensajes.schemas import (
     NodeHistoricalData,
     HistoricalDataPoint
 )
-
+from fastapi.responses import StreamingResponse
+from src.utils.qr_utils import obtener_enlace_invitacion, generar_qr
 
 # Inicializa el router para definir las rutas de este módulo
 router = APIRouter() 
+
+@router.get("/generar_qr_telegram/")
+async def generar_qr_telegram():
+    """
+    Genera un código QR a partir del enlace de invitación del canal de Telegram.
+    """
+    try:
+        enlace_invitacion = obtener_enlace_invitacion()  # Obtiene el enlace del canal
+        qr_image = generar_qr(enlace_invitacion)  # Genera QR con el enlace
+        
+        # Devuelve la imagen como respuesta en formato PNG
+        return StreamingResponse(qr_image, media_type="image/png")
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 @router.get("/clima/temperatura/", response_model=TemperatureResponse)
 def get_temperature_data(

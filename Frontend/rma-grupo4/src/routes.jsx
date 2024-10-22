@@ -17,6 +17,7 @@ import ModificarPassword from './components/ModificarPassword';
 import EliminarUsuario from './components/EliminarUsuario';
 import HelpModal from './components/HelpModal';
 import PantallaComparativa from './analisis/PantallaComparativa';
+import GeneraQR from './utils/GeneraQR';
 
 function AppRoutes() {
   return (
@@ -156,6 +157,16 @@ function AppRoutes() {
             <App>
               <PrivateRoute>
                 <HelpModal />
+              </PrivateRoute>
+            </App>
+          } 
+        />
+        <Route 
+          path="/generar_qr" 
+          element={
+            <App>
+              <PrivateRoute>
+                <GeneraQR />
               </PrivateRoute>
             </App>
           } 
