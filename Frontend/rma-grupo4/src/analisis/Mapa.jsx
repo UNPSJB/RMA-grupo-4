@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import { Box, Fade } from '@chakra-ui/react';
+import { Box, Fade, useColorMode } from '@chakra-ui/react'; // Importar useColorMode
 import 'leaflet/dist/leaflet.css';
 
 const MapComponent = () => {
   const markerPosition = [-43.518, -66.0423];
   const [showAttribution, setShowAttribution] = useState(true);
+  const { colorMode } = useColorMode(); // Usar el hook useColorMode
 
   // Detectar el scroll de la ventana
   const handleScroll = () => {
@@ -40,7 +41,16 @@ const MapComponent = () => {
       
       {/* Usar Fade para ocultar la atribución */}
       <Fade in={showAttribution} unmountOnExit>
-        <Box position="absolute" bottom="10px" left="10px" backgroundColor="white" padding="2" borderRadius="md" boxShadow="md">
+        <Box 
+          position="absolute" 
+          bottom="10px" 
+          left="10px" 
+          backgroundColor={colorMode === 'dark' ? 'gray.700' : 'white'} // Cambiar fondo según el tema
+          color={colorMode === 'dark' ? 'white' : 'black'} // Cambiar color del texto según el tema
+          padding="2" 
+          borderRadius="md" 
+          boxShadow="md"
+        >
           Tiles &copy; Esri
         </Box>
       </Fade>
@@ -49,6 +59,8 @@ const MapComponent = () => {
 };
 
 const Mapa = () => {
+  const { colorMode } = useColorMode(); // Usar el hook useColorMode
+
   return (
     <Box 
       height="420px" 
@@ -56,8 +68,8 @@ const Mapa = () => {
       boxShadow="lg" 
       cursor="pointer"
       overflow="hidden"
-      bg="gray.700" 
-      color="white" 
+      bg={colorMode === 'dark' ? 'gray.700' : 'gray.200'} // Cambiar fondo según el tema
+      color={colorMode === 'dark' ? 'white' : 'black'} // Cambiar color del texto según el tema
       p={{ base: 2, md: 4 }}
       width={{ base: '100%', md: 'auto' }}
       overflowX="auto"

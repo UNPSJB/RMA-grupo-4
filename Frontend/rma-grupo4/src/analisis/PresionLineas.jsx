@@ -76,18 +76,18 @@ const PresionLineas = ({ nodeId1, nodeId2 }) => {
         maintainAspectRatio: false,
         scales: {
             x: { 
-                ticks: { color: 'white' },
-                grid: { color: 'rgba(255, 255, 255, 0.3)' }
+                ticks: { color: colorMode === 'light' ? 'black' : 'white'},
+                grid: { color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)' }
             },
             y: { 
-                title: { display: true, text: 'Presión (hPa)', color: 'white' },
-                ticks: { color: 'white' },
-                grid: { color: 'rgba(255, 255, 255, 0.3)' }
+                title: { display: true, text: 'Presión (hPa)', color: colorMode === 'light' ? 'black' : 'white'},
+                ticks: { color: colorMode === 'light' ? 'black' : 'white' },
+                grid: { color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)' }
             },
         },
         plugins: {
             legend: {
-                labels: { color: 'white' }
+                labels: { color: colorMode === 'light' ? 'black' : 'white' }
             }
         }
     };
@@ -95,8 +95,8 @@ const PresionLineas = ({ nodeId1, nodeId2 }) => {
     return (
     <>
         <Box 
-            bg="gray.700" 
-            color="white" 
+            bg={colorMode === 'light' ? 'gray.100' : 'gray.700'}
+            color={colorMode === 'light' ? 'black' : 'white'} 
             p={{ base: 2, md: 4 }}
             borderRadius="md" 
             boxShadow="lg"

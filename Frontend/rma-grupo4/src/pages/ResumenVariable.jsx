@@ -59,7 +59,7 @@ const ResumenVariable = ({ title, url, nodeId, unidad }) => {
         {summary.average_value !== null ? ` ${unidad}` : ''}
       </Text>
       <Text fontSize="lg" color={colorMode === 'dark' ? 'white' : 'black'} mb="1" textAlign="center">
-        Promedio: {summary.average_value !== null ? summary.average_value.toFixed(2) : '--'}
+        Media: {summary.average_value !== null ? summary.average_value.toFixed(2) : '--'}
         {summary.average_value !== null ? ` ${unidad}` : ''}
       </Text>
     </Box>

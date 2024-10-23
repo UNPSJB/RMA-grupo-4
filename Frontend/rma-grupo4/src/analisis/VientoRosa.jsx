@@ -104,8 +104,8 @@ const VientoRosa = ({ nodeId1, nodeId2 }) => {
     <>
       
         <Box 
-            bg="gray.700" 
-            color="white" 
+            bg={colorMode === 'light' ? 'gray.100' : 'gray.700'}
+            color={colorMode === 'light' ? 'black' : 'white'}  
             p={{ base: 2, md: 4 }}
             borderRadius="md" 
             boxShadow="lg"
