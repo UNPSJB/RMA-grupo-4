@@ -18,6 +18,7 @@ import EliminarUsuario from './components/EliminarUsuario';
 import HelpModal from './components/HelpModal';
 import PantallaComparativa from './analisis/PantallaComparativa';
 import GeneraQR from './utils/GeneraQR';
+import DescargasHistoricas from './pages/DescargasHistoricas'; 
 
 function AppRoutes() {
   return (
@@ -97,6 +98,17 @@ function AppRoutes() {
             <App>
               <PrivateRoute>
                 <GraficoBarra />
+              </PrivateRoute>
+            </App>
+          } 
+        />
+     
+        <Route 
+          path="/descargas_historicas" 
+          element={
+            <App>
+              <PrivateRoute>
+                <DescargasHistoricas />
               </PrivateRoute>
             </App>
           } 

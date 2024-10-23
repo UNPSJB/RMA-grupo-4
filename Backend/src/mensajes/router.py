@@ -401,25 +401,14 @@ def get_node_summary(db: Session = Depends(get_db)):
 
     return NodeSummaryResponse(summary=summary_response)
 
-
 @router.get("/clima/nodos/historico", response_model=List[NodeHistoricalData])
-def get_node_historical_data(db: Session = Depends(get_db)):
-    """
-    Endpoint para obtener los datos históricos de todos los nodos con valores de cada variable.
-    """
-    # Consultar todos los registros de Mensaje para cada nodo y tipo de variable
-    results = (
-        db.query(
-            Mensaje.id_nodo,
-            Mensaje.type,
-            Mensaje.data,
-            Mensaje.time.label("timestamp")
-        )
-        .order_by(Mensaje.id_nodo, Mensaje.type, Mensaje.time)  # Ordenar por nodo, tipo y tiempo
-        .all()
-    )
-
-    node_data = {}
+def get_node_historical_data(
+    db: Session = Depends(get_db),
+    start_date: Optional[datetime] = None,
+    end_date: Optional[datetime] = None,
+    variable: Optional[str] = None
+):
+    # Mapeo de tipos de variables a campos
     type_to_field = {
         "temp_t": "temperature",
         "humidity_t": "humidity",
@@ -427,6 +416,39 @@ def get_node_historical_data(db: Session = Depends(get_db)):
         "rainfall_t": "precipitation",
         "windspd_t": "wind"
     }
+
+    # Ajustes de fechas (sin cambios)
+    if start_date:
+        if start_date == start_date.date():
+            start_date = datetime.combine(start_date, time.min)
+    if end_date:
+        if end_date == end_date.date():
+            end_date = datetime.combine(end_date, time.max)
+
+    # Query base
+    query = db.query(
+        Mensaje.id_nodo,
+        Mensaje.type,
+        Mensaje.data,
+        Mensaje.time.label("timestamp")
+    )
+
+    # Aplicar filtros de fecha
+    if start_date:
+        query = query.filter(Mensaje.time >= start_date)
+    if end_date:
+        query = query.filter(Mensaje.time <= end_date)
+
+    # Aplicar filtro de variable
+    if variable:
+        if variable in type_to_field:
+            query = query.filter(Mensaje.type == variable)
+        else:
+            raise HTTPException(status_code=400, detail="Variable inválida")
+
+    results = query.order_by(Mensaje.id_nodo, Mensaje.type, Mensaje.time).all()
+
+    node_data = {}
 
     for record in results:
         node_id = record.id_nodo
@@ -448,11 +470,13 @@ def get_node_historical_data(db: Session = Depends(get_db)):
                 )
                 node_data[node_id][type_to_field[record.type]].append(data_point)
             except ValueError:
-                pass  # Ignorar datos inválidos
+                pass  # Ignora datos inválidos
 
-    # Convertir el objeto node_data en una lista de NodeHistoricalData
-    historical_response = [
-        NodeHistoricalData(**data) for data in node_data.values()
-    ]
+    # Filtrar nodos sin datos
+    historical_response = []
+    for data in node_data.values():
+        # Verifica si hay al menos un valor válido para la variable seleccionada
+        if any(data[var] for var in type_to_field.values()):
+            historical_response.append(NodeHistoricalData(**data))
 
     return historical_response

@@ -32,6 +32,7 @@ function NavigationButtons() {
 
   const navItems = [
     { text: "Datos Históricos", route: "/historicos" },
+    { text: "Descarga Historicos", route: "/descargas_historicas" },
     { text: "Analisis Avanzado", route: "/comparativo" },
     { text: "Suscripcion a alertas", route: "/generar_qr" },
   ];
