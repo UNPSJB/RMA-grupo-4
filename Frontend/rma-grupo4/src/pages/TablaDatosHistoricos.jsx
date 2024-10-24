@@ -104,12 +104,12 @@ const DescargasHistoricas = () => {
     if (mm === '--') return '--';
     return (mm / 10).toFixed(2);  // Conversión de mm a cm
   };
+  
   return (
-    <Box bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'} borderRadius="md" boxShadow="md" width="100%">
+    <Box bg={colorMode === 'light' ? 'gray.100' : 'gray.800'} color={colorMode === 'light' ? 'black' : 'white'} borderRadius="md" boxShadow="md" width="100%">
       <Heading as="h1" textAlign="center" p="8">Tabla Datos Históricos</Heading>
 
-      <Box p={6} bg={useColorModeValue('white', 'gray.800')} color={useColorModeValue('black', 'white')} borderRadius="md" boxShadow="md">
-        <Flex justify="space-evenly" mb={8} wrap="wrap" gap={4}>
+      <Flex justify="space-evenly" mb={8} wrap="wrap" gap={4} >
           <Box>
             <label htmlFor="start-date" style={{ fontWeight: 'bold', marginBottom: '8px', display: 'block', fontSize:"20px" }}>Fecha Inicio:</label>
             <Input id="start-date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
@@ -121,11 +121,12 @@ const DescargasHistoricas = () => {
             <Button  mt="10" colorScheme="teal" size="md" onClick={downloadCSV}>Descargar CSV</Button>
         </Flex>
 
-        <Box overflowX="auto" bg="gray.700" borderRadius="md" boxShadow="lg" p={7} >
+      <Box bg={colorMode === 'light' ? 'gray.300' : 'gray.600'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
+        <Box overflowX="auto" bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} borderRadius="md" boxShadow="lg" p={7} >
           <Table variant="simple" colorScheme="whiteAlpha" >
             <Thead>
               <Tr>
-                <Th textAlign="center" color="white">
+                <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>
                   Nodo
                 </Th>
                 <Th >
@@ -140,8 +141,8 @@ const DescargasHistoricas = () => {
                     Humedad
                   </Center>
                 </Th>
-                <Th textAlign="center" color="white">
-                  <Center>
+                <Th>
+                  <Center color={colorMode === 'light' ? 'black' : 'white'}>
                     <FaTemperatureHigh style={{ marginRight: "5px" }} /> Temperatura
                     <Button
                       size="xs"
@@ -197,8 +198,7 @@ const DescargasHistoricas = () => {
               ) : (
                 paginatedData.map((row, index) => (
                   <Tr 
-                    key={`${row.id_nodo}-${index}`} 
-                    bg={index % 2 === 0 ? "gray.700" : "gray.600"}
+                    bg={index % 2 === 0 ? useColorModeValue('gray.100', 'gray.700') : useColorModeValue('gray.300', 'gray.500')}
                   >
                     <Td textAlign="center">{row.id_nodo}</Td>
                     <Td textAlign="center">{formatDate(row.timestamp)} {formatHour(row.timestamp)}</Td>
@@ -227,19 +227,18 @@ const DescargasHistoricas = () => {
               )}
             </Tbody>
           </Table>
+          <Flex justify="center" mt={4}>
+            <Button p={4}onClick={handlePreviousPage} disabled={page === 1} colorScheme="teal" size="sm" mr={2}>
+              Anterior
+            </Button>
+            <Text fontSize="sm" alignSelf="center">
+              Página {page} de {totalPages}
+            </Text>
+            <Button p={4} onClick={handleNextPage} disabled={page === totalPages} colorScheme="teal" size="sm" ml={2}>
+              Siguiente
+            </Button>
+          </Flex>
         </Box>
-
-        <Flex justify="center" mt={4}>
-          <Button p={4}onClick={handlePreviousPage} disabled={page === 1} colorScheme="teal" size="sm" mr={2}>
-            Anterior
-          </Button>
-          <Text fontSize="sm" alignSelf="center">
-            Página {page} de {totalPages}
-          </Text>
-          <Button p={4} onClick={handleNextPage} disabled={page === totalPages} colorScheme="teal" size="sm" ml={2}>
-            Siguiente
-          </Button>
-        </Flex>
       </Box>
     </Box>
   );
