@@ -38,7 +38,11 @@ const PantallaComparativa = () => {
 
     const downloadPDF = () => {
         const element = document.getElementById('viewToDownload');
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> a4098fafb4c1823dc88a2cb52b0ff6fba16d9796
         const options = {
           margin: [10, 0],
           filename: 'vista_datos_mejorada.pdf',
@@ -51,6 +55,7 @@ const PantallaComparativa = () => {
           jsPDF: { format: 'a2', orientation: 'portrait' },
           pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
         };
+<<<<<<< HEAD
     
         // Aplicar estilos temporales
         const originalBackgroundColor = element.style.backgroundColor;
@@ -85,6 +90,26 @@ const PantallaComparativa = () => {
 
     return (
         <Box textAlign="center" maxWidth="auto" mx="auto" bg={colorMode === 'dark' ? 'gray.900' : 'gray.100'} boxShadow="md" color={colorMode === 'light' ? 'black' : 'white'}>
+=======
+
+        const originalColor = element.style.color;
+        const originalBackgroundColor = element.style.backgroundColor;
+
+        // Ajustar los colores según el modo de color activo
+        element.style.color = colorMode === 'light' ? '#000000' : '#ffffff';
+        element.style.backgroundColor = colorMode === 'light' ? '#ffffff' : '#1A202C';
+
+        setTimeout(() => {
+          html2pdf().from(element).set(options).save().then(() => {
+            element.style.color = originalColor;
+            element.style.backgroundColor = originalBackgroundColor;
+          });
+        }, 500);
+      };
+
+    return (
+        <Box textAlign="center" maxWidth="auto" mx="auto" bg={colorMode === 'dark' ? 'gray.900' : 'gray.100'} boxShadow="md">
+>>>>>>> a4098fafb4c1823dc88a2cb52b0ff6fba16d9796
             <Box id="viewToDownload">
                 <Box p={{ base: 2, md: 4 }}>
                     <Heading as="h1" pt="2" textAlign="center">Análisis Avanzado</Heading>

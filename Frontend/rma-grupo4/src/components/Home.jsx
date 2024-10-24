@@ -37,7 +37,7 @@ export default function Home() {
                 mb={6}
                 color={colorMode === 'dark' ? 'white' : 'black'} // Color del título según el modo
             >
-                Bienvenido a Nuestra Plataforma
+                Bienvenido a TAVI
             </Heading>
 
             <Text 

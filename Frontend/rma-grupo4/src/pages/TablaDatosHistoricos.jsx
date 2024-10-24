@@ -106,7 +106,7 @@ const DescargasHistoricas = () => {
           Nodo
         </Th>
         <Th textAlign="center" color="white">
-           Humedad
+             Humedad
         </Th>
         <Th textAlign="center" color="white">
           <Center>

@@ -108,25 +108,25 @@ const HumedadPrecipitacionArea = ({ nodeId1, nodeId2 }) => {
         maintainAspectRatio: false,
         scales: {
             x: {
-                ticks: { color: 'white' },
-                grid: { color: 'rgba(255, 255, 255, 0.3)' }
+                ticks: { color: colorMode === 'light' ? 'black' : 'white'},
+                grid: { color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'  }
             },
             y1: { 
-                ticks: { color: 'white' },
-                grid: { color: 'rgba(255, 255, 255, 0.3)' },
+                ticks: { color: colorMode === 'light' ? 'black' : 'white'},
+                grid: { color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'  },
                 position: 'left',
-                title: { display: true, text: 'Precipitacion (mm)', color: 'white' }
+                title: { display: true, text: 'Precipitacion (mm)', color: colorMode === 'light' ? 'black' : 'white' }
             },
             y2: { 
-                ticks: { color: 'white' },
-                grid: { color: 'rgba(255, 255, 255, 0.3)' },
+                ticks: { color: colorMode === 'light' ? 'black' : 'white' },
+                grid: { color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'  },
                 position: 'right',
-                title: { display: true, text: 'Humedad (%)', color: 'white' }
+                title: { display: true, text: 'Humedad (%)', color: colorMode === 'light' ? 'black' : 'white' }
             }
         },
         plugins: {
             legend: {
-                labels: { color: 'white' }
+                labels: { color: colorMode === 'light' ? 'black' : 'white' }
             }
         },
         elements: {
@@ -139,8 +139,8 @@ const HumedadPrecipitacionArea = ({ nodeId1, nodeId2 }) => {
       
 
         <Box 
-            bg="gray.700" 
-            color="white" 
+            bg={colorMode === 'light' ? 'gray.100' : 'gray.700'}
+            color={colorMode === 'light' ? 'black' : 'white'}  
             p={{ base: 2, md: 4 }}
             borderRadius="md" 
             boxShadow="lg"
