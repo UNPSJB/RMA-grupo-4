@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
+from src.models import Mensaje
 
 def validar_mensaje(mensaje_json):    
     # Definir rangos permitidos para cada tipo
     rangos = {
         'temp_t': (0, 45),         # Rango de temperatura en grados Celsius
-        'humidity_t': (30, 85),    # Rango de humedad en porcentaje
+        'humidity_t': (30, 85),    # Rango de humedad en porcentaje HUMIDITY_T
         'pressure_t': (900, 1100), # Rango de presión en hPa
         'windspd_t': (0, 150),     # Rango de velocidad del viento en km/h
         'rainfall_t': (0, 150),     # Rango de precipitación en mm
@@ -34,3 +35,11 @@ def validar_fecha_hora_actual(timestamp_str):
         return ahora - diferencia <= timestamp <= ahora + diferencia
     except ValueError:
         return False
+    
+def validar_duplicado(db, mensaje_json):
+    return db.query(Mensaje).filter(
+        Mensaje.id_nodo == mensaje_json['id'],
+        Mensaje.type == mensaje_json['type'],
+        Mensaje.data == mensaje_json['data'],
+        Mensaje.time == datetime.strptime(mensaje_json['time'], "%Y-%m-%d %H:%M:%S.%f")
+    ).first() is not None

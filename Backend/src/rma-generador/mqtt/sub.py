@@ -12,7 +12,7 @@ class Subscriptor:
     client: paho.Client
     message_counter: int = 0
     logger_enabled: bool = True
-    on_message_callback: Optional[Callable[str, None]] = None
+    on_message_callback: Optional[Callable[[str], None]] = None
 
     def __post_init__(self) -> None:
         self.set_event_handlers()
