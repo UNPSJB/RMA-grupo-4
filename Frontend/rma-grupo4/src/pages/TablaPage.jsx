@@ -89,6 +89,7 @@ function TablaPage({ onRowSelection }) {
     }
   };
 
+
   const formatNumber = (number) => {
     if (number === null || isNaN(number)) {
       return '--';

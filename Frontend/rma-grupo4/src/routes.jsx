@@ -18,7 +18,7 @@ import EliminarUsuario from './components/EliminarUsuario';
 import HelpModal from './components/HelpModal';
 import PantallaComparativa from './analisis/PantallaComparativa';
 import GeneraQR from './utils/GeneraQR';
-import DescargasHistoricas from './pages/DescargasHistoricas'; 
+import TablaDatosHistoricos from './pages/TablaDatosHistoricos'; 
 
 function AppRoutes() {
   return (
@@ -104,11 +104,11 @@ function AppRoutes() {
         />
      
         <Route 
-          path="/descargas_historicas" 
+          path="/tabla_datos_historicos" 
           element={
             <App>
               <PrivateRoute>
-                <DescargasHistoricas />
+                <TablaDatosHistoricos />
               </PrivateRoute>
             </App>
           } 

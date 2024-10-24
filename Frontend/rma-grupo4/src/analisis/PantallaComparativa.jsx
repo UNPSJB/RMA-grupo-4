@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Select, Box, Flex , Grid, GridItem, Heading, Button } from '@chakra-ui/react';
+import { Select, Box, Flex , Grid, GridItem, Heading, Button, useColorMode } from '@chakra-ui/react';
 import TemperaturaHumedadLineas from './TemperaturaHumedadLineas';
 import TemperaturaPrecipitacionBarra from './TemperaturaPrecipitacionBarra';
 import HumedadPrecipitacionArea from './HumedadPrecipitacionArea';
@@ -10,12 +10,11 @@ import TablaSummary from './TablaSummary';
 import Mapa from './Mapa';
 import html2pdf from 'html2pdf.js';
 
-
 const PantallaComparativa = () => {
     const [availableNodes, setAvailableNodes] = useState([]);
     const [selectedNode1, setSelectedNode1] = useState('0');
     const [selectedNode2, setSelectedNode2] = useState('1');
-
+    const { colorMode } = useColorMode(); // Usar hook para manejar modos de color
 
     useEffect(() => {
         const fetchAvailableNodes = async () => {
@@ -36,10 +35,10 @@ const PantallaComparativa = () => {
             setSelectedNode2(availableNodes[1]);
         }
     }, [availableNodes]);
+
     const downloadPDF = () => {
         const element = document.getElementById('viewToDownload');
     
-        // Fijar colores para el PDF según el modo actual
         const options = {
           margin: [10, 0],
           filename: 'vista_datos_mejorada.pdf',
@@ -47,45 +46,64 @@ const PantallaComparativa = () => {
             scale: 4, 
             useCORS: true,
             logging: true,
+            backgroundColor: '#ffffff', // Fondo siempre blanco
           },
           jsPDF: { format: 'a2', orientation: 'portrait' },
           pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
         };
     
-        // Aplicar estilos temporales para mejorar la visibilidad en PDF
-        const originalColor = element.style.color;
+        // Aplicar estilos temporales
         const originalBackgroundColor = element.style.backgroundColor;
+        const originalColor = element.style.color;
     
-        // Cambiar el color del texto y del fondo para que sea legible según el modo de color
-        //element.style.color = colorMode === 'light' ? '#000000' : '#ffffff';
-        //element.style.backgroundColor = colorMode === 'light' ? '#ffffff' : '#1A202C';
+        // Obtener todos los gráficos
+        const graphs = element.querySelectorAll('canvas');
+    
+        graphs.forEach((graph) => {
+          const chart = graph.getContext('2d');
+          chart.fillStyle = '#000000'; // Color de los gráficos a negro forzados
+        });
+    
+        // Cambia el color de fondo y el color del texto para el PDF
+        element.style.backgroundColor = '#ffffff'; 
+        element.style.color = '#000000'; 
     
         setTimeout(() => {
           html2pdf().from(element).set(options).save().then(() => {
             // Restaurar los estilos originales después de la exportación
-            element.style.color = originalColor;
             element.style.backgroundColor = originalBackgroundColor;
-          });
-        }, 500); // Tiempo para que los gráficos se redibujen correctamente
-      };
-    
-    return (
-        <Box textAlign="center" maxWidth="auto" mx="auto" bg="gray.900" boxShadow="md">
+            element.style.color = originalColor;
             
-            <Box id="viewToDownload">
+            // Restaurar los estilos de los gráficos
+            graphs.forEach((graph) => {
+              const chart = graph.getContext('2d');
+              chart.fillStyle = ''; 
+            });
+          });
+        }, 500); 
+      };
 
-                <Box p={{ base: 2, md: 4 }} >
+    return (
+        <Box textAlign="center" maxWidth="auto" mx="auto" bg={colorMode === 'dark' ? 'gray.900' : 'gray.100'} boxShadow="md" color={colorMode === 'light' ? 'black' : 'white'}>
+            <Box id="viewToDownload">
+                <Box p={{ base: 2, md: 4 }}>
                     <Heading as="h1" pt="2" textAlign="center">Análisis Avanzado</Heading>
                     <Flex justify="center" mb={4} mt={2} wrap="wrap" gap={4}>
                         <Select 
                             value={selectedNode1} 
                             onChange={e => setSelectedNode1(e.target.value)} 
-                            mb={4} 
+                            bg={colorMode === 'light' ? 'white' : 'gray.800'}
+                            color={colorMode === 'light' ? 'black' : 'white'} 
+                            borderColor={colorMode === 'light' ? 'gray.300' : 'gray.600'}
+                            _hover={{ borderColor: 'teal.300' }}  
+                            _focus={{ borderColor: 'teal.500', boxShadow: '0 0 0 1px teal.500' }}  
+                            borderRadius="md"   
                             width="150px"
                             sx={{
                                 option: {
-                                backgroundColor: 'gray.900',
-                                },
+                                    backgroundColor: colorMode === 'light' ? 'white' : 'gray.900',
+                                    color: colorMode === 'light' ? 'black' : 'white',
+                                  },
                             }}
                         >
                             {availableNodes.map(node => (
@@ -99,11 +117,18 @@ const PantallaComparativa = () => {
                             value={selectedNode2} 
                             onChange={e => setSelectedNode2(e.target.value)} 
                             mb={4} 
+                            bg={colorMode === 'light' ? 'white' : 'gray.800'}
+                            color={colorMode === 'light' ? 'black' : 'white'} 
+                            borderColor={colorMode === 'light' ? 'gray.300' : 'gray.600'}
+                            _hover={{ borderColor: 'teal.300' }}  
+                            _focus={{ borderColor: 'teal.500', boxShadow: '0 0 0 1px teal.500' }}  
+                            borderRadius="md"   
                             width="150px"
                             sx={{
                                 option: {
-                                backgroundColor: 'gray.900',
-                                },
+                                    backgroundColor: colorMode === 'light' ? 'white' : 'gray.900',
+                                    color: colorMode === 'light' ? 'black' : 'white',
+                                  },
                             }}
                         >
                             {availableNodes.map(node => (
@@ -113,62 +138,46 @@ const PantallaComparativa = () => {
                             ))}
                         </Select>
                     </Flex>
-                    <Grid
-                        templateColumns={{ base: '1fr', md: '1fr 1fr' }} 
-                        gap={4}
-                        maxWidth="100%"
-                        bg="gray.900"
-                        borderRadius="md"
-                        mb="4"
-                    >
-                        <GridItem bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
+
+                    {/* Gráficos */}
+                    <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={4} maxWidth="100%" bg={colorMode === 'dark' ? 'gray.900' : 'gray.100'} borderRadius="md" mb="4">
+                        <GridItem bg={colorMode === 'dark' ? 'gray.800' : 'gray.300'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
                             <TemperaturaHumedadLineas nodeId1={selectedNode1} nodeId2={selectedNode2} />
                         </GridItem>
-                        <GridItem bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
-                            <TemperaturaPrecipitacionBarra  nodeId1={selectedNode1} nodeId2={selectedNode2} />
+                        <GridItem bg={colorMode === 'dark' ? 'gray.800' : 'gray.300'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
+                            <TemperaturaPrecipitacionBarra nodeId1={selectedNode1} nodeId2={selectedNode2} />
                         </GridItem>
                     </Grid>
-                    <Grid
-                        templateColumns={{ base: '1fr', md: '1fr 1fr' }} 
-                        gap={4}
-                        maxWidth="100%"
-                        bg="gray.900"
-                        borderRadius="md"
-                        mb="4"
-                    >
-                        <GridItem bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
+
+                    {/* Más Gráficos */}
+                    <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={4} maxWidth="100%" bg={colorMode === 'dark' ? 'gray.900' : 'gray.100'} borderRadius="md" mb="4">
+                        <GridItem bg={colorMode === 'dark' ? 'gray.800' : 'gray.300'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
                             <PresionLineas nodeId1={selectedNode1} nodeId2={selectedNode2} />
                         </GridItem>
-                        <GridItem bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
+                        <GridItem bg={colorMode === 'dark' ? 'gray.800' : 'gray.300'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
                             <HumedadPrecipitacionArea nodeId1={selectedNode1} nodeId2={selectedNode2} />
                         </GridItem>
                     </Grid>
-                    <Grid
-                        templateColumns={{ base: '1fr', md: '1fr 1fr' }} 
-                        gap={4}
-                        maxWidth="100%"
-                        bg="gray.900"
-                        borderRadius="md"
-                        mb="4"
-                    >
-                        <GridItem bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
-                            <TablaSummary  nodeId1={selectedNode1} nodeId2={selectedNode2} />
+
+                    <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={4} maxWidth="100%" bg={colorMode === 'dark' ? 'gray.900' : 'gray.100'} borderRadius="md" mb="4">
+                        <GridItem bg={colorMode === 'dark' ? 'gray.800' : 'gray.300'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
+                            <TablaSummary nodeId1={selectedNode1} nodeId2={selectedNode2} />
                         </GridItem>
-                        <GridItem bg="gray.800" p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
+                        <GridItem bg={colorMode === 'dark' ? 'gray.800' : 'gray.300'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
                             <GridItem mb="4">
-                                <VientoRosaPrecipitacionBarra  nodeId1={selectedNode1} nodeId2={selectedNode2} />
+                                <VientoRosaPrecipitacionBarra nodeId1={selectedNode1} nodeId2={selectedNode2} />
                             </GridItem>
                             <GridItem>
-                                <Mapa></Mapa>
+                                <Mapa />
                             </GridItem>
                         </GridItem>
                     </Grid>
                 </Box>
             </Box>
-            {/* Botón para descargar la vista como PDF */}
+
             <Button colorScheme="blue" m={4} onClick={downloadPDF}>
                 Descargar PDF
-            </Button>  
+            </Button>
         </Box>
     );
 };
