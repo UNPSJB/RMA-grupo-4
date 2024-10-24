@@ -96,7 +96,8 @@ function TablaPage({ onRowSelection }) {
     }
     return new Intl.NumberFormat("es-AR", { maximumFractionDigits: 2 }).format(number);
   };
-    const formatTime = (timestamp) => {
+  
+  const formatTime = (timestamp) => {
     if (!timestamp || isNaN(timestamp.getTime())) return "--";
     return timestamp.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
   };

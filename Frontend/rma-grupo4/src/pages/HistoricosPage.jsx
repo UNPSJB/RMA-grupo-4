@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, Select, Table, Thead, Tbody, Tr, Th, Td, Flex, useColorMode } from '@chakra-ui/react';
+import { Box, Heading, Select, Flex, useColorMode, Table, Thead, Tbody, Tr, Th, Td, } from '@chakra-ui/react';
 import { Chart as ChartJS, registerables } from 'chart.js';
-import { Line } from 'react-chartjs-2';
+import { Line, Bar, PolarArea } from 'react-chartjs-2'; // Importar diferentes tipos de gráficos
 import axios from 'axios';
 
 ChartJS.register(...registerables);
@@ -11,6 +11,7 @@ const variables = [
   { name: 'Humedad', color: 'rgba(54, 162, 235, 0.5)' },
   { name: 'Presión', color: 'rgba(100, 206, 86, 0.5)' },
   { name: 'Viento', color: 'rgba(75, 192, 192, 0.5)' },
+  { name: 'Precipitacion', color: 'rgba(10, 122, 122, 0.5)' },
 ];
 
 const variableMapping = {
@@ -18,6 +19,7 @@ const variableMapping = {
   Humedad: 'humidity',
   Presión: 'pressure',
   Viento: 'wind',
+  Precipitacion: 'precipitation',
 };
 
 const months = [
@@ -49,6 +51,7 @@ function HistoricosPage() {
   const [days, setDays] = useState([]);
   const [historicalData, setHistoricalData] = useState([]);
   const [options, setOptions] = useState({});
+  const [optionsPolar, setOptionsPolar] = useState({});
 
   const getDias = (year, month) => Array.from({ length: new Date(year, month, 0).getDate() }, (_, i) => i + 1);
 
@@ -99,7 +102,6 @@ function HistoricosPage() {
           Object.values(entry).forEach(e => processedData.push(e));
         });
 
-        // Filtrar los datos según el año, mes, día seleccionado
         processedData = processedData.filter(item => {
           if (selectedYear && item.year !== parseInt(selectedYear)) return false;
           if (selectedMonth && item.month !== parseInt(selectedMonth)) return false;
@@ -126,7 +128,7 @@ function HistoricosPage() {
       return dateA - dateB;
     });
 
-    const labels = sortedData.map(row => `${row.year}-${row.month}-${row.day} ${row.hour}:00`);
+    const labels = sortedData.map(row => `${row.hour}:00`);
     const data = sortedData.map(row => (typeof row[selectedVariable] === 'number' ? row[selectedVariable] : null));
 
     const filteredData = data.filter(d => d !== null);
@@ -140,8 +142,8 @@ function HistoricosPage() {
           backgroundColor: variables.find(v => v.name === selectedVariable).color,
           borderColor: variables.find(v => v.name === selectedVariable).color,
           borderWidth: 4,
-          fill: false,
-          tension: 0.4,
+          fill: selectedVariable === 'Humedad' || selectedVariable === 'Precipitacion',
+          tension: selectedVariable === 'Temperatura' || selectedVariable === 'Presión' || selectedVariable === 'Humedad' ? 0.4 : 0, // Curva solo en líneas
         },
       ],
     };
@@ -162,25 +164,115 @@ function HistoricosPage() {
             },
           },
         },
+        legend: { 
+          position: 'top',
+          labels: { 
+            color: colorMode === 'light' ? 'black' : 'white',
+            font: { size: 12 } 
+          }
+        },
+      },
+      scales: {
+        x: { 
+          ticks: { 
+            color: colorMode === 'light' ? 'black' : 'white', 
+            font: { size: 12 } 
+          },
+          grid: { 
+            color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)' 
+          }
+        },
+        y: { 
+          ticks: { 
+            color: colorMode === 'light' ? 'black' : 'white',
+            font: { size: 12 }
+          },
+          title: { display: true, color: 'white' },
+          grid: { 
+            color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'
+          }
+        },
       },
     };
 
+    const chartOptionsPolar = {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 1000,
+        easing: 'easeInOutQuad',
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              const row = sortedData[context.dataIndex];
+              return `Nodo ${row.id}: ${context.formattedValue} ${selectedVariable}`;
+            },
+          },
+        },
+        legend: { 
+          position: 'right',
+          labels: { 
+            color: colorMode === 'light' ? 'black' : 'white',
+            font: { size: 12 } 
+          }
+        },
+      },
+      scales: {
+        y: { 
+          ticks: { 
+            color: colorMode === 'light' ? 'black' : 'white',
+            font: { size: 12 }
+          },
+          title: { display: true, color: 'white' },
+          grid: { 
+            color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'
+          }
+        },
+        r: { // Para la escala radial del gráfico Radar
+          pointLabels: { // Controla las etiquetas de las horas alrededor del gráfico
+            color: colorMode === 'light' ? 'black' : 'white',  // Cambia este valor para ajustar el color de las etiquetas
+            font: { size: 12
+             } // Tamaño de las etiquetas de las horas
+          },
+          angleLines: {
+            display: true,
+            color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'white', 
+          },
+          ticks: { 
+            color: colorMode === 'light' ? 'black' : 'black', 
+            font: { size: 12 } 
+          },
+          grid: { 
+            color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'white' 
+          }
+        }
+      },
+    }
+
     setChartData(newChartData);
     setOptions(chartOptions);
-  }, [historicalData, selectedVariable]);
+    setOptionsPolar(chartOptionsPolar);
+  }, [historicalData, selectedVariable, colorMode]);
 
-  const renderBarChart = () => {
+  const renderChart = () => {
     if (!chartData) return null;
-    return (
-      <Box borderRadius="md" boxShadow="md" height="400px" maxHeight="400px" overflow="hidden" bg={colorMode === 'light' ? 'white' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
-        <Line data={chartData} options={options} />
-      </Box>
-    );
+
+    if (selectedVariable === 'Temperatura' || selectedVariable === 'Presión') {
+      return <Line data={chartData} options={options} />;
+    } else if (selectedVariable === 'Humedad') {
+      return <Line data={chartData} options={{ ...options, elements: { line: { fill: true } } }} />;
+    } else if (selectedVariable === 'Precipitacion') {
+      return <Bar data={chartData} options={options} />;
+    } else if (selectedVariable === 'Viento') {
+      return <PolarArea data={chartData} options={optionsPolar} />;
+    }
   };
 
   return (
     <Box p={4} bg={colorMode === 'light' ? 'white' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'}>
-      <Heading as="h1" m={7} textAlign="center">Históricos de variables</Heading>
+      <Heading as="h1" m={7} textAlign="center">Graficos Datos Históricos</Heading>
       <Flex justify="center" mb={4} mt={5} wrap="wrap" gap={4}>
         <Select
           value={selectedVariable}
@@ -224,44 +316,47 @@ function HistoricosPage() {
         </Select>
       </Flex>
 
-      {renderBarChart()}
-
-      <Table mt={10} size="sm" variant="striped" colorScheme="teal">
-        <Thead>
-          <Tr>
-            <Th textAlign={'center'}>Nodo</Th>
-            <Th textAlign={'center'}>Fecha</Th>
-            <Th textAlign={'center'}>Hora</Th>
-            <Th textAlign={'center'}>{selectedVariable}</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {historicalData.map((item, index) => (
-            <Tr key={index}>
-              <Td textAlign={'center'}>{item.id}</Td>
-              <Td textAlign={'center'}>{item.year}-{item.month}-{item.day}</Td>
-              <Td textAlign={'center'}>{item.hour}:00</Td>
-              <Td textAlign={'center'}>
-              {
-                typeof item[selectedVariable] === 'number' && !isNaN(item[selectedVariable])
-                  ? `${item[selectedVariable].toFixed(2)} ${
-                      selectedVariable === 'Temperatura'
-                        ? '°C'
-                        : selectedVariable === 'Viento'
-                        ? 'km/h'
-                        : selectedVariable === 'Humedad'
-                        ? '%'
-                        : selectedVariable === 'Presión'
-                        ? 'hPa'
-                        : ''
-                    }`
-                  : '-'
-              }
-              </Td>
+      <Box borderRadius="md" boxShadow="md" height="400px" maxHeight="400px" overflow="hidden" bg={colorMode === 'light' ? 'white' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
+        {renderChart()}
+      </Box>
+      <Box mt={10} borderRadius="md" boxShadow="md" overflow="hidden" bg={colorMode === 'light' ? 'white' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
+        <Table  size="sm" variant="striped" colorScheme="teal">
+          <Thead>
+            <Tr>
+              <Th textAlign={'center'}>Nodo</Th>
+              <Th textAlign={'center'}>Fecha</Th>
+              <Th textAlign={'center'}>Hora</Th>
+              <Th textAlign={'center'}>{selectedVariable}</Th>
             </Tr>
-          ))}
-        </Tbody>
-      </Table>
+          </Thead>
+          <Tbody>
+            {historicalData.map((item, index) => (
+              <Tr key={index}>
+                <Td textAlign={'center'}>{item.id}</Td>
+                <Td textAlign={'center'}>{item.year}-{item.month}-{item.day}</Td>
+                <Td textAlign={'center'}>{item.hour}:00</Td>
+                <Td textAlign={'center'}>
+                {
+                  typeof item[selectedVariable] === 'number' && !isNaN(item[selectedVariable])
+                    ? `${item[selectedVariable].toFixed(2)} ${
+                        selectedVariable === 'Temperatura'
+                          ? '°C'
+                          : selectedVariable === 'Viento'
+                          ? 'km/h'
+                          : selectedVariable === 'Humedad'
+                          ? '%'
+                          : selectedVariable === 'Presión'
+                          ? 'hPa'
+                          : ''
+                      }`
+                    : '-'
+                }
+                </Td>
+              </Tr>
+            ))}
+          </Tbody>
+        </Table>
+      </Box>
     </Box>
   );
 }

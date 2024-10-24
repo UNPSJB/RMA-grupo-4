@@ -31,7 +31,7 @@ function NavigationButtons() {
   }, [isVisible]);
 
   const navItems = [
-    { text: "Datos Históricos", route: "/historicos" },
+    { text: "Gráficos Datos Históricos", route: "/historicos" },
     { text: "Tabla Datos Historicos", route: "/tabla_datos_historicos" },
     { text: "Analisis Avanzado", route: "/comparativo" },
     { text: "Suscripcion a alertas", route: "/generar_qr" },
