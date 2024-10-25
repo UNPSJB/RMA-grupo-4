@@ -4,7 +4,6 @@ import { FaTemperatureHigh, FaTint, FaWind, FaClock } from 'react-icons/fa';
 import { GiSpeedometer, GiWaterDrop } from 'react-icons/gi';
 import axios from 'axios';
 import { saveAs } from 'file-saver';
-import { useColorModeValue } from "@chakra-ui/react";
 
 const DescargasHistoricas = () => {
   const { colorMode } = useColorMode();
@@ -24,7 +23,6 @@ const DescargasHistoricas = () => {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:8000/api/v1/clima/nodos/historico');
-        console.log("ACAAAA: ", response.data);
         setHistoricalData(response.data);
       } catch (error) {
         console.error('Error al obtener los datos:', error);
@@ -33,7 +31,8 @@ const DescargasHistoricas = () => {
     fetchData();
   }, []);
   
-  const filteredData = historicalData.flatMap(row => row.humidity.map((humidityRow, i) => ({
+  const filteredData = historicalData
+  .flatMap(row => row.humidity.map((humidityRow, i) => ({
     id_nodo: row.id_nodo,
     humidity: humidityRow.value,
     temperature: row.temperature[i]?.value || 0,
@@ -41,10 +40,21 @@ const DescargasHistoricas = () => {
     precipitation: row.precipitation[i]?.value || 0,
     wind: row.wind[i]?.value || 0,
     timestamp: humidityRow.timestamp,
-  }))).filter(row => {
+  })))
+  .filter(row => {
     const rowDate = new Date(row.timestamp);
     return rowDate >= new Date(startDate) && rowDate <= new Date(endDate);
-  });
+  })
+  .sort((a, b) => {
+    const dateA = new Date(a.timestamp);
+    const dateB = new Date(b.timestamp);
+
+    if (dateA < dateB) return -1;
+    if (dateA > dateB) return 1;
+
+    return a.id_nodo - b.id_nodo;
+  }).reverse(); 
+
 
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
@@ -116,7 +126,7 @@ const DescargasHistoricas = () => {
           </Box>
           <Box>
             <label htmlFor="end-date" style={{ fontWeight: 'bold', marginBottom: '8px', display: 'block', fontSize:"20px"}}>Fecha Fin:</label>
-            <Input id="end-date" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} min={startDate} />
+            <Input id="end-date" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} min={startDate} max={argentinaDate}/>
           </Box>
             <Button  mt="10" colorScheme="teal" size="md" onClick={downloadCSV}>Descargar CSV</Button>
         </Flex>
@@ -198,7 +208,9 @@ const DescargasHistoricas = () => {
               ) : (
                 paginatedData.map((row, index) => (
                   <Tr 
-                    bg={index % 2 === 0 ? useColorModeValue('gray.100', 'gray.700') : useColorModeValue('gray.300', 'gray.500')}
+                    key={`${row.id_nodo}-${index}`}
+                    bg={colorMode === 'light' ? 'white' : 'gray.700'} 
+                    color={colorMode === 'light' ? 'black' : 'white'}
                   >
                     <Td textAlign="center">{row.id_nodo}</Td>
                     <Td textAlign="center">{formatDate(row.timestamp)} {formatHour(row.timestamp)}</Td>

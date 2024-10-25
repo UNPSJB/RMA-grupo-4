@@ -46,7 +46,7 @@ function HistoricosPage() {
   const [selectedVariable, setSelectedVariable] = useState('Temperatura');
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
   const [selectedMonth, setSelectedMonth] = useState((new Date().getMonth() + 1).toString().padStart(2, '0'));
-  const [selectedDay, setSelectedDay] = useState(new Date().getDate().toString());
+  const [selectedDay, setSelectedDay] = useState('21');
   const [chartData, setChartData] = useState(null);
   const [days, setDays] = useState([]);
   const [historicalData, setHistoricalData] = useState([]);
