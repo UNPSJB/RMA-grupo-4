@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, Select, Flex, useColorMode, Table, Thead, Tbody, Tr, Th, Td, } from '@chakra-ui/react';
+import { Box, Heading, Select, Flex, useColorMode, Table, Thead, Tbody, Tr, Th, Td, Input} from '@chakra-ui/react';
 import { Chart as ChartJS, registerables } from 'chart.js';
-import { Line, Bar, PolarArea } from 'react-chartjs-2'; // Importar diferentes tipos de gráficos
+import { Line, Bar, PolarArea } from 'react-chartjs-2'; 
 import axios from 'axios';
 
 ChartJS.register(...registerables);
@@ -22,54 +22,28 @@ const variableMapping = {
   Precipitacion: 'precipitation',
 };
 
-const months = [
-  { name: 'Enero', value: '01' },
-  { name: 'Febrero', value: '02' },
-  { name: 'Marzo', value: '03' },
-  { name: 'Abril', value: '04' },
-  { name: 'Mayo', value: '05' },
-  { name: 'Junio', value: '06' },
-  { name: 'Julio', value: '07' },
-  { name: 'Agosto', value: '08' },
-  { name: 'Septiembre', value: '09' },
-  { name: 'Octubre', value: '10' },
-  { name: 'Noviembre', value: '11' },
-  { name: 'Diciembre', value: '12' },
-];
-
-const years = [
-  { value: '2024' },
-];
-
 function HistoricosPage() {
   const { colorMode } = useColorMode();
   const [selectedVariable, setSelectedVariable] = useState('Temperatura');
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
-  const [selectedMonth, setSelectedMonth] = useState((new Date().getMonth() + 1).toString().padStart(2, '0'));
-  const [selectedDay, setSelectedDay] = useState('21');
   const [chartData, setChartData] = useState(null);
-  const [days, setDays] = useState([]);
   const [historicalData, setHistoricalData] = useState([]);
   const [options, setOptions] = useState({});
   const [optionsPolar, setOptionsPolar] = useState({});
+  const today = new Date();
+  const argentinaOffset = today.getTimezoneOffset() + 180; // UTC-3
+  const argentinaDate = new Date(today.getTime() - argentinaOffset * 60000).toISOString().split('T')[0];
+  const [selectedDate, setSelectedDate] = useState(argentinaDate);
 
-  const getDias = (year, month) => Array.from({ length: new Date(year, month, 0).getDate() }, (_, i) => i + 1);
-
-  useEffect(() => {
-    if (selectedYear && selectedMonth) {
-      const monthIndex = parseInt(selectedMonth, 10);
-      const daysArray = getDias(selectedYear, monthIndex);
-      setDays(daysArray);
-    }
-  }, [selectedYear, selectedMonth]);
+  const [availableDates, setAvailableDates] = useState([]);
+  const [noData, setNoData] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:8000/api/v1/clima/nodos/historico');
-
         const nodes = response.data;
         let processedData = [];
+        let datesSet = new Set();
 
         nodes.forEach(node => {
           const entry = {};
@@ -82,6 +56,8 @@ function HistoricosPage() {
             variableData.forEach(item => {
               const date = new Date(item.timestamp);
               const timeKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${date.getHours()}:00`;
+              datesSet.add(`${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`); // Guardamos la fecha
+
               if (!entry[timeKey]) {
                 entry[timeKey] = {
                   id: node.id_nodo,
@@ -102,13 +78,26 @@ function HistoricosPage() {
           Object.values(entry).forEach(e => processedData.push(e));
         });
 
-        processedData = processedData.filter(item => {
-          if (selectedYear && item.year !== parseInt(selectedYear)) return false;
-          if (selectedMonth && item.month !== parseInt(selectedMonth)) return false;
-          if (selectedDay && item.day !== parseInt(selectedDay)) return false;
+        // Convertimos el Set a un array y lo guardamos como fechas disponibles
+        setAvailableDates(Array.from(datesSet));
 
-          return item[selectedVariable] !== '-' && item[selectedVariable] !== null && !isNaN(item[selectedVariable]);
+        processedData = processedData.filter(item => {
+          const [year, month, day] = selectedDate.split('-').map(Number);
+          return (
+            item.year === year &&
+            item.month === month &&
+            item.day === day &&
+            item[selectedVariable] !== '-' &&
+            item[selectedVariable] !== null &&
+            !isNaN(item[selectedVariable])
+          );
         });
+
+        if (processedData.length === 0) {
+          setNoData(true);
+        } else {
+          setNoData(false);
+        }
 
         setHistoricalData(processedData);
       } catch (error) {
@@ -117,7 +106,7 @@ function HistoricosPage() {
     };
 
     fetchData();
-  }, [selectedYear, selectedMonth, selectedDay, selectedVariable]);
+  }, [selectedDate, selectedVariable]);
 
   useEffect(() => {
     if (historicalData.length === 0) return;
@@ -257,6 +246,7 @@ function HistoricosPage() {
   }, [historicalData, selectedVariable, colorMode]);
 
   const renderChart = () => {
+    if (noData) return <Box textAlign="center" mt={4}>No hay datos disponibles para esta fecha.</Box>;
     if (!chartData) return null;
 
     if (selectedVariable === 'Temperatura' || selectedVariable === 'Presión') {
@@ -284,36 +274,23 @@ function HistoricosPage() {
             <option key={v.name} value={v.name}>{v.name}</option>
           ))}
         </Select>
-        <Select
-          value={selectedYear}
-          onChange={(e) => setSelectedYear(e.target.value)}
-          width="100px"
-          variant="outline"
-        >
-          {years.map((m) => (
-            <option key={m.value} value={m.value}>{m.value}</option>
-          ))}
-        </Select>
-        <Select
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
-          width="120px"
-          variant="outline"
-        >
-          {months.map((m) => (
-            <option key={m.value} value={m.value}>{m.name}</option>
-          ))}
-        </Select>
-        <Select
-          value={selectedDay}
-          onChange={(e) => setSelectedDay(e.target.value)}
-          width="90px"
-          variant="outline"
-        >
-          {days.map((d) => (
-            <option key={d} value={d}>{d}</option>
-          ))}
-        </Select>
+        <Box>
+          <Input
+            id="date-selector"
+            type="date"
+            value={selectedDate}
+            onChange={(e) => {
+              const newDate = e.target.value;
+              if (availableDates.includes(newDate)) {
+                setSelectedDate(newDate);
+              } else {
+                alert("No hay datos disponibles para la fecha seleccionada.");
+              }
+            }}
+            min="2024-10-01" 
+            max={argentinaDate}
+          />
+        </Box>
       </Flex>
 
       <Box borderRadius="md" boxShadow="md" height="400px" maxHeight="400px" overflow="hidden" bg={colorMode === 'light' ? 'white' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
