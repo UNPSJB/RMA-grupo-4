@@ -1,8 +1,4 @@
-from pydantic import BaseModel, StrictFloat, EmailStr, field_validator
-from typing import List
-from datetime import datetime
-from src.example.constants import ErrorCode
-from src.example import exceptions
+from pydantic import BaseModel, StrictFloat, field_validator, root_validator
 from typing import Optional
 
 class CrearNodo(BaseModel):
@@ -18,9 +14,10 @@ class ModificarNodo(BaseModel):
     latitud: Optional[float] = None
     descripcion: Optional[str] = None
 
+
 class RespuestaNodo(BaseModel): 
-    id:int
-    alias:str
-    longitud:float
+    id: int
+    alias: str
+    longitud: float
     latitud: float
     descripcion: str

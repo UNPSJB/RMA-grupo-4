@@ -15,9 +15,9 @@ def Crear_Nodo(alias: CrearNodo, db: Session = Depends(get_db)):
     return crear_nodo(db = db, alias = alias)
 
 
-@router.put("/modificar_datos_nodo/{nodo}", response_model=RespuestaNodo)
-def modificar_datos_nodo(alias: str, datos: ModificarNodo, db: Session = Depends(get_db)):
-    db_nodo = get_nodo(db, alias)
+@router.put("/modificar_datos_nodo/{id}", response_model=RespuestaNodo)
+def modificar_datos_nodo(id: int, datos: ModificarNodo, db: Session = Depends(get_db)):
+    db_nodo = get_nodo_por_id(db, id)  # Cambiar a la función que busca por ID
     if db_nodo is None:
         raise HTTPException(status_code=404, detail="Nodo no encontrado")
     
@@ -27,14 +27,19 @@ def modificar_datos_nodo(alias: str, datos: ModificarNodo, db: Session = Depends
     return nodo_modificado
 
 
-@router.delete("/eliminar_nodo/{nodo}", response_model=RespuestaNodo)
+
+@router.delete("/eliminar_nodo/{alias}", response_model=RespuestaNodo)
 def eliminar_nodo(alias: str, db: Session = Depends(get_db)):
     db_nodo = get_nodo(db, alias)
     if db_nodo is None:
         raise HTTPException(status_code=404, detail="Nodo no encontrado")
     
-    # Eliminar el nodo de la base de datos
     db.delete(db_nodo)
     db.commit()
     
     return db_nodo  # Devuelve el nodo eliminado (opcional)
+
+@router.get("/obtenerNodos", response_model=List[RespuestaNodo])
+def obtener_nodos(db: Session = Depends(get_db)):
+    nodos = get_all_nodos(db)
+    return nodos

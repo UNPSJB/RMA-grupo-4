@@ -36,7 +36,7 @@ function NavigationButtons() {
     { text: "Analisis Avanzado", route: "/comparativo" },
     { text: "Suscripcion a alertas", route: "/generar_qr" },
     { text: "Tabla auditoria", route: "/auditoria" },
-    { text: "Aagregar Nodo", route: "/crear_nodo" }
+    { text: "Agregar Nodo", route: "/crear_nodo" }
   ];
 
   return (

@@ -28,6 +28,9 @@ def crear_nodo(db: Session, alias: CrearNodo):
 def get_nodo(db: Session, alias: str):
     return db.query(Nodo).filter(Nodo.alias == alias).first()
 
+def get_nodo_por_id(db: Session, id: int):
+    return db.query(Nodo).filter(Nodo.id == id).first()
+
 def modificar_nodo(db: Session, db_nodo: Nodo, datos: ModificarNodo):
     if datos.alias is not None:
         db_nodo.alias = datos.alias
@@ -41,4 +44,7 @@ def modificar_nodo(db: Session, db_nodo: Nodo, datos: ModificarNodo):
     db.commit()
     db.refresh(db_nodo)
     return db_nodo
+
+def get_all_nodos(db: Session):
+    return db.query(Nodo).all()
     
