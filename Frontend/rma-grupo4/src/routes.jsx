@@ -20,6 +20,7 @@ import PantallaComparativa from './analisis/PantallaComparativa';
 import GeneraQR from './utils/GeneraQR';
 import TablaDatosHistoricos from './pages/TablaDatosHistoricos'; 
 import TablaAuditoria from './pages/TablaAuditoria';
+import CrearNodo from './components/Nodo';
 
 function AppRoutes() {
   return (
@@ -190,6 +191,16 @@ function AppRoutes() {
             <App>
               <PrivateRoute>
                 <GeneraQR />
+              </PrivateRoute>
+            </App>
+          } 
+        />
+        <Route 
+          path="/crear_nodo" 
+          element={
+            <App>
+              <PrivateRoute>
+                <CrearNodo/>
               </PrivateRoute>
             </App>
           } 
