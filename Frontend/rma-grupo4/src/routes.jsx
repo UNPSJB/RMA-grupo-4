@@ -19,6 +19,7 @@ import HelpModal from './components/HelpModal';
 import PantallaComparativa from './analisis/PantallaComparativa';
 import GeneraQR from './utils/GeneraQR';
 import TablaDatosHistoricos from './pages/TablaDatosHistoricos'; 
+import TablaAuditoria from './pages/TablaAuditoria';
 
 function AppRoutes() {
   return (
@@ -109,6 +110,16 @@ function AppRoutes() {
             <App>
               <PrivateRoute>
                 <TablaDatosHistoricos />
+              </PrivateRoute>
+            </App>
+          } 
+        />
+         <Route 
+          path="/auditoria" 
+          element={
+            <App>
+              <PrivateRoute>
+                <TablaAuditoria />
               </PrivateRoute>
             </App>
           } 

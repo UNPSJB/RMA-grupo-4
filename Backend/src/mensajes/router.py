@@ -4,7 +4,7 @@ from sqlalchemy import func
 from typing import List, Optional
 from datetime import datetime, time
 from src.database import get_db  
-from src.models import Mensaje  
+from src.models import Mensaje, MensajeAuditoria
 from src.mensajes.schemas import (
     TemperatureData, 
     TemperatureResponse,
@@ -19,7 +19,7 @@ from src.mensajes.schemas import (
     NodeSummary,
     NodeSummaryResponse,
     NodeHistoricalData,
-    HistoricalDataPoint
+    HistoricalDataPoint,
 )
 from fastapi.responses import StreamingResponse
 from src.utils.qr_utils import obtener_enlace_invitacion, generar_qr
@@ -480,3 +480,11 @@ def get_node_historical_data(
             historical_response.append(NodeHistoricalData(**data))
 
     return historical_response
+
+
+@router.get("/mensajes/auditoria")
+def obtener_mensajes_auditoria(tipo_mensaje: str = None, db: Session = Depends(get_db)):
+    query = db.query(MensajeAuditoria)
+    if tipo_mensaje:
+        query = query.filter(MensajeAuditoria.tipo_mensaje == tipo_mensaje)
+    return query.all()

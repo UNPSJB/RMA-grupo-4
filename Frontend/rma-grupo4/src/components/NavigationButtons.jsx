@@ -35,6 +35,7 @@ function NavigationButtons() {
     { text: "Tabla Datos Historicos", route: "/tabla_datos_historicos" },
     { text: "Analisis Avanzado", route: "/comparativo" },
     { text: "Suscripcion a alertas", route: "/generar_qr" },
+    { text: "Tabla auditoria", route: "/auditoria" },
   ];
 
   return (
