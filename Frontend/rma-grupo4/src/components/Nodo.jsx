@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, FormControl, FormLabel, Input, Button, Textarea, useToast, HStack, useColorMode, Table, Thead, Tbody, Tr, Th, Td, IconButton
+  Box, FormControl, Heading, FormLabel, Input, Button, Textarea, useToast, VStack, HStack , useColorMode, Table, Thead, Tbody, Tr, Th, Td, IconButton
 } from '@chakra-ui/react';
 import { FaTrashAlt, FaPen } from "react-icons/fa";
-import Mapa from '../analisis/Mapa';
+import MapaNodo from '../analisis/MapaNodo';
 
 const CrearNodo = () => {
   const [formData, setFormData] = useState({
@@ -47,12 +47,20 @@ const CrearNodo = () => {
 
   useEffect(() => {
     fetchNodos();
-  }, []);
+  }, );
 
   // Maneja los cambios en el formulario
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleMapClick = (lat, lng) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      latitud: lat,
+      longitud: lng,
+    }));
   };
 
   // Maneja el envío del formulario (crear/modificar)
@@ -153,21 +161,93 @@ const CrearNodo = () => {
   };
 
   return (
-    <HStack display="flex" justifyContent="center" alignItems="center" minHeight="100vh" spacing={10}>
+    <VStack display="flex" justifyContent="center" alignItems="center" minHeight="100vh" spacing={4} p={4} bg={colorMode === 'light' ? 'white' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'}>
+      <Heading as="h1" m={7} textAlign="center">Gestión Nodos</Heading>
+      {/* Fila para el Formulario y el Mapa */}
+      <HStack spacing={4}>
+        {/* Formulario para Crear/Modificar Nodo */}
+        <Box height="450px" maxW="sm" p={4} borderWidth="1px" borderRadius="lg" bg={isLight ? 'white' : 'gray.800'}>
+          <form onSubmit={handleSubmit}>
+            <FormControl isRequired>
+              <FormLabel color={isLight ? 'black' : 'white'}>Alias</FormLabel>
+              <Input
+                name="alias"
+                value={formData.alias}
+                onChange={handleChange}
+                placeholder="Ingrese el alias"
+                color={isLight ? 'black' : 'white'}
+                borderColor={isLight ? 'black' : 'white'}
+              />
+            </FormControl>
+            <FormControl isRequired mt={4}>
+              <FormLabel color={isLight ? 'black' : 'white'}>Longitud</FormLabel>
+              <Input
+                name="longitud"
+                type="number"
+                step="any"
+                value={formData.longitud}
+                onChange={handleChange}
+                placeholder="Ingrese la longitud"
+                color={isLight ? 'black' : 'white'}
+                borderColor={isLight ? 'black' : 'white'}
+              />
+            </FormControl>
+            <FormControl isRequired mt={4}>
+              <FormLabel color={isLight ? 'black' : 'white'}>Latitud</FormLabel>
+              <Input
+                name="latitud"
+                type="number"
+                step="any"
+                value={formData.latitud}
+                onChange={handleChange}
+                placeholder="Ingrese la latitud"
+                color={isLight ? 'black' : 'white'}
+                borderColor={isLight ? 'black' : 'white'}
+              />
+            </FormControl>
+            <FormControl mt={4}>
+              <FormLabel color={isLight ? 'black' : 'white'}>Descripción</FormLabel>
+              <Textarea
+                name="descripcion"
+                value={formData.descripcion}
+                onChange={handleChange}
+                placeholder="Ingrese una descripción"
+                color={isLight ? 'black' : 'white'}
+                borderColor={isLight ? 'black' : 'white'}
+              />
+            </FormControl>
+            <Button mt={2} colorScheme="blue" type="submit">
+              {editingNodeId ? 'Modificar Nodo' : 'Crear Nodo'}
+            </Button>
+          </form>
+        </Box>
+  
+        {/* Componente de Mapa */}
+        <Box height="450px" width="lg" p={2} borderWidth="1px" borderRadius="lg" bg={isLight ? 'white' : 'gray.800'}>
+          <MapaNodo onMapClick={handleMapClick}/>
+        </Box>
+      </HStack>
+  
       {/* Tabla de Nodos Existentes */}
-      <Box maxW="sm" p={4} borderWidth="1px" borderRadius="lg" bg={isLight ? 'white' : 'gray.800'}>
+      <Box maxW="800px" p={4} borderWidth="1px" borderRadius="lg" bg={isLight ? 'white' : 'gray.800'} mb={4}>
         <Table variant="simple">
           <Thead>
             <Tr>
-              <Th color={isLight ? 'black' : 'white'}>Alias</Th>
-              <Th color={isLight ? 'black' : 'white'}>Acciones</Th>
+              <Th textAlign={'center'} color={isLight ? 'black' : 'white'}>Id Nodo</Th>
+              <Th textAlign={'center'} color={isLight ? 'black' : 'white'}>Alias</Th>
+              <Th textAlign={'center'} color={isLight ? 'black' : 'white'}>Latitud</Th>
+              <Th textAlign={'center'} color={isLight ? 'black' : 'white'}>Longitud</Th>
+              <Th textAlign={'center'} color={isLight ? 'black' : 'white'}>Acciones</Th>
             </Tr>
           </Thead>
           <Tbody>
             {nodos.map((nodo) => (
               <Tr key={nodo.id}>
-                <Td color={isLight ? 'black' : 'white'}>{nodo.alias}</Td>
-                <Td>
+                <Td textAlign={'center'} color={isLight ? 'black' : 'white'}>{nodo.id}</Td>
+                <Td textAlign={'center'} color={isLight ? 'black' : 'white'}>{nodo.alias}</Td>
+                <Td textAlign={'center'} color={isLight ? 'black' : 'white'}>{nodo.latitud}</Td>
+                <Td textAlign={'center'} color={isLight ? 'black' : 'white'}>{nodo.longitud}</Td>
+                <Td textAlign={'center'}>
                   <IconButton
                     aria-label="Edit Node"
                     icon={<FaPen />}
@@ -185,75 +265,8 @@ const CrearNodo = () => {
           </Tbody>
         </Table>
       </Box>
-
-      {/* Formulario para Crear/Modificar Nodo */}
-      <Box maxW="sm" p={4} borderWidth="1px" borderRadius="lg" bg={isLight ? 'white' : 'gray.800'}>
-        <form onSubmit={handleSubmit}>
-          <FormControl isRequired>
-            <FormLabel color={isLight ? 'black' : 'white'}>Alias</FormLabel>
-            <Input
-              name="alias"
-              value={formData.alias}
-              onChange={handleChange}
-              placeholder="Ingrese el alias"
-              color={isLight ? 'black' : 'white'}
-              borderColor={isLight ? 'black' : 'white'}
-            />
-          </FormControl>
-          <FormControl isRequired mt={4}>
-            <FormLabel color={isLight ? 'black' : 'white'}>Longitud</FormLabel>
-            <Input
-              name="longitud"
-              type="number"
-              step="any"
-              value={formData.longitud}
-              onChange={handleChange}
-              placeholder="Ingrese la longitud"
-              color={isLight ? 'black' : 'white'}
-              borderColor={isLight ? 'black' : 'white'}
-            />
-          </FormControl>
-          <FormControl isRequired mt={4}>
-            <FormLabel color={isLight ? 'black' : 'white'}>Latitud</FormLabel>
-            <Input
-              name="latitud"
-              type="number"
-              step="any"
-              value={formData.latitud}
-              onChange={handleChange}
-              placeholder="Ingrese la latitud"
-              color={isLight ? 'black' : 'white'}
-              borderColor={isLight ? 'black' : 'white'}
-            />
-          </FormControl>
-          <FormControl mt={4}>
-            <FormLabel color={isLight ? 'black' : 'white'}>Descripción</FormLabel>
-            <Textarea
-              name="descripcion"
-              value={formData.descripcion}
-              onChange={handleChange}
-              placeholder="Ingrese una descripción"
-              color={isLight ? 'black' : 'white'}
-              borderColor={isLight ? 'black' : 'white'}
-            />
-          </FormControl>
-          <Button mt={6} colorScheme="blue" type="submit">
-            {editingNodeId ? 'Modificar Nodo' : 'Crear Nodo'}
-          </Button>
-        </form>
-      </Box>
-      <Box
-        width="lg"
-        maxW="md"
-        p={2}
-        borderWidth="1px"
-        borderRadius="lg"
-        bg={isLight ? 'white' : 'gray.800'}
-      >
-        <Mapa />
-      </Box>
-    </HStack>
-  );
+    </VStack>
+  );    
 };
 
 export default CrearNodo;
