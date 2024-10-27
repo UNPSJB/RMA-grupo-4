@@ -2,7 +2,8 @@ from fastapi import APIRouter, HTTPException, Query, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List, Optional
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
+from collections import defaultdict
 from src.database import get_db  
 from src.models import Mensaje, MensajeAuditoria
 from src.mensajes.schemas import (
@@ -433,54 +434,75 @@ def get_node_historical_data(
         Mensaje.time.label("timestamp")
     )
 
-    # Aplicar filtros de fecha
+    # Aplica filtros de fecha
     if start_date:
         query = query.filter(Mensaje.time >= start_date)
     if end_date:
         query = query.filter(Mensaje.time <= end_date)
 
-    # Aplicar filtro de variable
+    # Aplica filtro de variable
     if variable:
         if variable in type_to_field:
             query = query.filter(Mensaje.type == variable)
         else:
             raise HTTPException(status_code=400, detail="Variable inválida")
 
+    # Obtiene resultados ordenados
     results = query.order_by(Mensaje.id_nodo, Mensaje.type, Mensaje.time).all()
 
-    node_data = {}
+    # Diccionario para almacenar datos agrupados
+    node_data = defaultdict(lambda: {
+        "id_nodo": None,
+        "temperature": defaultdict(list),
+        "humidity": defaultdict(list),
+        "pressure": defaultdict(list),
+        "precipitation": defaultdict(list),
+        "wind": defaultdict(list)
+    })
 
+    # Agrupa por nodo, tipo y hora
     for record in results:
         node_id = record.id_nodo
-        if node_id not in node_data:
-            node_data[node_id] = {
-                "id_nodo": node_id,
-                "temperature": [],
-                "humidity": [],
-                "pressure": [],
-                "precipitation": [],
-                "wind": []
-            }
+        variable_type = record.type
+        hourly_timestamp = record.timestamp.replace(minute=0, second=0, microsecond=0)  # Redondea a la hora
 
-        if record.type in type_to_field:
+        # Convierte el valor a flotante y agrega al acumulador correspondiente
+        if variable_type in type_to_field:
             try:
-                data_point = HistoricalDataPoint(
-                    timestamp=record.timestamp,
-                    value=float(record.data)
-                )
-                node_data[node_id][type_to_field[record.type]].append(data_point)
+                data_point = float(record.data)
+                # Agrega el dato al grupo de la hora redondeada
+                node_data[node_id][type_to_field[variable_type]][hourly_timestamp].append(data_point)
+                node_data[node_id]["id_nodo"] = node_id
             except ValueError:
                 pass  # Ignora datos inválidos
 
-    # Filtrar nodos sin datos
+    # Crea respuesta final calculando promedios por hora
     historical_response = []
-    for data in node_data.values():
-        # Verifica si hay al menos un valor válido para la variable seleccionada
-        if any(data[var] for var in type_to_field.values()):
-            historical_response.append(NodeHistoricalData(**data))
+    for node_id, data in node_data.items():
+        # Crea diccionario con datos promediados
+        averaged_data = {
+            "id_nodo": node_id,
+            "temperature": [],
+            "humidity": [],
+            "pressure": [],
+            "precipitation": [],
+            "wind": []
+        }
+
+        # Calcula el promedio para cada hora
+        for variable, hourly_data in data.items():
+            if variable != "id_nodo":  # Omite id_nodo en el cálculo
+                for timestamp, values in hourly_data.items():
+                    # Crea punto de datos promedio
+                    if values:  # se asegura de que haya valores
+                        avg_value = sum(values) / len(values)
+                        averaged_data[variable].append(HistoricalDataPoint(timestamp=timestamp, value=avg_value))
+
+        # Verifica si hay al menos un dato válido para la respuesta
+        if any(averaged_data[var] for var in type_to_field.values()):
+            historical_response.append(NodeHistoricalData(**averaged_data))
 
     return historical_response
-
 
 @router.get("/mensajes/auditoria")
 def obtener_mensajes_auditoria(tipo_mensaje: str = None, db: Session = Depends(get_db)):
