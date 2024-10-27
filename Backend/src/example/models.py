@@ -5,6 +5,12 @@ from enum import auto, StrEnum
 from datetime import datetime, UTC
 from src.models import BaseModel
 
+class Rol(BaseModel):
+    __tablename__ = "roles"
+
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String, unique=True, index=True)
+
 class Usuario(BaseModel):
     __tablename__ = "usuarios"
 
@@ -13,4 +19,6 @@ class Usuario(BaseModel):
     email = Column(String, unique=True, index=True)
     edad = Column(Integer)
     password = Column(String)
-    rol = Column(String, default="estudiante")  # Nuevo campo para el rol
+    rol_id = Column(Integer, ForeignKey("roles.id"), nullable=False)  # FK al rol
+    rol = relationship("Rol", backref="usuarios")
+

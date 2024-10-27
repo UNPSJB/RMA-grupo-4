@@ -25,7 +25,8 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     if not bcrypt.checkpw(request.password.encode('utf-8'), db_usuario.password.encode('utf-8')):
         raise HTTPException(status_code=401, detail="Credenciales incorrectas")
 
-    token = crear_token(request.usuario, db_usuario.rol)  # Pasamos el rol al crear el token
+    # Crear el token con el nombre del rol correspondiente
+    token = crear_token(request.usuario, db_usuario.rol_id, db)  
     return {"token": token}  # Devuelve el token al frontend
 
 @router.get("/usuarios/{usuario}", response_model=RespuestaUsuario)
@@ -62,8 +63,16 @@ def eliminar_usuario(usuario: str, db: Session = Depends(get_db)):
     
     return db_usuario  # Devuelve el usuario eliminado (opcional)
 
-@router.get("/test_rol", dependencies=[Depends(verificar_rol("profesional"))])
+@router.get("/test_rol", dependencies=[Depends(verificar_rol("profesional", "universidad"))])
 def acceso_roles(db: Session = Depends(get_db)):
-    return {"mensaje": "Acceso permitido para profesionales"}
+    return {"mensaje": "Acceso permitido "}
 
+@router.get("/roles", response_model=list[str])
+def get_roles(db: Session = Depends(get_db)):
+    """Endpoint temporal para obtener los roles válidos."""
+    return obtener_roles_validos(db)
 
+@router.get("/rol_invitado", response_model=int)
+def get_roles(db: Session = Depends(get_db)):
+    """Endpoint temporal para obtener los roles válidos."""
+    return obtener_rol_invitado(db)

@@ -4,22 +4,21 @@ from datetime import datetime
 from src.example.constants import ErrorCode
 from src.example import exceptions
 from typing import Optional
-
-# Los siguientes schemas contienen atributos sin muchas restricciones de tipo.
-# Podemos crear atributos con ciertas reglas mediante el uso de un "Field" adecuado.
-# https://docs.pydantic.dev/latest/concepts/fields/
+from src.example.services import *
 
 class CrearUsuario(BaseModel):
     usuario: str
     email: str
     edad: int
     password: str
-    rol: str  # Añadido para seleccionar "estudiante" o "profesional"
+    rol_id: int
     
-    @field_validator('rol')
-    def validar_rol(cls, v):
-        if v not in ["estudiante", "profesional"]:
-            raise ValueError("El rol debe ser 'estudiante' o 'profesional'")
+    @classmethod
+    def validar_rol(cls, v, values, **kwargs):
+        db: Session = kwargs.get("db")  # Recibe la sesión de la BD
+        roles_validos = obtener_roles_validos(db)
+        if v not in roles_validos:
+            raise ValueError(f"El rol debe ser uno de los siguientes: {', '.join(roles_validos)}")
         return v
 
 class RespuestaUsuario(BaseModel): 
@@ -27,6 +26,7 @@ class RespuestaUsuario(BaseModel):
     usuario:str
     email:str
     edad: int
+    rol_id: int  
 
 class LoginRequest(BaseModel):
     usuario: str

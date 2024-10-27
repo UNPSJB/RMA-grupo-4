@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Box, Input, Button, FormControl, FormLabel, Heading, Text, Select, useToast, useColorMode, Switch } from '@chakra-ui/react';
@@ -8,10 +8,41 @@ function Registrar() {
     const [email, setEmail] = useState('');
     const [edad, setEdad] = useState('');
     const [password, setPassword] = useState('');
-    const [rol, setRol] = useState('estudiante');
+    const [rolId, setRolId] = useState(null); // Estado para almacenar el rol_id
     const navigate = useNavigate();
     const toast = useToast();
-    const { colorMode, toggleColorMode } = useColorMode(); // Para manejar el modo de color
+    const { colorMode } = useColorMode(); // Para manejar el modo de color
+
+    useEffect(() => {
+        const fetchRolId = async () => {
+            try {
+                const response = await axios.get('http://localhost:8000/rol_invitado');
+                setRolId(response.data); // Suponiendo que la respuesta es solo el rol_id
+                console.log(response.data);
+            } catch (error) {
+                console.error('Error al obtener el rol:', error);
+                toast({
+                    render: () => (
+                        <Box 
+                            color="white" 
+                            bg="red.600" 
+                            borderRadius="md" 
+                            p={5} 
+                            mb={4}
+                            boxShadow="md"
+                            fontSize="lg" 
+                        >
+                            Error al obtener el rol. Intente nuevamente.
+                        </Box>
+                    ),
+                    duration: 2000,
+                    isClosable: true,
+                });
+            }
+        };
+
+        fetchRolId();
+    }, []); // Solo se ejecuta al montar el componente
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -21,7 +52,7 @@ function Registrar() {
                 email,
                 edad: parseInt(edad),
                 password,
-                rol
+                rol_id: rolId
             });
             toast({
                 render: () => (
@@ -168,7 +199,7 @@ function Registrar() {
                         />
                     </FormControl>
 
-                    <FormControl id="rol" mb={6} isRequired>
+                    {/* <FormControl id="rol" mb={6} isRequired>
                         <FormLabel color={colorMode === 'light' ? "gray.800" : "gray.300"}>Rol</FormLabel>
                         <Select
                             value={rol}
@@ -185,7 +216,7 @@ function Registrar() {
                             <option value="estudiante">Estudiante</option>
                             <option value="profesional">Profesional</option>
                         </Select>
-                    </FormControl>
+                    </FormControl> */}
 
                     <Button 
                         type="submit" 
