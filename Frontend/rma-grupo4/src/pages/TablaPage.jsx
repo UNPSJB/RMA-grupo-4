@@ -14,7 +14,7 @@ function TablaPage({ onRowSelection }) {
   const [isCm, setIsCm] = useState(false);
   const [isMobile] = useMediaQuery("(max-width: 48em)");
   const { colorMode } = useColorMode();  // Hook para el modo de color
-  const rowsPerPage = isMobile ? 3 : 3;
+  const rowsPerPage = isMobile ? 1 : 3;
 
   useEffect(() => {
     let timeoutId;
@@ -128,7 +128,7 @@ function TablaPage({ onRowSelection }) {
     >
       <Box overflowX="auto">
         <Table variant="simple" colorScheme="whiteAlpha" size={isMobile ? "xs" : "md"}>
-          <Thead>
+          <Thead display={{ base: "none", md: "table-header-group" }}>
             <Tr>
               <Th onClick={() => handleSort("Nodo")}>
                 <Center color={colorMode === 'light' ? 'black' : 'white'}>
@@ -194,10 +194,15 @@ function TablaPage({ onRowSelection }) {
                   </Button>
                 </Center>
               </Th>
-              <Th>
+              <Th onClick={() => handleSort("Timestamp")}>
                 <Center color={colorMode === 'light' ? 'black' : 'white'}>
                   <FaClock size="1.5em" style={{ marginRight: "5px" }} />
                   Hora
+                  {sortConfig.key === "Timestamp" && (
+                    <span style={{ marginLeft: "5px" }}>
+                      {sortConfig.direction === "asc" ? "↑" : "↓"}
+                    </span>
+                  )}
                 </Center>
               </Th>
             </Tr>
@@ -216,30 +221,90 @@ function TablaPage({ onRowSelection }) {
                   onClick={() => handleRowClick(index)}
                   bg={selectedRowIndex === index ? (colorMode === 'light' ? "gray.100" : "gray.700") : "transparent"}
                   _hover={{ backgroundColor: colorMode === 'light' ? "gray.100" : "gray.700" }}
+                  display={{ base: "flex", md: "table-row" }} 
+                  flexDirection={{ base: "column", md: "row" }} 
                 >
-                  <Td textAlign="center">{row.Nodo}</Td>
-                  <Td textAlign="center">{formatNumber(row.Humedad)} {row.Humedad == "--" ? '' : '%'}</Td>
-                  <Td textAlign="center">
+                  <Td 
+                    textAlign="center" 
+                    _before={{ 
+                      content: '"Nodo: "', 
+                      fontWeight: "bold", 
+                      display: { base: "inline-block", md: "none" },
+                      marginRight: "4px"
+                    }}
+                  >
+                    {row.Nodo}
+                  </Td>
+                  <Td 
+                    textAlign="center"
+                    _before={{ 
+                      content: '"Humedad: "', 
+                      fontWeight: "bold", 
+                      display: { base: "inline-block", md: "none" },
+                      marginRight: "4px"
+                    }}
+                  >
+                    {formatNumber(row.Humedad)} {row.Humedad === "--" ? '' : '%'}
+                  </Td>
+                  <Td
+                    textAlign="center"
+                    _before={{ 
+                      content: '"Temperatura: "', 
+                      fontWeight: "bold", 
+                      display: { base: "inline-block", md: "none" },
+                      marginRight: "4px"
+                    }}
+                  >
                     {isFahrenheit 
-                      ? formatNumber(convertToFahrenheit(row.Temperatura)) + (row.Temperatura == "--" ? '' : '°F') 
-                      : formatNumber(row.Temperatura) + (row.Temperatura == "--" ?  '' : "°C"
-                      )}
+                      ? formatNumber(convertToFahrenheit(row.Temperatura)) + (row.Temperatura === "--" ? '' : '°F') 
+                      : formatNumber(row.Temperatura) + (row.Temperatura === "--" ? '' : "°C")}
                   </Td>
-                  <Td textAlign="center" display={{ base: "none", md: "table-cell" }}>
-                    {formatNumber(row.Presion)} {row.Presion == "--" ? '' : 'hPa'}
+                  <Td 
+                   textAlign="center"
+                   _before={{ 
+                     content: '"Presión: "', 
+                     fontWeight: "bold", 
+                     display: { base: "inline-block", md: "none" },
+                      marginRight: "4px"
+                   }}
+                  >
+                    {formatNumber(row.Presion)} {row.Presion === "--" ? '' : 'hPa'}
                   </Td>
-                  <Td textAlign="center">
+                  <Td 
+                    textAlign="center"
+                    _before={{ 
+                      content: '"Viento: "', 
+                      fontWeight: "bold", 
+                      display: { base: "inline-block", md: "none" },
+                      marginRight: "4px"
+                    }}
+                  >
                     {isMtsXSegundo 
-                      ? formatNumber(convertToMetroXSeg(row.Viento)) + (row.Viento == "--" ? '' : 'm/s') 
-                      : formatNumber(row.Viento) + (row.Viento == "--" ? '' : 'km/h')}
+                      ? formatNumber(convertToMetroXSeg(row.Viento)) + (row.Viento === "--" ? '' : 'm/s') 
+                      : formatNumber(row.Viento) + (row.Viento === "--" ? '' : 'km/h')}
                   </Td>
-                  <Td textAlign="center">
+                  <Td 
+                    textAlign="center"
+                    _before={{ 
+                      content: '"Precipitación: "', 
+                      fontWeight: "bold", 
+                      display: { base: "inline-block", md: "none" },
+                      marginRight: "4px"
+                    }}
+                  >
                     {isCm 
-                      ? formatNumber(convertToCentimeters(parseFloat(row.Precipitacion))) + (row.Precipitacion == "--" ? '' : 'cm') 
-                      : formatNumber(row.Precipitacion) + (row.Precipitacion == "--" ? '' : 'mm')}
+                      ? formatNumber(convertToCentimeters(parseFloat(row.Precipitacion))) + (row.Precipitacion === "--" ? '' : 'cm') 
+                      : formatNumber(row.Precipitacion) + (row.Precipitacion === "--" ? '' : 'mm')}
                   </Td>
-
-                  <Td textAlign="center">{formatTime(row.Timestamp)}</Td>
+                  <Td 
+                    textAlign="center"
+                    _before={{ 
+                      content: '"Hora: "', 
+                      fontWeight: "bold", 
+                      display: { base: "inline-block", md: "none" },
+                      marginRight: "4px"
+                    }}
+                  >{formatTime(row.Timestamp)} Hs</Td>
                 </Tr>
               ))
             )}

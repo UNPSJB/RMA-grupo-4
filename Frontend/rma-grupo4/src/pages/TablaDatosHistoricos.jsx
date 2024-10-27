@@ -8,6 +8,7 @@ import { saveAs } from 'file-saver';
 const DescargasHistoricas = () => {
   const { colorMode } = useColorMode();
   const [historicalData, setHistoricalData] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ key: "value", direction: "asc" });
   const [page, setPage] = useState(1); // Estado para la paginación
   const [rowsPerPage] = useState(10); // Número de filas por página
   const [isFahrenheit, setIsFahrenheit] = useState(false); // Para conversión de temperatura
@@ -16,7 +17,7 @@ const DescargasHistoricas = () => {
   const today = new Date();
   const argentinaOffset = today.getTimezoneOffset() + 180; // UTC-3
   const argentinaDate = new Date(today.getTime() - argentinaOffset * 60000).toISOString().split('T')[0];
-  const [startDate, setStartDate] = useState(argentinaDate);
+  const [startDate, setStartDate] = useState(argentinaDate); 
   const [endDate, setEndDate] = useState(argentinaDate);
 
   useEffect(() => {
@@ -31,6 +32,12 @@ const DescargasHistoricas = () => {
     fetchData();
   }, []);
   
+  useEffect(() => {
+    if (new Date(endDate) < new Date(startDate)) {
+      setEndDate(startDate); 
+    }
+  }, [startDate, endDate]);
+
   const filteredData = historicalData
   .flatMap(row => row.humidity.map((humidityRow, i) => ({
     id_nodo: row.id_nodo,
@@ -43,18 +50,30 @@ const DescargasHistoricas = () => {
   })))
   .filter(row => {
     const rowDate = new Date(row.timestamp);
-    return rowDate >= new Date(startDate) && rowDate <= new Date(endDate);
+    const adjustedRowDate = new Date(rowDate.getTime() - argentinaOffset * 60000);
+    return adjustedRowDate >= new Date(startDate) && adjustedRowDate <= new Date(new Date(endDate).setDate(new Date(endDate).getDate() + 1));
   })
   .sort((a, b) => {
-    const dateA = new Date(a.timestamp);
-    const dateB = new Date(b.timestamp);
+    const { key, direction } = sortConfig;
+    const modifier = direction === "asc" ? 1 : -1;
 
-    if (dateA < dateB) return -1;
-    if (dateA > dateB) return 1;
+    if (key === "id_nodo") {
+      return (a[key] - b[key]) * modifier;
+    } else {
+      const dateA = new Date(a.timestamp);
+      const dateB = new Date(b.timestamp);
 
-    return a.id_nodo - b.id_nodo;
-  }).reverse(); 
+      return (dateA - dateB) * modifier;
+    }
+  }).reverse();
 
+  const handleSort = (columnKey) => {
+    let direction = "asc";
+    if (sortConfig.key === columnKey && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key: columnKey, direction });
+  };
 
   const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
@@ -122,7 +141,7 @@ const DescargasHistoricas = () => {
       <Flex justify="space-evenly" mb={8} wrap="wrap" gap={4} >
           <Box>
             <label htmlFor="start-date" style={{ fontWeight: 'bold', marginBottom: '8px', display: 'block', fontSize:"20px" }}>Fecha Inicio:</label>
-            <Input id="start-date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+            <Input id="start-date" type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} max={argentinaDate}/>
           </Box>
           <Box>
             <label htmlFor="end-date" style={{ fontWeight: 'bold', marginBottom: '8px', display: 'block', fontSize:"20px"}}>Fecha Fin:</label>
@@ -136,13 +155,23 @@ const DescargasHistoricas = () => {
           <Table variant="simple" colorScheme="whiteAlpha" >
             <Thead>
               <Tr>
-                <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>
+                <Th onClick={() => handleSort("id_nodo")} textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>
                   Nodo
+                  {sortConfig.key === "id_nodo" && (
+                    <span style={{ marginLeft: "5px" }}>
+                      {sortConfig.direction === "asc" ? "↑" : "↓"}
+                    </span>
+                  )}
                 </Th>
-                <Th >
+                <Th onClick={() => handleSort("timestamp")}>
                 <Center color={colorMode === 'light' ? 'black' : 'white'}>
                   <FaClock size="1.5em" style={{ marginRight: "5px" }} />
                   Fecha
+                  {sortConfig.key === "timestamp" && (
+                    <span style={{ marginLeft: "5px" }}>
+                      {sortConfig.direction === "asc" ? "↑" : "↓"}
+                    </span>
+                  )}
                 </Center>
                 </Th>
                 <Th>
