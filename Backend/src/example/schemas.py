@@ -40,6 +40,19 @@ class ModificarContrasena(BaseModel):
     password: str
     repetir_password: str
 
+class RolAsignacion(BaseModel):
+    nuevo_rol_id: int
+
+class ListaUsuarios(BaseModel):
+    id: int
+    usuario: str
+    email: str
+    edad: int
+    rol_nombre: str
+
+class RolResponse(BaseModel):
+    id: int
+    nombre: str
 class Config: 
     orm_mode= True
 

@@ -63,16 +63,32 @@ def eliminar_usuario(usuario: str, db: Session = Depends(get_db)):
     
     return db_usuario  # Devuelve el usuario eliminado (opcional)
 
-@router.get("/test_rol", dependencies=[Depends(verificar_rol("profesional", "universidad"))])
-def acceso_roles(db: Session = Depends(get_db)):
-    return {"mensaje": "Acceso permitido "}
-
 @router.get("/roles", response_model=list[str])
 def get_roles(db: Session = Depends(get_db)):
     """Endpoint temporal para obtener los roles válidos."""
     return obtener_roles_validos(db)
 
+@router.get("/rolesnombresId", response_model=List[RolResponse])
+def roles_nombres_id(db: Session = Depends(get_db)):
+    """Endpoint para obtener los roles con sus IDs y nombres."""
+    return obtener_roles_con_id(db)
+
 @router.get("/rol_invitado", response_model=int)
 def get_roles(db: Session = Depends(get_db)):
     """Endpoint temporal para obtener los roles válidos."""
     return obtener_rol_invitado(db)
+
+@router.put("/asignar_rol/{usuario_id}", response_model=RespuestaUsuario)
+#def asignar_rol(usuario_id: int, rol_asignacion: RolAsignacion, db: Session = Depends(get_db), rol: str = Depends(verificar_rol("admin"))):
+def asignar_rol(usuario_id: int, rol_asignacion: RolAsignacion, db: Session = Depends(get_db)):
+    """Endpoint para que un admin asigne un rol a un usuario."""
+    return asignar_rol_usuario(db, usuario_id, rol_asignacion.nuevo_rol_id)
+
+@router.get("/test_rol", dependencies=[Depends(verificar_rol("profesional", "universidad"))])
+def acceso_roles(db: Session = Depends(get_db)):
+    return {"mensaje": "Acceso permitido "}
+
+@router.get("/lista_usuarios", response_model=List[ListaUsuarios])
+def lista_usuarios(db: Session = Depends(get_db)):
+    """Endpoint para listar todos los usuarios y sus roles."""
+    return listar_usuarios(db)

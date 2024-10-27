@@ -113,9 +113,40 @@ def obtener_rol_invitado(db: Session) -> int:
         raise ValueError("El rol 'invitado' no existe en la base de datos.")
     return rol_invitado.id
 
+def asignar_rol_usuario(db: Session, usuario_id: int, nuevo_rol_id: int) -> Usuario:
+    db_usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
+    if db_usuario is None:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    # Verificar si el nuevo rol existe
+    nuevo_rol = db.query(Rol).filter(Rol.id == nuevo_rol_id).first()
+    if nuevo_rol is None:
+        raise HTTPException(status_code=404, detail="Rol no encontrado")
+    
+    # Asignar el nuevo rol
+    db_usuario.rol_id = nuevo_rol_id
+    db.commit()
+    db.refresh(db_usuario)
+    return db_usuario
 
-#Propósito: Implementa las operaciones de creación, lectura, actualización y eliminación (CRUD) en la base de datos.
-#Función: Las funciones en el archivo crud.py interactúan directamente con la base de datos a través de SQLAlchemy. 
-#Estas funciones contienen la lógica para realizar operaciones como insertar nuevos registros, recuperar usuarios, etc.
+def obtener_roles_con_id(db: Session) -> List[RolResponse]:
+    """Obtiene todos los roles con sus IDs y nombres."""
+    roles = db.query(Rol).all()  # Recupera todos los roles
+    return [RolResponse(id=rol.id, nombre=rol.nombre) for rol in roles]
 
+def listar_usuarios(db: Session) -> List[ListaUsuarios]:
+    """Obtiene todos los usuarios junto con sus roles."""
+    usuarios = db.query(Usuario).all()  # Recupera todos los usuarios
+    lista_usuarios = []
 
+    for usuario in usuarios:
+        rol_nombre = usuario.rol.nombre if usuario.rol else "Sin rol"  # Obtiene el nombre del rol
+        lista_usuarios.append(ListaUsuarios(
+            id=usuario.id,
+            usuario=usuario.usuario,
+            email=usuario.email,
+            edad=usuario.edad,
+            rol_nombre=rol_nombre,
+        ))
+
+    return lista_usuarios

@@ -21,6 +21,11 @@ import GeneraQR from './utils/GeneraQR';
 import TablaDatosHistoricos from './pages/TablaDatosHistoricos'; 
 import TablaAuditoria from './pages/TablaAuditoria';
 import CrearNodo from './components/Nodo';
+import Admin from './components/Admin';
+import AsignarRol from './components/AsignarRol';
+import Usuarios from './components/Usuarios';
+import Roles from './components/Roles';
+import ListaNodos from './components/ListaNodos';
 
 function AppRoutes() {
   return (
@@ -155,6 +160,37 @@ function AppRoutes() {
             </App>
           } 
         />
+        
+        <Route 
+          path="/usuarios" 
+          element={
+            <App>
+              <PrivateRoute>
+                <Usuarios />
+              </PrivateRoute>
+            </App>
+          } 
+        />
+        <Route 
+          path="/roles" 
+          element={
+            <App>
+              <PrivateRoute>
+                <Roles />
+              </PrivateRoute>
+            </App>
+          } 
+        />
+        <Route 
+          path="/nodos" 
+          element={
+            <App>
+              <PrivateRoute>
+                <ListaNodos />
+              </PrivateRoute>
+            </App>
+          } 
+        />
         <Route 
           path="/modificar_password" 
           element={
@@ -201,6 +237,16 @@ function AppRoutes() {
             <App>
               <PrivateRoute>
                 <CrearNodo/>
+              </PrivateRoute>
+            </App>
+          } 
+        />
+        <Route 
+          path="/admin" 
+          element={
+            <App>
+              <PrivateRoute>
+                <Admin />
               </PrivateRoute>
             </App>
           } 
