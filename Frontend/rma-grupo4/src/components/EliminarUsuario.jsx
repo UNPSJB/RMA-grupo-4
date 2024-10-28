@@ -30,39 +30,39 @@ const EliminarUsuario = ({ isOpen, onClose, onConfirm }) => {
                     ¿Está seguro que desea eliminar el usuario?
                 </ModalBody>
                 <ModalFooter>
-                    <Button 
+                <Button 
                         onClick={onConfirm}
-                        bg="red.500"
+                        bg="orange.500"
                         border="none"
                         p="6"
                         boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
                         _hover={{
-                            bg: 'red.600',
+                            bg: 'orange.600',
                             boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)',
                             transform: 'scale(1.05)',
                         }}
                         _active={{
-                            bg: 'red.700',
+                            bg: 'orange.700',
                             transform: 'translateY(2px)',
                             boxShadow: '10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)',
                         }}
                     >
-                        Sí
+                        Si
                     </Button>
                     <Button 
                         onClick={onClose} 
                         ml={3} 
-                        bg="green.500"
+                        bg="grey.500"
                         border="none"
                         p="6"
                         boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
                         _hover={{
-                            bg: 'green.600',
+                            bg: 'grey.600',
                             boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)',
                             transform: 'scale(1.05)',
                         }}
                         _active={{
-                            bg: 'green.700',
+                            bg: 'grey.700',
                             transform: 'translateY(2px)',
                             boxShadow: '10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)',
                         }}

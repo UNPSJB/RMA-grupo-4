@@ -1,22 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import {
-    Modal,
-    ModalOverlay,
-    ModalContent,
-    ModalHeader,
-    ModalFooter,
-    ModalBody,
-    Button,
-    Select,
-    useColorMode,
-} from '@chakra-ui/react';
+import {Modal,ModalOverlay,ModalContent,ModalHeader,ModalFooter,ModalBody,Button,Select,useColorMode,} from '@chakra-ui/react';
 import axios from 'axios';
-
 const AsignarRol = ({ isOpen, onClose, onConfirm, usuario }) => {
     const { colorMode } = useColorMode();
     const [roles, setRoles] = useState([]);
     const [nuevoRolId, setNuevoRolId] = useState("");
-
     useEffect(() => {
         const fetchRoles = async () => {
             try {
@@ -31,15 +19,12 @@ const AsignarRol = ({ isOpen, onClose, onConfirm, usuario }) => {
                 console.error("Error al obtener los roles: ", error);
             }
         };
-
         fetchRoles();
     }, []);
-
     const handleConfirm = () => {
         onConfirm(nuevoRolId); // Pasa el ID del nuevo rol
         setNuevoRolId(""); // Reiniciar el rol seleccionado
     };
-
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <ModalOverlay />
@@ -68,5 +53,4 @@ const AsignarRol = ({ isOpen, onClose, onConfirm, usuario }) => {
         </Modal>
     );
 };
-
 export default AsignarRol;

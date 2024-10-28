@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Thead, Tbody, Tr, Th, Td, Box, Spinner, Button, Icon } from '@chakra-ui/react';
-import { AiOutlineSetting, AiOutlineClose } from 'react-icons/ai';
+import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Box, Spinner, Button, Icon, Center, useColorModeValue } from '@chakra-ui/react';
+import { AiOutlineSetting, AiOutlineClose, AiOutlineDelete } from 'react-icons/ai'; // Importa el icono de tacho de basura
 import axios from 'axios';
 import EliminarUsuario from './EliminarUsuario';
-import AsignarRol from './AsignarRol'; // Asegúrate de importar el nuevo modal
+import AsignarRol from './AsignarRol';
 
 export default function Usuarios() {
     const [usuarios, setUsuarios] = useState([]);
@@ -33,7 +33,7 @@ export default function Usuarios() {
         try {
             await axios.delete(`http://localhost:8000/eliminar_usuario/${usuario}`);
             setIsModalEliminarOpen(false);
-            await fetchUsuarios(); // Refrescar la lista de usuarios
+            await fetchUsuarios();
         } catch (error) {
             setError("Error al eliminar el usuario: " + error.message);
         }
@@ -41,10 +41,10 @@ export default function Usuarios() {
 
     const handleAsignarRol = async (nuevoRol) => {
         try {
-            const usuarioId = usuarioAModificar.id; // Asegúrate de tener el ID del usuario aquí
+            const usuarioId = usuarioAModificar.id;
             await axios.put(`http://localhost:8000/asignar_rol/${usuarioId}`, { nuevo_rol_id: nuevoRol });
             setIsModalAsignarOpen(false);
-            await fetchUsuarios(); // Refrescar la lista de usuarios
+            await fetchUsuarios();
         } catch (error) {
             setError("Error al asignar rol: " + error.message);
         }
@@ -52,9 +52,9 @@ export default function Usuarios() {
 
     if (loading) {
         return (
-            <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
+            <Center h="100vh">
                 <Spinner size="xl" />
-            </Box>
+            </Center>
         );
     }
 
@@ -62,57 +62,74 @@ export default function Usuarios() {
         return <Box color="red.500">{error}</Box>;
     }
 
+    const bg = useColorModeValue('gray.100', 'gray.700');
+    const headerBg = useColorModeValue('gray.300', 'gray.600');
+    const textColor = useColorModeValue('black', 'white'); // Color de texto en modo oscuro
+    const shadow = useColorModeValue('6px 6px 10px rgba(0, 0, 0, 0.1), -6px -6px 10px rgba(255, 255, 255, 0.7)', '6px 6px 10px rgba(0, 0, 0, 0.3), -6px -6px 10px rgba(0, 0, 0, 0.2)');
+
+    // Colores de los botones según el modo de color
+    const buttonDefaultColor = useColorModeValue('gray.300', 'gray.600'); // Color gris por defecto
+    const buttonHoverColor = useColorModeValue('rgb(0, 31, 63)', 'rgb(255, 130, 37)'); // Color naranja al hover
+    const buttonShadow = useColorModeValue("5px 5px 3px #5a5a5a, -5px -5px 3px #ffffff", "2px 2px 3px rgba(0, 0, 0, 0.3)"); // Sombra tenue en modo oscuro
+
     return (
-        <Box p={5}>
-            <Box mb={4} fontSize="2xl" fontWeight="bold">Lista de Usuarios</Box>
-            <Table variant="striped" colorScheme="teal">
-                <Thead>
-                    <Tr>
-                        <Th>ID</Th>
-                        <Th>Usuario</Th>
-                        <Th>Email</Th>
-                        <Th>Edad</Th>
-                        <Th>Rol</Th>
-                        <Th>Acciones</Th>
-                    </Tr>
-                </Thead>
-                <Tbody>
-                    {usuarios.map(usuario => (
-                        <Tr key={usuario.id}>
-                            <Td>{usuario.id}</Td>
-                            <Td>{usuario.usuario}</Td>
-                            <Td>{usuario.email}</Td>
-                            <Td>{usuario.edad}</Td>
-                            <Td>{usuario.rol_nombre}</Td>
-                            <Td>
-                                <Button 
-                                    leftIcon={<Icon as={AiOutlineSetting} />} 
-                                    colorScheme="blue"
-                                    variant="outline"
-                                    onClick={() => {
-                                        setUsuarioAModificar(usuario); // Establecer el usuario a modificar
-                                        setIsModalAsignarOpen(true); // Abrir el modal
-                                    }}
-                                    mr={2}
-                                >
-                                    Modificar Rol
-                                </Button>
-                                <Button 
-                                    leftIcon={<Icon as={AiOutlineClose} />}
-                                    colorScheme="red"
-                                    variant="outline"
-                                    onClick={() => {
-                                        setUsuarioAEliminar(usuario.usuario);
-                                        setIsModalEliminarOpen(true);
-                                    }}
-                                >
-                                    Eliminar
-                                </Button>
-                            </Td>
+        <Box bg={bg} borderRadius="md" boxShadow={shadow} p={4}>
+            <TableContainer>
+                <Table variant="simple">
+                    <Thead>
+                        <Tr bg={headerBg}>
+                            <Th color={textColor} p={1}>ID</Th>
+                            <Th color={textColor} p={1}>Usuario</Th>
+                            <Th color={textColor} p={1}>Email</Th>
+                            <Th color={textColor} p={1}>Edad</Th>
+                            <Th color={textColor} p={1}>Rol</Th>
+                            <Th color={textColor} p={1}>Acciones</Th>
                         </Tr>
-                    ))}
-                </Tbody>
-            </Table>
+                    </Thead>
+                    <Tbody>
+                        {usuarios.map(usuario => (
+                            <Tr key={usuario.id}>
+                                <Td color={useColorModeValue('black', 'white')} p={1}>{usuario.id}</Td>
+                                <Td color={useColorModeValue('black', 'white')} p={1}>{usuario.usuario}</Td>
+                                <Td color={useColorModeValue('black', 'white')} p={1}>{usuario.email}</Td>
+                                <Td color={useColorModeValue('black', 'white')} p={1}>{usuario.edad}</Td>
+                                <Td color={useColorModeValue('black', 'white')} p={1}>{usuario.rol_nombre}</Td>
+                                <Td p={1}>
+                                    <Button 
+                                        leftIcon={<Icon as={AiOutlineSetting} />} 
+                                        background={buttonDefaultColor} // Color gris por defecto
+                                        borderRadius="6px"
+                                        boxShadow={buttonShadow} // Sombra tenue en modo oscuro
+                                        variant="solid"
+                                        size="sm"
+                                        _hover={{ background: buttonHoverColor }} // Cambiar a color deseado al pasar el mouse
+                                        onClick={() => {
+                                            setUsuarioAModificar(usuario);
+                                            setIsModalAsignarOpen(true);
+                                        }}
+                                        mr={2}
+                                    >
+                                    </Button>
+                                    <Button 
+                                        leftIcon={<Icon as={AiOutlineDelete} />} // Icono de tacho de basura
+                                        background={buttonDefaultColor} // Color gris por defecto
+                                        borderRadius="6px"
+                                        boxShadow={buttonShadow} // Sombra tenue en modo oscuro
+                                        variant="solid"
+                                        size="sm"
+                                        _hover={{ background: buttonHoverColor }} // Cambiar a color deseado al pasar el mouse
+                                        onClick={() => {
+                                            setUsuarioAEliminar(usuario.usuario);
+                                            setIsModalEliminarOpen(true);
+                                        }}
+                                    >
+                                    </Button>
+                                </Td>
+                            </Tr>
+                        ))}
+                    </Tbody>
+                </Table>
+            </TableContainer>
 
             {/* Modales */}
             <EliminarUsuario 
@@ -124,7 +141,7 @@ export default function Usuarios() {
                 isOpen={isModalAsignarOpen} 
                 onClose={() => setIsModalAsignarOpen(false)} 
                 onConfirm={handleAsignarRol} 
-                usuario={usuarioAModificar ? usuarioAModificar.usuario : ""} // Pasa el nombre del usuario
+                usuario={usuarioAModificar ? usuarioAModificar.usuario : ""}
             />
         </Box>
     );
