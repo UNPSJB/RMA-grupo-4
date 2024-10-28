@@ -8,12 +8,22 @@ from dotenv import load_dotenv
 load_dotenv()
 
 telegram_token = os.getenv('TELEGRAM_TOKEN')
-chat_id = int(os.getenv('TELEGRAM_CHAT_ID'))
 
-def obtener_enlace_invitacion():
+def obtener_enlace_invitacion(canal_id: str):
     """
     Llama al método exportChatInviteLink de la API de Telegram para obtener el enlace de invitación del canal.
     """
+    # Diccionario que relaciona cada canal_id con su chat_id específico
+    chat_ids = {
+        "canal_1": int(os.getenv("TELEGRAM_CHAT_ID_1")),
+        "canal_2": int(os.getenv("TELEGRAM_CHAT_ID_2"))
+    }
+    
+    # Verifica si el canal_id es válido
+    if canal_id not in chat_ids:
+        raise HTTPException(status_code=400, detail="ID de canal inválido.")
+    
+    chat_id = chat_ids[canal_id]
     url = f"https://api.telegram.org/bot{telegram_token}/exportChatInviteLink"
     
     # Realiza la solicitud para obtener el enlace de invitación del canal

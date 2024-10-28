@@ -110,13 +110,13 @@ class Nodo:
         elif tipo == TipoMensaje.WINDSPD_T:
             # Genera un valor de velocidad de viento entre 0 y 100 km/h
             return str(random.uniform(0.0, 160.0))
-        elif tipo == TipoMensaje.LIGHT_T:
-            # Genera un valor de intensidad de luz entre 0 y 10000 lux
-            return str(random.uniform(0.0, 10000.0))
+        elif tipo == TipoMensaje.VOLTAGE_T:
+            # Genera un valor entre 10.5V y 13.5V
+            return str(random.uniform(10.0, 13.5))
         elif tipo == TipoMensaje.RAINFALL_T:
             return str(random.uniform(0.0, 170.0))
         elif tipo == TipoMensaje.ALTITUDE_T:
-            return str(random.uniform(0.0, 170.0))
+            return str(random.uniform(0.0, 2.5))
         else:
             # Por defecto, devuelve un número aleatorio
             return str(random.uniform(0.0, 100.0))

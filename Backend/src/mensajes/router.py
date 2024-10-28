@@ -28,15 +28,15 @@ from src.utils.qr_utils import obtener_enlace_invitacion, generar_qr
 # Inicializa el router para definir las rutas de este módulo
 router = APIRouter() 
 
-@router.get("/generar_qr_telegram/")
-async def generar_qr_telegram():
+@router.get("/generar_qr_telegram/{canal_id}")
+async def generar_qr_telegram(canal_id: str):
     """
-    Genera un código QR a partir del enlace de invitación del canal de Telegram.
+    Genera un código QR a partir del enlace de invitación del canal de Telegram especificado por canal_id.
     """
     try:
-        enlace_invitacion = obtener_enlace_invitacion()  # Obtiene el enlace del canal
-        qr_image = generar_qr(enlace_invitacion)  # Genera QR con el enlace
-        
+        enlace_invitacion = obtener_enlace_invitacion(canal_id)  # Obtiene el enlace correcto
+        qr_image = generar_qr(enlace_invitacion)  # Genera el QR con el enlace
+
         # Devuelve la imagen como respuesta en formato PNG
         return StreamingResponse(qr_image, media_type="image/png")
     except HTTPException as e:

@@ -6,57 +6,54 @@ from dotenv import load_dotenv
 load_dotenv()
 
 token = os.getenv('TELEGRAM_TOKEN')
-chat_id = int(os.getenv('TELEGRAM_CHAT_ID'))  
+chat_ids = [int(os.getenv('TELEGRAM_CHAT_ID_1')), int(os.getenv('TELEGRAM_CHAT_ID_2'))]
 
-estado_anterior_sensores = {} # almacena el estado anterior de cada sensor
+estado_anterior_sensores = {}  # Almacena el estado anterior de cada sensor
 
 descripciones_tipos = {
-    'temp_t': 'Temperatura',
-    'windspd_t': 'Velocidad del viento',
-    'rainfall_t': 'Precipitación',
+    'altitude_t': 'Hidrometrico',
+    'voltage_t': 'Voltage'
 }
 
 unidad_medida = {
-    'temp_t': '°C',
-    'windspd_t': 'km/h',
-    'rainfall_t': 'mm',
+    'altitude_t': 'Mts',
+    'voltage_t': 'V'
 }
 
-def enviar_mensaje_telegram(mensaje):
+def enviar_mensaje_telegram(mensaje, tipo_alerta):
     url = f'https://api.telegram.org/bot{token}/sendMessage'
+    
+    if tipo_alerta == 'Hidrometrico':
+        chat_id = chat_ids[0] #Trae el id_chat para alertas cooperativa (Nivel del agua)
+    else:
+        chat_id = chat_ids[1] #Trae el id_chat para alertas profesional (voltage)
     
     payload = {
         'chat_id': chat_id,
         'text': mensaje,
-        'parse_mode': 'Markdown' 
+        'parse_mode': 'Markdown'
     }
     
     try:
         response = requests.post(url, json=payload)
-        response.raise_for_status() 
+        response.raise_for_status()
     except requests.exceptions.RequestException as e:
         print(f'Error al enviar mensaje a Telegram: {e}')
-        print(f'Respuesta del servidor: {response.text}') 
+        if response:
+            print(f'Respuesta del servidor: {response.text}')
 
 def determinar_nivel_alerta(tipo, data):
     niveles = {
-        'temp_t': [
-            (0.0, 30.0, 'verde'),  
-            (30.0, 35.0, 'amarillo'),  
-            (35.0, 40.0, 'naranja'),  
-            (40.0, 50.0, 'rojo')  
+        'altitude_t': [
+            (0.0, 0.5, 'verde'),
+            (0.6, 0.7, 'amarillo'),
+            (0.8, 1.5, 'naranja'),
+            (1.6, 2.0, 'rojo')
         ],
-        'windspd_t': [
-            (0.0, 64.9, 'verde'),  
-            (65.0, 75.0, 'amarillo'),  
-            (75.0, 109.9, 'naranja'),  
-            (110.0, 140.0, 'rojo')  
-        ],
-        'rainfall_t': [
-            (0.0, 9.9, 'verde'),  
-            (10.0, 30.0, 'amarillo'),  
-            (30.0, 50.0, 'naranja'),  
-            (50.0, 80.0, 'rojo')  
+        'voltage_t': [
+            (11.4, 13.5, 'verde'),
+            (10.6, 11.5, 'amarillo'),
+            (10.0, 10.5, 'rojo')
         ]
     }
 
@@ -71,16 +68,15 @@ def analizar_alerta(mensaje_json):
     data = float(mensaje_json.get('data'))
     nodo_id = mensaje_json.get('id')
 
-    tipo_legible = descripciones_tipos.get(tipo) # Obtiene la descripción amigable del tipo
+    tipo_legible = descripciones_tipos.get(tipo)  
 
     # Si el tipo no está definido en el diccionario, no hacemos nada
     if not tipo_legible:
-        print(f"Tipo no válido: {tipo}")
         return
     
     unidad_legible = unidad_medida.get(tipo)
     
-    nivel_alerta_actual = determinar_nivel_alerta(tipo, data) # Determina el nivel de alerta para ese tipo de sensor
+    nivel_alerta_actual = determinar_nivel_alerta(tipo, data)  # Determina el nivel de alerta para ese tipo de sensor
 
     data_formateada = f"{data:.2f}"
 
@@ -88,7 +84,7 @@ def analizar_alerta(mensaje_json):
     if nodo_id not in estado_anterior_sensores:
         estado_anterior_sensores[nodo_id] = {}
     
-    nivel_alerta_anterior = estado_anterior_sensores[nodo_id].get(tipo) # Obtiene el estado anterior del sensor específico (tipo) en el nodo
+    nivel_alerta_anterior = estado_anterior_sensores[nodo_id].get(tipo)  # Obtiene el estado anterior del sensor específico (tipo) en el nodo
 
     # Si el estado cambió para este tipo de sensor, enviamos una alerta
     if nivel_alerta_actual != nivel_alerta_anterior:
@@ -101,7 +97,7 @@ def analizar_alerta(mensaje_json):
                 f"Valor: {data_formateada} {unidad_legible.replace('_', '\\_')}\n"
                 f"Nuevo Nivel de Alerta: {nivel_alerta_actual.capitalize()}"
             )
-            enviar_mensaje_telegram(mensaje_telegram)
+            enviar_mensaje_telegram(mensaje_telegram, tipo_legible)
         
         elif nivel_alerta_actual == 'verde' and nivel_alerta_anterior in ['amarillo', 'naranja', 'rojo']:
             # Mensaje de normalización si la alerta vuelve a verde
@@ -111,6 +107,6 @@ def analizar_alerta(mensaje_json):
                 f"Valor: {data_formateada} {unidad_legible.replace('_', '\\_')}\n"
                 f"Nivel de Alerta: {nivel_alerta_actual.capitalize()}"
             )
-            enviar_mensaje_telegram(mensaje_telegram)
+            enviar_mensaje_telegram(mensaje_telegram, tipo_legible)
         
-        estado_anterior_sensores[nodo_id][tipo] = nivel_alerta_actual # Actualiza el estado anterior de ese tipo de sensor en el nodo
+        estado_anterior_sensores[nodo_id][tipo] = nivel_alerta_actual  # Actualiza el estado anterior de ese tipo de sensor en el nodo
