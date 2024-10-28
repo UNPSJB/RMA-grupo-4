@@ -1,26 +1,21 @@
 import React from 'react';
-import { Box, SimpleGrid, Text, VStack, Icon, Button, useColorMode } from '@chakra-ui/react';
+import { Box, SimpleGrid, Text, VStack, Icon, useColorMode } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { FaUser, FaKey, FaNetworkWired, FaBell, FaCog, FaArrowLeft } from 'react-icons/fa';
+import { FaBell, FaCogs } from 'react-icons/fa';
 
-export default function Admin() {
+export default function AlertasAdmin() {
   const navigate = useNavigate();
   const { colorMode } = useColorMode();
 
-  // Definición de las rutas e íconos de cada card
   const cards = [
-    { id: 1, title: 'Usuarios', route: '/usuarios', icon: FaUser },
-    { id: 2, title: 'Roles', route: '/roles', icon: FaKey },
-    { id: 3, title: 'Nodos', route: '/nodos', icon: FaNetworkWired },
-    { id: 4, title: 'Alertas', route: '/alertaAdmin', icon: FaBell },
-    { id: 5, title: 'Configuración', route: '/configuracion', icon: FaCog },
+    { id: 1, title: 'Suscripción a Alertas', route: '/utils/GeneraQR', icon: FaBell },
+    { id: 2, title: 'Personalización de Alertas', route: '/personalizacion-alertas', icon: FaCogs },
   ];
 
   return (
     <Box p={5}>
-
       <SimpleGrid
-        columns={{ base: 1, md: 2, lg: 5 }}
+        columns={{ base: 1, md: 2 }}
         spacing={5}
         justifyContent="center"
         maxW="1000px"

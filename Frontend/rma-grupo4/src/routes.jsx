@@ -26,6 +26,7 @@ import AsignarRol from './components/AsignarRol';
 import Usuarios from './components/Usuarios';
 import Roles from './components/Roles';
 import ListaNodos from './components/ListaNodos';
+import AlertasAdmin from './components/AlertasAdmin';
 
 function AppRoutes() {
   return (
@@ -186,7 +187,7 @@ function AppRoutes() {
           element={
             <App>
               <PrivateRoute>
-                <ListaNodos />
+                <ListaNodos/>
               </PrivateRoute>
             </App>
           } 
@@ -251,8 +252,40 @@ function AppRoutes() {
             </App>
           } 
         />
+        <Route 
+          path="/alertaAdmin" 
+          element={
+            <App>
+              <PrivateRoute>
+                <AlertasAdmin/>
+              </PrivateRoute>
+            </App>
+          } 
+        />
+        <Route 
+          path="/crear_nodo" 
+          element={
+            <App>
+              <PrivateRoute>
+                <CrearNodo/>
+              </PrivateRoute>
+            </App>
+          } 
+        />
+        <Route 
+          path="/utils/GeneraQR" 
+          element={
+            <App>
+              <PrivateRoute>
+               <GeneraQR />
+              </PrivateRoute>
+            </App>
+          } 
+        />
       </Routes>
+      
     </Router>
+    
   );
 }
 

@@ -8,7 +8,7 @@ export default function Nodos() {
   const { colorMode } = useColorMode();
 
   const cards = [
-    { id: 1, title: 'Agregar Nodo', route: '/agregar-nodo', icon: FaPlus },
+    { id: 1, title: 'Agregar Nodo', route: '/crear_nodo', icon: FaPlus },
     { id: 2, title: 'Modificar Nodo', route: '/modificar-nodo', icon: FaEdit },
     { id: 3, title: 'Eliminar Nodo', route: '/eliminar-nodo', icon: FaTrash },
     { id: 4, title: 'Lista de Nodos', route: '/lista-nodos', icon: FaList },
