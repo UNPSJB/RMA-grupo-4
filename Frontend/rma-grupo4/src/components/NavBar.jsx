@@ -22,7 +22,7 @@ import ButtonTheme from './ButtonTheme';
 
 function NavBar() {
     const navigate = useNavigate();
-    const { isAuthenticated, user, logout } = useAuth();
+    const { isAuthenticated, user, logout, userRole } = useAuth();
     const [isModalOpen, setModalOpen] = useState(false);
     const [isHelpOpen, setHelpOpen] = useState(false);
     const { colorMode } = useColorMode();
@@ -34,7 +34,7 @@ function NavBar() {
 
     const handleHomeClick = () => {
         if (isAuthenticated) {
-            navigate('/inicio');
+            navigate('/inicio'); 
         } else {
             navigate('/');
         }
@@ -91,18 +91,20 @@ function NavBar() {
                 mx="auto"
             >
                 <Flex align="center">
-                    <Button
-                        onClick={handleHomeClick}
-                        bg="transparent"
-                        color={colorMode === 'dark' ? 'white' : 'black'}
-                        _hover={{ bg: colorMode === 'dark' ? 'gray.800' : 'gray.200' }}
-                        _focus={{ boxShadow: 'none' }}
-                        {...buttonStyle}
-                        leftIcon={<Icon as={FaHome} />}
-                        mr={4}
-                    >
-                        Inicio
-                    </Button>
+                    {["admin", "profesional", "cooperativa"].includes(userRole) && (
+                        <Button
+                            onClick={handleHomeClick}
+                            bg="transparent"
+                            color={colorMode === 'dark' ? 'white' : 'black'}
+                            _hover={{ bg: colorMode === 'dark' ? 'gray.800' : 'gray.200' }}
+                            _focus={{ boxShadow: 'none' }}
+                            {...buttonStyle}
+                            leftIcon={<Icon as={FaHome} />}
+                            mr={4}
+                        >
+                            Inicio
+                        </Button>
+                    )}
 
                     {isAuthenticated && <NavigationButtons />}
                 </Flex>

@@ -5,16 +5,9 @@ import Login from './components/Login';
 import Registrar from './components/Registrar';
 import Inicio from './components/Inicio';
 import PrivateRoute from './components/PrivateRoute';
-import TablaPage from './pages/TablaPage';   
 import HistoricosPage from './pages/HistoricosPage'; 
-import GraficoLinea from './pages/GraficoLinea';   
-import GraficoBarra from './pages/GraficoBarra';  
-import GraficoArea from './pages/GraficoArea';
-import GraficoRosa from './pages/GraficoRosa';
-import GraficoMedidor from './pages/GraficoMedidor';
 import ModificarDatos from './components/ModificarDatos';
 import ModificarPassword from './components/ModificarPassword';
-import EliminarUsuario from './components/EliminarUsuario';
 import HelpModal from './components/HelpModal';
 import PantallaComparativa from './analisis/PantallaComparativa';
 import GeneraQR from './utils/GeneraQR';
@@ -47,10 +40,7 @@ function AppRoutes() {
             </App>
           } 
         />
-        
         {/* Rutas adicionales protegidas */}
-        
-        
         <Route 
           path="/historicos" 
           element={
@@ -71,9 +61,6 @@ function AppRoutes() {
             </App>
           } 
         />
-        
-        
-     
         <Route 
           path="/tabla_datos_historicos" 
           element={
@@ -94,8 +81,6 @@ function AppRoutes() {
             </App>
           } 
         />
-        
-        
         <Route 
           path="/modificar_datos" 
           element={
@@ -106,7 +91,6 @@ function AppRoutes() {
             </App>
           } 
         />
-        
         <Route 
           path="/usuarios" 
           element={
@@ -147,7 +131,6 @@ function AppRoutes() {
             </App>
           } 
         />
-        
         <Route 
           path="/help" 
           element={
@@ -198,15 +181,8 @@ function AppRoutes() {
             </App>
           } 
         />
-        
-        
-      
-      
-      </Routes>
-      
-      
+      </Routes>  
     </Router>
-    
   );
 }
 

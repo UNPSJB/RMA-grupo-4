@@ -2,10 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Button, Flex, IconButton, useColorMode } from "@chakra-ui/react";
 import { FaBars, FaTimes } from 'react-icons/fa';
+import { useAuth } from './AuthContext';
 
 function NavigationButtons() {
   const [isVisible, setIsVisible] = useState(false);
   const { colorMode } = useColorMode(); 
+  const { userRole } = useAuth(); 
   const menuRef = useRef(); 
 
   const toggleVisibility = () => {
@@ -30,14 +32,18 @@ function NavigationButtons() {
     };
   }, [isVisible]);
 
+  // Definir permisos para cada rol
   const navItems = [
-    { text: "Gráficos Datos Históricos", route: "/historicos" },
-    { text: "Tabla Datos Historicos", route: "/tabla_datos_historicos" },
-    { text: "Analisis Avanzado", route: "/comparativo" },
-    { text: "Suscripcion a alertas", route: "/generar_qr" },
-    { text: "Tabla auditoria", route: "/auditoria" },
-    { text: "Agregar Nodo", route: "/crear_nodo" }
+    { text: "Gráficos Datos Históricos", route: "/historicos", allowedRoles: ["admin", "invitado", "universidad"] },
+    { text: "Tabla Datos Historicos", route: "/tabla_datos_historicos", allowedRoles: ["admin", "invitado", "universidad"] },
+    { text: "Analisis Avanzado", route: "/comparativo", allowedRoles: ["admin", "profesional", "cooperativa"] },
+    { text: "Suscripcion a alertas", route: "/generar_qr", allowedRoles: ["admin", "profesional", "cooperativa"] },
+    { text: "Tabla auditoria", route: "/auditoria", allowedRoles: ["admin"] },
+    { text: "Agregar Nodo", route: "/crear_nodo", allowedRoles: ["admin", "profesional", "cooperativa"] }
   ];
+
+  // Filtrar los items según el rol del usuario
+  const filteredNavItems = navItems.filter(item => item.allowedRoles.includes(userRole));
 
   return (
     <Box>
@@ -77,7 +83,7 @@ function NavigationButtons() {
         paddingTop={4} 
         borderRadius={5}
       >
-        {navItems.map((item, index) => (
+        {filteredNavItems.map((item, index) => (
           <Button
             key={index}
             as={Link}
