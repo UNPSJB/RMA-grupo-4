@@ -22,7 +22,6 @@ import TablaDatosHistoricos from './pages/TablaDatosHistoricos';
 import TablaAuditoria from './pages/TablaAuditoria';
 import CrearNodo from './components/Nodo';
 import Admin from './components/Admin';
-import AsignarRol from './components/AsignarRol';
 import Usuarios from './components/Usuarios';
 import Roles from './components/Roles';
 import ListaNodos from './components/ListaNodos';
@@ -42,7 +41,7 @@ function AppRoutes() {
           path="/inicio" 
           element={
             <App>
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['admin','cooperativa','profesional']}>
                 <Inicio />
               </PrivateRoute>
             </App>
@@ -50,31 +49,13 @@ function AppRoutes() {
         />
         
         {/* Rutas adicionales protegidas */}
-        <Route 
-          path="/tabla" 
-          element={
-            <App>
-              <PrivateRoute>
-                <TablaPage />
-              </PrivateRoute>
-            </App>
-          } 
-        />
-        <Route 
-          path="/area" 
-          element={
-            <App>
-              <PrivateRoute>
-                <GraficoArea />
-              </PrivateRoute>
-            </App>
-          } 
-        />
+        
+        
         <Route 
           path="/historicos" 
           element={
             <App>
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['admin', 'invitado', 'universidad']}>
                 <HistoricosPage />
               </PrivateRoute>
             </App>
@@ -84,38 +65,20 @@ function AppRoutes() {
           path="/comparativo" 
           element={
             <App>
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['admin', 'profesional', 'cooperativa']}>
                 <PantallaComparativa />
               </PrivateRoute>
             </App>
           } 
         />
-        <Route 
-          path="/graficoLinea" 
-          element={
-            <App>
-              <PrivateRoute>
-                <GraficoLinea />
-              </PrivateRoute>
-            </App>
-          } 
-        />
-        <Route 
-          path="/graficoBarra" 
-          element={
-            <App>
-              <PrivateRoute>
-                <GraficoBarra />
-              </PrivateRoute>
-            </App>
-          } 
-        />
+        
+        
      
         <Route 
           path="/tabla_datos_historicos" 
           element={
             <App>
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['admin', 'invitado', 'universidad']}>
                 <TablaDatosHistoricos />
               </PrivateRoute>
             </App>
@@ -125,37 +88,19 @@ function AppRoutes() {
           path="/auditoria" 
           element={
             <App>
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['admin']}>
                 <TablaAuditoria />
               </PrivateRoute>
             </App>
           } 
         />
-        <Route 
-          path="/graficoRosa" 
-          element={
-            <App>
-              <PrivateRoute>
-                <GraficoRosa />
-              </PrivateRoute>
-            </App>
-          } 
-        />
-        <Route 
-          path="/graficoMedidor" 
-          element={
-            <App>
-              <PrivateRoute>
-                <GraficoMedidor />
-              </PrivateRoute>
-            </App>
-          } 
-        />
+        
+        
         <Route 
           path="/modificar_datos" 
           element={
             <App>
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['admin','cooperativa','profesional','invitado', 'universidad']}>
                 <ModificarDatos />
               </PrivateRoute>
             </App>
@@ -166,7 +111,7 @@ function AppRoutes() {
           path="/usuarios" 
           element={
             <App>
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['admin']}>
                 <Usuarios />
               </PrivateRoute>
             </App>
@@ -176,7 +121,7 @@ function AppRoutes() {
           path="/roles" 
           element={
             <App>
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['admin']}>
                 <Roles />
               </PrivateRoute>
             </App>
@@ -186,7 +131,7 @@ function AppRoutes() {
           path="/nodos" 
           element={
             <App>
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['admin']}>
                 <ListaNodos/>
               </PrivateRoute>
             </App>
@@ -196,27 +141,18 @@ function AppRoutes() {
           path="/modificar_password" 
           element={
             <App>
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['admin','cooperativa','profesional','invitado', 'universidad']}>
                 <ModificarPassword />
               </PrivateRoute>
             </App>
           } 
         />
-         <Route 
-          path="/eliminar_usuario" 
-          element={
-            <App>
-              <PrivateRoute>
-                <EliminarUsuario />
-              </PrivateRoute>
-            </App>
-          } 
-        />
+        
         <Route 
           path="/help" 
           element={
             <App>
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['admin','cooperativa','profesional','invitado', 'universidad']}>
                 <HelpModal />
               </PrivateRoute>
             </App>
@@ -226,7 +162,7 @@ function AppRoutes() {
           path="/generar_qr" 
           element={
             <App>
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['admin','cooperativa','profesional']}>
                 <GeneraQR />
               </PrivateRoute>
             </App>
@@ -236,7 +172,7 @@ function AppRoutes() {
           path="/crear_nodo" 
           element={
             <App>
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['admin','cooperativa','profesional']}>
                 <CrearNodo/>
               </PrivateRoute>
             </App>
@@ -246,7 +182,7 @@ function AppRoutes() {
           path="/admin" 
           element={
             <App>
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['admin']}>
                 <Admin />
               </PrivateRoute>
             </App>
@@ -256,33 +192,18 @@ function AppRoutes() {
           path="/alertaAdmin" 
           element={
             <App>
-              <PrivateRoute>
+              <PrivateRoute allowedRoles={['admin']}>
                 <AlertasAdmin/>
               </PrivateRoute>
             </App>
           } 
         />
-        <Route 
-          path="/crear_nodo" 
-          element={
-            <App>
-              <PrivateRoute>
-                <CrearNodo/>
-              </PrivateRoute>
-            </App>
-          } 
-        />
-        <Route 
-          path="/utils/GeneraQR" 
-          element={
-            <App>
-              <PrivateRoute>
-               <GeneraQR />
-              </PrivateRoute>
-            </App>
-          } 
-        />
+        
+        
+      
+      
       </Routes>
+      
       
     </Router>
     

@@ -17,7 +17,11 @@ export function AuthProvider({ children }) {
         return localStorage.getItem('user'); // Recupera el nombre de usuario almacenado
     });
 
-    // Efecto para actualizar localStorage cada vez que cambie isAuthenticated o user
+    const [userRole, setUserRole] = useState(() => {
+        return localStorage.getItem('userRole'); // Recupera el rol almacenado
+    });
+    
+    // Efecto para actualizar localStorage cada vez que cambie isAuthenticated, user o userRole
     useEffect(() => {
         localStorage.setItem('isAuthenticated', isAuthenticated);
         if (user) {
@@ -25,23 +29,30 @@ export function AuthProvider({ children }) {
         } else {
             localStorage.removeItem('user');
         }
-    }, [isAuthenticated, user]);
+        if (userRole) {
+            localStorage.setItem('userRole', userRole);
+        } else {
+            localStorage.removeItem('userRole');
+        }
+    }, [isAuthenticated, user, userRole]);
 
-    const login = (username) => {
+    const login = (username, role) => {
         setIsAuthenticated(true);
         setUser(username);
-        localStorage.setItem(`token_${username}`, 'your_token_value'); // Guarda el token en localStorage (si es necesario)
+        setUserRole(role); // Guarda el rol del usuario
+        localStorage.setItem('token', 'your_token_value'); // Guarda el token si es necesario
     };
 
     const logout = () => {
         setIsAuthenticated(false);
         setUser(null);
+        setUserRole(null); // Limpia el rol del usuario
         localStorage.removeItem('user');
-        localStorage.removeItem(`token_${user}`); // Elimina el token de localStorage
+        localStorage.removeItem('userRole'); // Elimina el rol de localStorage
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, user, userRole, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

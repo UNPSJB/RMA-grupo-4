@@ -62,10 +62,12 @@ function Login() {
                 login(usuario, rol); // Pasar el rol al contexto
     
                 // Redirigir basado en el rol
-                if (rol === 'profesional') {
-                    navigate('/inicio');
-                } else if (rol === 'estudiante') {
+                if (rol === 'admin') {
+                    navigate('/admin');
+                } else if (rol === 'universidad' || rol === 'invitado') {
                     navigate('/historicos');
+                } else if (rol === 'profesional' || rol === 'cooperativa'){
+                    navigate('/inicio');
                 }
             }
         } catch (error) {

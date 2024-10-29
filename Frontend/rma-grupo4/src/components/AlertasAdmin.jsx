@@ -8,7 +8,7 @@ export default function AlertasAdmin() {
   const { colorMode } = useColorMode();
 
   const cards = [
-    { id: 1, title: 'Suscripción a Alertas', route: '/utils/GeneraQR', icon: FaBell },
+    { id: 1, title: 'Suscripción a Alertas', route: '/generar_qr', icon: FaBell },
     { id: 2, title: 'Personalización de Alertas', route: '/personalizacion-alertas', icon: FaCogs },
   ];
 
