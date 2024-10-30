@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import {Modal,ModalOverlay,ModalContent,ModalHeader,ModalFooter,ModalBody,Button,Select,useColorMode,} from '@chakra-ui/react';
 import axios from 'axios';
+import { useAuth } from './AuthContext';
+
 const AsignarRol = ({ isOpen, onClose, onConfirm, usuario }) => {
     const { colorMode } = useColorMode();
     const [roles, setRoles] = useState([]);
     const [nuevoRolId, setNuevoRolId] = useState("");
+    const { token } = useAuth();
+
     useEffect(() => {
         const fetchRoles = async () => {
             try {
+                // console.log(token);
                 const response = await axios.get('http://localhost:8000/rolesnombresId', {
-                    headers: {
-                        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbiIsInJvbCI6ImFkbWluIiwiZXhwIjoxNzMwMDcyNTYyfQ.a4WdNwC0RWsz2CLbCXZnuqYHqpNsnFcGeNi4MC5A0ao",
-                        "accept": "application/json"
-                    }
                 });
                 setRoles(response.data);
             } catch (error) {

@@ -4,6 +4,7 @@ import { AiOutlineSetting, AiOutlineClose, AiOutlineDelete } from 'react-icons/a
 import axios from 'axios';
 import EliminarUsuario from './EliminarUsuario';
 import AsignarRol from './AsignarRol';
+import { useAuth } from './AuthContext';
 
 export default function Usuarios() {
     const [usuarios, setUsuarios] = useState([]);
@@ -13,9 +14,11 @@ export default function Usuarios() {
     const [isModalAsignarOpen, setIsModalAsignarOpen] = useState(false);
     const [usuarioAEliminar, setUsuarioAEliminar] = useState(null);
     const [usuarioAModificar, setUsuarioAModificar] = useState(null);
+    const { token } = useAuth();
 
     const fetchUsuarios = async () => {
         try {
+            console.log(token);
             const response = await axios.get('http://localhost:8000/lista_usuarios');
             setUsuarios(response.data);
         } catch (error) {
@@ -42,7 +45,8 @@ export default function Usuarios() {
     const handleAsignarRol = async (nuevoRol) => {
         try {
             const usuarioId = usuarioAModificar.id;
-            await axios.put(`http://localhost:8000/asignar_rol/${usuarioId}`, { nuevo_rol_id: nuevoRol });
+            await axios.put(`http://localhost:8000/asignar_rol/${usuarioId}`, { nuevo_rol_id: nuevoRol }, {headers: { Authorization: `Bearer ${token}` }}
+            );
             setIsModalAsignarOpen(false);
             await fetchUsuarios();
         } catch (error) {

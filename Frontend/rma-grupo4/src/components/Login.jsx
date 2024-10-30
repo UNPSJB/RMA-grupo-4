@@ -22,7 +22,6 @@ function Login() {
     const navigate = useNavigate();
     const toast = useToast();
     const { login } = useAuth();
-    const { toggleColorMode } = useColorMode(); // Manejo del modo de color
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -59,7 +58,7 @@ function Login() {
                 login(usuario);
                 navigate('/inicio');
 
-                login(usuario, rol); // Pasar el rol al contexto
+                login(usuario, rol, response.data.token); // Pasar el rol al contexto
     
                 // Redirigir basado en el rol
                 if (rol === 'admin') {

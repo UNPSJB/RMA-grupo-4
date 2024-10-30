@@ -7,21 +7,24 @@ export function useAuth() {
 }
 
 export function AuthProvider({ children }) {
-    // Recupera el estado de autenticación desde localStorage al cargar la aplicación
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
         const storedAuth = localStorage.getItem('isAuthenticated');
-        return storedAuth === 'true'; // Convierte el string a booleano
+        return storedAuth === 'true';
     });
     
     const [user, setUser] = useState(() => {
-        return localStorage.getItem('user'); // Recupera el nombre de usuario almacenado
+        return localStorage.getItem('user');
     });
 
     const [userRole, setUserRole] = useState(() => {
-        return localStorage.getItem('userRole'); // Recupera el rol almacenado
+        return localStorage.getItem('userRole');
     });
-    
-    // Efecto para actualizar localStorage cada vez que cambie isAuthenticated, user o userRole
+
+    const [token, setToken] = useState(() => {
+        // Recupera el token desde localStorage
+        return localStorage.getItem('token');
+    });
+
     useEffect(() => {
         localStorage.setItem('isAuthenticated', isAuthenticated);
         if (user) {
@@ -34,25 +37,32 @@ export function AuthProvider({ children }) {
         } else {
             localStorage.removeItem('userRole');
         }
-    }, [isAuthenticated, user, userRole]);
+        if (token) {
+            localStorage.setItem('token', token);
+        } else {
+            localStorage.removeItem('token');
+        }
+    }, [isAuthenticated, user, userRole, token]);
 
-    const login = (username, role) => {
+    const login = (username, role, authToken) => {
         setIsAuthenticated(true);
         setUser(username);
-        setUserRole(role); // Guarda el rol del usuario
-        localStorage.setItem('token', 'your_token_value'); // Guarda el token si es necesario
+        setUserRole(role);
+        setToken(authToken); // Guarda el token
     };
 
     const logout = () => {
         setIsAuthenticated(false);
         setUser(null);
-        setUserRole(null); // Limpia el rol del usuario
+        setUserRole(null);
+        setToken(null); // Limpia el token
         localStorage.removeItem('user');
-        localStorage.removeItem('userRole'); // Elimina el rol de localStorage
+        localStorage.removeItem('userRole');
+        localStorage.removeItem('token'); // Elimina el token de localStorage
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, userRole, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, user, userRole, token, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

@@ -79,8 +79,8 @@ def get_roles(db: Session = Depends(get_db)):
     return obtener_rol_invitado(db)
 
 @router.put("/asignar_rol/{usuario_id}", response_model=RespuestaUsuario)
-#def asignar_rol(usuario_id: int, rol_asignacion: RolAsignacion, db: Session = Depends(get_db), rol: str = Depends(verificar_rol("admin"))):
-def asignar_rol(usuario_id: int, rol_asignacion: RolAsignacion, db: Session = Depends(get_db)):
+def asignar_rol(usuario_id: int, rol_asignacion: RolAsignacion, db: Session = Depends(get_db), rol: str = Depends(verificar_rol("admin"))):
+#def asignar_rol(usuario_id: int, rol_asignacion: RolAsignacion, db: Session = Depends(get_db)):
     """Endpoint para que un admin asigne un rol a un usuario."""
     return asignar_rol_usuario(db, usuario_id, rol_asignacion.nuevo_rol_id)
 
