@@ -39,7 +39,7 @@ function NavigationButtons() {
     { text: "Analisis Avanzado", route: "/comparativo", allowedRoles: ["admin", "profesional", "cooperativa"] },
     { text: "Suscripcion a alertas", route: "/generar_qr", allowedRoles: ["admin", "profesional", "cooperativa"] },
     { text: "Tabla auditoria", route: "/auditoria", allowedRoles: ["admin"] },
-    { text: "Agregar Nodo", route: "/crear_nodo", allowedRoles: ["admin", "profesional", "cooperativa"] }
+    { text: "Gestión Nodo", route: "/crear_nodo", allowedRoles: ["admin", "profesional", "cooperativa"] }
   ];
 
   // Filtrar los items según el rol del usuario

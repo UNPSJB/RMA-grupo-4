@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, FormControl, Heading, FormLabel, Input, Button, Textarea, useToast, VStack, HStack , useColorMode, Table, Thead, Tbody, Tr, Th, Td, IconButton
+  Box, FormControl, Heading, FormLabel, Input, Textarea, useToast, VStack, HStack , useColorMode, Table, Thead, Tbody, Tr, Th, Td, IconButton
 } from '@chakra-ui/react';
-import { FaTrashAlt, FaPen } from "react-icons/fa";
+import { FaTrashAlt, FaPen,FaTimes ,FaCheck} from "react-icons/fa";
 import MapaNodo from '../analisis/MapaNodo';
 
 const CrearNodo = () => {
   const [formData, setFormData] = useState({
+    id_nodo:'',
     alias: '',
     longitud: '',
     latitud: '',
@@ -54,6 +55,25 @@ const CrearNodo = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
+
+  const handleKeyDown = (e) => {
+    // Permitir solo números, punto decimal y el signo negativo
+    const allowedCharacters = /[0-9.-]/;
+    if (!allowedCharacters.test(e.key) && e.key !== "Backspace" && e.key !== "Enter" && e.key !== "Tab") {
+      e.preventDefault(); // Evitar la entrada
+    }
+  };
+
+  const handleAliasKeyDown = (e) => {
+    // Lista de caracteres especiales que quieres bloquear
+    const specialCharacters = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~¡]/;
+  
+    // Evitar caracteres especiales
+    if (specialCharacters.test(e.key) && e.key !== "Backspace" && e.key !== "Enter" && e.key !== "Tab") {
+      e.preventDefault(); // Evitar la entrada
+    }
+  };
+  
 
   const handleMapClick = (lat, lng) => {
     setFormData((prevData) => ({
@@ -110,7 +130,7 @@ const CrearNodo = () => {
         isClosable: true,
       });
     }
-    setFormData({ alias: '', longitud: '', latitud: '', descripcion: '' });
+    setFormData({ id_nodo:'',alias: '', longitud: '', latitud: '', descripcion: '' });
   };
 
 
@@ -118,6 +138,7 @@ const CrearNodo = () => {
   const handleEdit = (nodo) => {
     setEditingNodeId(nodo.id); // Usa el ID del nodo para edición
     setFormData({
+      id_nodo: nodo.id_nodo,
       alias: nodo.alias,
       longitud: nodo.longitud,
       latitud: nodo.latitud,
@@ -160,20 +181,40 @@ const CrearNodo = () => {
     }
   };
 
+  const handleCancelEdit = () => {
+    setEditingNodeId(null);
+    setFormData({ id_nodo:'',alias: '', longitud: '', latitud: '', descripcion: '' });
+  };
+
   return (
     <VStack display="flex" justifyContent="center" alignItems="center" minHeight="100vh" spacing={4} p={4} bg={colorMode === 'light' ? 'white' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'}>
-      <Heading as="h1" m={7} textAlign="center">Gestión Nodos</Heading>
+      <Heading as="h1"textAlign="center">Gestión Nodos</Heading>
       {/* Fila para el Formulario y el Mapa */}
       <HStack spacing={4}>
         {/* Formulario para Crear/Modificar Nodo */}
-        <Box height="450px" maxW="sm" p={4} borderWidth="1px" borderRadius="lg" bg={isLight ? 'white' : 'gray.800'}>
+        <Box height="525px" maxW="sm" p={4} borderColor={isLight ? 'black' : 'gray.500'} borderWidth="1px" borderRadius="lg" bg={isLight ? 'white' : 'gray.800'}>
           <form onSubmit={handleSubmit}>
+          <FormControl isRequired>
+              <FormLabel color={isLight ? 'black' : 'white'}>Id Nodo</FormLabel>
+              <Input
+                name="id_nodo"
+                type='number'
+                step={1}
+                value={formData.id_nodo}
+                onChange={handleChange}
+                onKeyDown={handleKeyDown}
+                placeholder="Ingrese el Id del Nodo"
+                color={isLight ? 'black' : 'white'}
+                borderColor={isLight ? 'black' : 'white'}
+              />
+            </FormControl>
             <FormControl isRequired>
               <FormLabel color={isLight ? 'black' : 'white'}>Alias</FormLabel>
               <Input
                 name="alias"
                 value={formData.alias}
                 onChange={handleChange}
+                onKeyDown={handleAliasKeyDown}
                 placeholder="Ingrese el alias"
                 color={isLight ? 'black' : 'white'}
                 borderColor={isLight ? 'black' : 'white'}
@@ -187,6 +228,7 @@ const CrearNodo = () => {
                 step="any"
                 value={formData.longitud}
                 onChange={handleChange}
+                onKeyDown={handleKeyDown}
                 placeholder="Ingrese la longitud"
                 color={isLight ? 'black' : 'white'}
                 borderColor={isLight ? 'black' : 'white'}
@@ -200,6 +242,7 @@ const CrearNodo = () => {
                 step="any"
                 value={formData.latitud}
                 onChange={handleChange}
+                onKeyDown={handleKeyDown}
                 placeholder="Ingrese la latitud"
                 color={isLight ? 'black' : 'white'}
                 borderColor={isLight ? 'black' : 'white'}
@@ -214,22 +257,36 @@ const CrearNodo = () => {
                 placeholder="Ingrese una descripción"
                 color={isLight ? 'black' : 'white'}
                 borderColor={isLight ? 'black' : 'white'}
+                resize="none"
               />
             </FormControl>
-            <Button mt={2} colorScheme="blue" type="submit">
-              {editingNodeId ? 'Modificar Nodo' : 'Crear Nodo'}
-            </Button>
+            <HStack mt={2} display="flex" justifyContent="center" alignItems="center">
+              <IconButton
+                aria-label={editingNodeId ? "Guardar cambios" : "Crear Nodo"}
+                icon={<FaCheck />}
+                onClick={handleSubmit}
+                colorScheme="green"
+              />
+              {editingNodeId && (
+                <IconButton
+                  aria-label="Cancelar edición"
+                  icon={<FaTimes  />}
+                  onClick={handleCancelEdit}
+                  colorScheme="red"
+                />
+              )}
+            </HStack>
           </form>
         </Box>
   
         {/* Componente de Mapa */}
-        <Box height="450px" width="lg" p={2} borderWidth="1px" borderRadius="lg" bg={isLight ? 'white' : 'gray.800'}>
+        <Box height="525px" width="700px" p={2} borderColor={isLight ? 'black' : 'gray.500'} borderWidth="1px" borderRadius="lg" bg={isLight ? 'white' : 'gray.800'}>
           <MapaNodo onMapClick={handleMapClick}/>
         </Box>
       </HStack>
   
       {/* Tabla de Nodos Existentes */}
-      <Box maxW="800px" p={4} borderWidth="1px" borderRadius="lg" bg={isLight ? 'white' : 'gray.800'} mb={4}>
+      <Box width={993} p={4} borderWidth="1px" borderColor={isLight ? 'black' : 'gray.500'} borderRadius="lg" bg={isLight ? 'white' : 'gray.800'} mb={4}>
         <Table variant="simple">
           <Thead>
             <Tr>
@@ -243,7 +300,7 @@ const CrearNodo = () => {
           <Tbody>
             {nodos.map((nodo) => (
               <Tr key={nodo.id}>
-                <Td textAlign={'center'} color={isLight ? 'black' : 'white'}>{nodo.id}</Td>
+                <Td textAlign={'center'} color={isLight ? 'black' : 'white'}>{nodo.id_nodo}</Td>
                 <Td textAlign={'center'} color={isLight ? 'black' : 'white'}>{nodo.alias}</Td>
                 <Td textAlign={'center'} color={isLight ? 'black' : 'white'}>{nodo.latitud}</Td>
                 <Td textAlign={'center'} color={isLight ? 'black' : 'white'}>{nodo.longitud}</Td>
@@ -253,11 +310,13 @@ const CrearNodo = () => {
                     icon={<FaPen />}
                     onClick={() => handleEdit(nodo)}
                     mr={2}
+                    colorScheme='blue'
                   />
                   <IconButton
                     aria-label="Delete Node"
                     icon={<FaTrashAlt />}
                     onClick={() => handleDelete(nodo.alias)}
+                    colorScheme='red'
                   />
                 </Td>
               </Tr>

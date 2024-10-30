@@ -15,6 +15,7 @@ ENV = os.getenv("ENV")
 
 def crear_nodo(db: Session, alias: CrearNodo):
     db_nodo = Nodo(
+        id_nodo = alias.id_nodo,
         alias = alias.alias,
         longitud = alias.longitud,
         latitud = alias.latitud,
@@ -32,6 +33,8 @@ def get_nodo_por_id(db: Session, id: int):
     return db.query(Nodo).filter(Nodo.id == id).first()
 
 def modificar_nodo(db: Session, db_nodo: Nodo, datos: ModificarNodo):
+    if datos.id_nodo is not None:
+        db_nodo.id_nodo = datos.id_nodo
     if datos.alias is not None:
         db_nodo.alias = datos.alias
     if datos.longitud is not None:

@@ -4,12 +4,17 @@ import { Box, Fade, useColorMode } from '@chakra-ui/react';
 import 'leaflet/dist/leaflet.css';
 
 function MapaNodo({ onMapClick }) {
-  const markerPosition = [-43.518, -66.0423];
+  const markerPosition = [-38.4161, -63.6167]; // Centro de Argentina
   const [showAttribution, setShowAttribution] = useState(true);
   const [selectedPosition, setSelectedPosition] = useState(null); 
   const { colorMode } = useColorMode();
 
-  // Detectar el scroll de la ventana para mostrar u ocultar la atribución
+  // Definir los límites de Argentina (aproximados y reducidos)
+  const bounds = [
+    [-55.0, -73.0], // Suroeste
+    [-21.0, -53.0]  // Noreste
+  ];
+
   const handleScroll = () => {
     setShowAttribution(window.scrollY <= 50);
   };
@@ -24,8 +29,17 @@ function MapaNodo({ onMapClick }) {
     useMapEvents({
       click: (e) => {
         const { lat, lng } = e.latlng;
-        setSelectedPosition([lat, lng]); 
-        onMapClick(lat, lng); 
+
+        // Validar si las coordenadas están dentro de los límites de Argentina
+        if (
+          lat >= bounds[0][0] && lat <= bounds[1][0] && // Validar latitud
+          lng >= bounds[0][1] && lng <= bounds[1][1]   // Validar longitud
+        ) {
+          setSelectedPosition([lat, lng]); 
+          onMapClick(lat, lng); 
+        } else {
+          alert("No se puede colocar un pin fuera de Argentina."); // Mensaje de advertencia
+        }
       },
     });
     return null;
@@ -34,9 +48,11 @@ function MapaNodo({ onMapClick }) {
   return (
     <MapContainer 
       center={markerPosition} 
-      zoom={7} 
+      zoom={5} 
       style={{ height: '100%', width: '100%', borderRadius: '2%' }}
-      zoomControl={false}
+      bounds={bounds} // Establecer límites
+      maxBounds={bounds} // Evitar que el mapa se desplace fuera de estos límites
+      scrollWheelZoom={true} // Permitir el zoom con la rueda del ratón
     >
       <TileLayer
         url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"

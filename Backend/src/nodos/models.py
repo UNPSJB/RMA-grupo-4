@@ -10,6 +10,7 @@ class Nodo(BaseModel):
     __tablename__ = "nodos"
 
     id = Column(Integer, primary_key=True, index=True)
+    id_nodo = Column(Integer, index=True)
     alias = Column(String, unique=True, index=True)
     longitud = Column(Float)
     latitud = Column(Float)
