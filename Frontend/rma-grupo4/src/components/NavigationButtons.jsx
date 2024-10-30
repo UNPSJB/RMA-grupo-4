@@ -34,6 +34,7 @@ function NavigationButtons() {
 
   // Definir permisos para cada rol
   const navItems = [
+    { text: "Analisis Actual", route: "/inicio", allowedRoles: ["admin"] },
     { text: "Gráficos Datos Históricos", route: "/historicos", allowedRoles: ["admin", "invitado", "universidad"] },
     { text: "Tabla Datos Historicos", route: "/tabla_datos_historicos", allowedRoles: ["admin", "invitado", "universidad"] },
     { text: "Analisis Avanzado", route: "/comparativo", allowedRoles: ["admin", "profesional", "cooperativa"] },

@@ -34,7 +34,15 @@ function NavBar() {
 
     const handleHomeClick = () => {
         if (isAuthenticated) {
-            navigate('/inicio'); 
+            if (userRole === "admin"){
+                navigate('/admin'); 
+            }else if (userRole === "profesional" || userRole === "cooperativa"){
+                navigate('/inicio');
+            }else if (userRole === "universidad"){
+                navigate('/historicos');
+            }else{
+                navigate('/historicos');
+            }
         } else {
             navigate('/');
         }
@@ -91,7 +99,7 @@ function NavBar() {
                 mx="auto"
             >
                 <Flex align="center">
-                    {["admin", "profesional", "cooperativa"].includes(userRole) && (
+                    {["admin", "profesional", "cooperativa", "invitado", "universidad"].includes(userRole) && (
                         <Button
                             onClick={handleHomeClick}
                             bg="transparent"
