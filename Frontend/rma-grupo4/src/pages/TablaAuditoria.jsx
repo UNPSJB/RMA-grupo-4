@@ -7,7 +7,7 @@ import { format } from 'date-fns';
 
 const TablaAuditoria = () => {
   const [mensajes, setMensajes] = useState([]);
-  const [tipoFiltro, setTipoFiltro] = useState("");
+  const [tipoFiltro, setTipoFiltro] = useState("correcto");
   const { colorMode } = useColorMode();
   const [sortConfig, setSortConfig] = useState({ key: "value", direction: "asc" });
   
@@ -57,6 +57,23 @@ const TablaAuditoria = () => {
 
   const totalPaginas = Math.ceil(mensajesOrdenados.length / mensajesPorPagina);
 
+  const cambiarVariable = (type) => {
+    switch (type) {
+      case "temp_t":
+        return "Temperatura";
+      case "humidity_t":
+        return "Humedad";
+      case "pressure_t":
+        return "Presión";
+      case "rainfall_t":
+        return "Precipitación";
+      case "windspd_t":
+        return "Viento";
+      default:
+        return type
+    }
+  };
+
   return (
     <Box
       bg={colorMode === 'light' ? 'gray.100' : 'gray.800'}
@@ -84,9 +101,9 @@ const TablaAuditoria = () => {
             bg={colorMode === 'light' ? 'white' : 'gray.700'}
             color={colorMode === 'light' ? 'black' : 'white'}
           >
-            <option value="">Todos</option>
-            <option value="duplicado">Duplicados</option>
             <option value="correcto">Correctos</option>
+            <option value="duplicado">Duplicados</option>
+            
             <option value="incorrecto">Incorrectos</option>
           </Select>
         </Box>
@@ -101,11 +118,12 @@ const TablaAuditoria = () => {
                 <Th onClick={() => handleSort("id_nodo")} textAlign={'center'} color={colorMode === 'light' ? 'black' : 'white'}>
                   Nodo {sortConfig.key === "id_nodo" && (sortConfig.direction === "asc" ? "↑" : "↓")}
                 </Th>
-                <Th textAlign={'center'} color={colorMode === 'light' ? 'black' : 'white'}>Data</Th>
+                <Th textAlign={'center'} color={colorMode === 'light' ? 'black' : 'white'}>Valor</Th>
                 <Th textAlign={'center'} color={colorMode === 'light' ? 'black' : 'white'}>Variable</Th>
+                <Th textAlign={'center'} color={colorMode === 'light' ? 'black' : 'white'}>Tipo</Th>
                 <Th textAlign={'center'} color={colorMode === 'light' ? 'black' : 'white'}>Fecha</Th>
                 <Th textAlign={'center'} color={colorMode === 'light' ? 'black' : 'white'}>Hora</Th>
-                <Th textAlign={'center'} color={colorMode === 'light' ? 'black' : 'white'}>Tipo</Th>
+                
               </Tr>
             </Thead>
             <Tbody>
@@ -122,11 +140,15 @@ const TablaAuditoria = () => {
                   return (
                     <Tr key={index} bg={colorMode === 'light' ? 'white' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
                       <Td textAlign={'center'}>{msg.id_nodo}</Td>
-                      <Td textAlign={'center'}>{msg.data.substring(0, 8)}{msg.data.length > 20 ? '...' : ''}</Td>
-                      <Td textAlign={'center'}>{msg.type}</Td>
+                      <Td textAlign={'center'}>
+                        {msg.data.replace(/\./g, ',').substring(0, 8)}
+                        {msg.data.length > 20 ? '...' : ''}
+                      </Td>
+                      <Td textAlign={'center'}>{cambiarVariable(msg.type)}</Td>
+                      <Td textAlign={'center'}>{msg.tipo_mensaje}</Td>
                       <Td textAlign={'center'}>{fechaFormateada}</Td>
                       <Td textAlign={'center'}>{horaFormateada}</Td>
-                      <Td textAlign={'center'}>{msg.tipo_mensaje}</Td>
+                      
                     </Tr>
                   );
                 })
