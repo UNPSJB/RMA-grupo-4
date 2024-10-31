@@ -3,6 +3,7 @@ import { Box, Heading, Select, Flex, useColorMode, Table, Thead, Tbody, Tr, Th, 
 import { Chart as ChartJS, registerables } from 'chart.js';
 import { Line, Bar, PolarArea } from 'react-chartjs-2'; 
 import axios from 'axios';
+import { useAuth } from '../components/AuthContext';
 
 ChartJS.register(...registerables);
 
@@ -33,14 +34,14 @@ function HistoricosPage() {
   const argentinaOffset = today.getTimezoneOffset() + 180; // UTC-3
   const argentinaDate = new Date(today.getTime() - argentinaOffset * 60000).toISOString().split('T')[0];
   const [selectedDate, setSelectedDate] = useState(argentinaDate);
-
+  const { token } = useAuth();
   const [availableDates, setAvailableDates] = useState([]);
   const [noData, setNoData] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/v1/clima/nodos/historico');
+        const response = await axios.get('http://localhost:8000/api/v1/clima/nodos/historico', {headers: { Authorization: `Bearer ${token}`}});
         const nodes = response.data;
         let processedData = [];
         let datesSet = new Set();

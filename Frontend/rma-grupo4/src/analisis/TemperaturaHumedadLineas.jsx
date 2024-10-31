@@ -3,6 +3,7 @@ import { Line } from 'react-chartjs-2';
 import axios from 'axios';
 import { Box,Text,useColorMode ,  Modal, ModalOverlay, ModalContent, ModalBody, ModalCloseButton,Button } from '@chakra-ui/react';
 import { MdZoomOutMap } from 'react-icons/md';
+import { useAuth } from '../components/AuthContext';
 
 const TemperaturaHumedadLineas = ({ nodeId1, nodeId2 }) => {
     const [chartData, setChartData] = useState(null);
@@ -10,14 +11,15 @@ const TemperaturaHumedadLineas = ({ nodeId1, nodeId2 }) => {
     const { colorMode } = useColorMode();
     const handleOpen = () => setIsOpen(true);
     const handleClose = () => setIsOpen(false);
+    const { token } = useAuth();
 
     const fetchChartData = async () => {
         try {
             const [temperaturaResponse1, temperaturaResponse2, humedadResponse1, humedadResponse2] = await Promise.all([
-                axios.get('http://localhost:8000/api/v1/clima/temperatura', { params: { node_id: nodeId1 } }),
-                axios.get('http://localhost:8000/api/v1/clima/temperatura', { params: { node_id: nodeId2 } }),
-                axios.get('http://localhost:8000/api/v1/clima/humedad', { params: { node_id: nodeId1 } }),
-                axios.get('http://localhost:8000/api/v1/clima/humedad', { params: { node_id: nodeId2 } })
+                axios.get('http://localhost:8000/api/v1/clima/temperatura', {headers: { Authorization: `Bearer ${token}`}}, { params: { node_id: nodeId1 } }),
+                axios.get('http://localhost:8000/api/v1/clima/temperatura', {headers: { Authorization: `Bearer ${token}`}}, { params: { node_id: nodeId2 } }),
+                axios.get('http://localhost:8000/api/v1/clima/humedad', {headers: { Authorization: `Bearer ${token}`}}, { params: { node_id: nodeId1 } }),
+                axios.get('http://localhost:8000/api/v1/clima/humedad', {headers: { Authorization: `Bearer ${token}`}}, { params: { node_id: nodeId2 } })
             ]);
 
             const extractData = (response) => {

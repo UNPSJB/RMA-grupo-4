@@ -4,6 +4,7 @@ import { FaTemperatureHigh, FaTint, FaWind, FaClock } from 'react-icons/fa';
 import { GiSpeedometer, GiWaterDrop } from 'react-icons/gi';
 import axios from 'axios';
 import { saveAs } from 'file-saver';
+import { useAuth } from '../components/AuthContext';
 
 const DescargasHistoricas = () => {
   const { colorMode } = useColorMode();
@@ -19,11 +20,12 @@ const DescargasHistoricas = () => {
   const argentinaDate = new Date(today.getTime() - argentinaOffset * 60000).toISOString().split('T')[0];
   const [startDate, setStartDate] = useState(argentinaDate); 
   const [endDate, setEndDate] = useState(argentinaDate);
+  const { token } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/v1/clima/nodos/historico');
+        const response = await axios.get('http://localhost:8000/api/v1/clima/nodos/historico', {headers: { Authorization: `Bearer ${token}`}});
         setHistoricalData(response.data);
       } catch (error) {
         console.error('Error al obtener los datos:', error);

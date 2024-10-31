@@ -1,14 +1,16 @@
 import { Box, Select, useColorMode } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useAuth } from '../components/AuthContext';
 
 function SelectorNodo({ onChange }) {
   const { colorMode } = useColorMode(); // Obtener el estado del color mode
   const [nodos, setNodos] = useState([]); 
   const [selectedNode, setSelectedNode] = useState(0); 
+  const { token } = useAuth();
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/v1/clima/nodos/resumen')
+    axios.get('http://localhost:8000/api/v1/clima/nodos/resumen', {headers: { Authorization: `Bearer ${token}`}})
       .then((response) => {
         const nodos = response.data.summary.map((item) => item.id_nodo);  
         

@@ -3,6 +3,7 @@ import { Box, Table, Thead, Tr, Th, Tbody, Td, Button, Flex, Text, Center, useMe
 import { FaTemperatureHigh, FaTint, FaWind, FaClock } from "react-icons/fa";
 import { GiWaterDrop, GiSpeedometer } from "react-icons/gi";
 import axios from 'axios';
+import { useAuth } from '../components/AuthContext';
 
 function TablaPage({ onRowSelection }) {
   const [data, setData] = useState([]);
@@ -15,12 +16,13 @@ function TablaPage({ onRowSelection }) {
   const [isMobile] = useMediaQuery("(max-width: 48em)");
   const { colorMode } = useColorMode();  // Hook para el modo de color
   const rowsPerPage = isMobile ? 1 : 3;
+  const { token } = useAuth();
 
   useEffect(() => {
     let timeoutId;
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/v1/clima/nodos/resumen');
+        const response = await axios.get('http://localhost:8000/api/v1/clima/nodos/resumen' , {headers: { Authorization: `Bearer ${token}`}});
         const resumenData = response.data.summary;
 
         const formattedData = resumenData.map((item) => ({

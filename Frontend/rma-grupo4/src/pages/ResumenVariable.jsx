@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Text, useColorMode } from '@chakra-ui/react'; // Importar useColorMode
 import axios from 'axios';
+import { useAuth } from '../components/AuthContext';
 
 const ResumenVariable = ({ title, url, nodeId, unidad }) => {
   const { colorMode } = useColorMode();
@@ -9,6 +10,7 @@ const ResumenVariable = ({ title, url, nodeId, unidad }) => {
     min_value: null,
     average_value: null
   });
+  const { token } = useAuth();
 
   useEffect(() => {
     let timeoutId;
@@ -16,7 +18,7 @@ const ResumenVariable = ({ title, url, nodeId, unidad }) => {
       try {
         const finalUrl = nodeId !== undefined ? `${url}?node_id=${nodeId}` : url;
 
-        const response = await axios.get(finalUrl);
+        const response = await axios.get(finalUrl , {headers: { Authorization: `Bearer ${token}`}});
         const resumenData = response.data.summary; 
         setSummary(resumenData); 
       } catch (error) {

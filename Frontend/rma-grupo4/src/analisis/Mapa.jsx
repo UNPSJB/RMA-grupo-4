@@ -30,6 +30,7 @@ const MapComponent = () => {
       zoom={7} 
       style={{ height: '100%', width: '100%', borderRadius:'2%' }}
       zoomControl={false}
+      attributionControl={false}
     >
       <TileLayer
         url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Table, Thead, Tbody, Tr, Th, Td, Text, useColorMode } from '@chakra-ui/react';
 import axios from 'axios';
+import { useAuth } from '../components/AuthContext';
 
 const TablaSummary = ({ nodeId1, nodeId2 }) => {
     const { colorMode } = useColorMode(); // Hook para obtener el modo de color
+    const { token } = useAuth();
     const [summaryData, setSummaryData] = useState({
         temperatura: { node1: {}, node2: {} },
         presion: { node1: {}, node2: {} },
@@ -23,8 +25,8 @@ const TablaSummary = ({ nodeId1, nodeId2 }) => {
             ];
 
             const summaryPromises = endpoints.map(async (endpoint) => {
-                const response1 = await axios.get(endpoint.url, { params: { node_id: nodeId1 } });
-                const response2 = await axios.get(endpoint.url, { params: { node_id: nodeId2 } });
+                const response1 = await axios.get(endpoint.url, {headers: { Authorization: `Bearer ${token}`}}, { params: { node_id: nodeId1 } });
+                const response2 = await axios.get(endpoint.url, {headers: { Authorization: `Bearer ${token}`}}, { params: { node_id: nodeId2 } });
 
                 return {
                     [endpoint.title]: {

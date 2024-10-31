@@ -4,6 +4,7 @@ import { Bar } from 'react-chartjs-2'; // Cambiar a Bar para gráficos de barras
 import axios from 'axios';
 import { MdZoomOutMap } from "react-icons/md";
 import { Box,Text,useColorMode ,  Modal, ModalOverlay, ModalContent, ModalBody, ModalCloseButton,Button } from '@chakra-ui/react';
+import { useAuth } from '../components/AuthContext';
 
 ChartJS.register(...registerables);
 
@@ -14,13 +15,14 @@ const GraficoBarra = ({ title, url, nodeId }) => {
   const [isOpen, setIsOpen] = useState(false);
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
+  const { token } = useAuth();
 
   useEffect(() => {
     let timeoutId;
     const fetchData = async () => {
       try {
         const finalUrl = nodeId !== undefined ? `${url}?node_id=${nodeId}` : url;
-        const response = await axios.get(finalUrl);
+        const response = await axios.get(finalUrl , {headers: { Authorization: `Bearer ${token}`}});
 
         const dataArray = response.data.data;
         const summaryData = response.data.summary;

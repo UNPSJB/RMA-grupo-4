@@ -4,7 +4,7 @@ import { Box, Fade, useColorMode } from '@chakra-ui/react';
 import 'leaflet/dist/leaflet.css';
 
 function MapaNodo({ onMapClick }) {
-  const markerPosition = [-38.4161, -63.6167]; // Centro de Argentina
+  const markerPosition = [-43.518, -66.0423]; // Nueva posición en la región especificada
   const [showAttribution, setShowAttribution] = useState(true);
   const [selectedPosition, setSelectedPosition] = useState(null); 
   const { colorMode } = useColorMode();
@@ -47,18 +47,28 @@ function MapaNodo({ onMapClick }) {
 
   return (
     <MapContainer 
-      center={markerPosition} 
-      zoom={5} 
+      center={markerPosition} // Centrar en la nueva posición
+      zoom={8} // Ajustar el zoom para comenzar en esa área específica
       style={{ height: '100%', width: '100%', borderRadius: '2%' }}
       bounds={bounds} // Establecer límites
       maxBounds={bounds} // Evitar que el mapa se desplace fuera de estos límites
       scrollWheelZoom={true} // Permitir el zoom con la rueda del ratón
+      zoomControl={false}
+      attributionControl={false}
     >
       <TileLayer
         url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
       />
       <Marker position={markerPosition}>
-        <Popup>Descarga Cuenca Sagmata</Popup>
+        <Popup>
+          <strong> Cuenca Sagmata:</strong>
+          <br />
+          Coordenadas seleccionadas
+          <br />
+          Latitud: {markerPosition[0].toFixed(5)}
+          <br />
+          Longitud: {markerPosition[1].toFixed(5)}
+        </Popup>
       </Marker>
       
       {selectedPosition && (

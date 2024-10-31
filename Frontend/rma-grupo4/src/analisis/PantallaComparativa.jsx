@@ -9,17 +9,19 @@ import axios from 'axios';
 import TablaSummary from './TablaSummary';
 import Mapa from './Mapa';
 import html2pdf from 'html2pdf.js';
+import { useAuth } from '../components/AuthContext';
 
 const PantallaComparativa = () => {
     const [availableNodes, setAvailableNodes] = useState([]);
     const [selectedNode1, setSelectedNode1] = useState('0');
     const [selectedNode2, setSelectedNode2] = useState('1');
     const { colorMode } = useColorMode(); // Usar hook para manejar modos de color
+    const { token } = useAuth();
 
     useEffect(() => {
         const fetchAvailableNodes = async () => {
             try {
-                const response = await axios.get('http://localhost:8000/api/v1/clima/nodos/resumen');
+                const response = await axios.get('http://localhost:8000/api/v1/clima/nodos/resumen', {headers: { Authorization: `Bearer ${token}`}});
                 setAvailableNodes(response.data.summary.map(node => node.id_nodo));
             } catch (error) {
                 console.error('Error fetching nodes:', error);

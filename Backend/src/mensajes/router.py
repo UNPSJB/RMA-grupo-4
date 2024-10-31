@@ -24,6 +24,7 @@ from src.mensajes.schemas import (
 )
 from fastapi.responses import StreamingResponse
 from src.utils.qr_utils import obtener_enlace_invitacion, generar_qr
+from src.example.services import *
 
 # Inicializa el router para definir las rutas de este módulo
 router = APIRouter() 
@@ -49,7 +50,8 @@ def get_temperature_data(
     end_time: Optional[datetime] = Query(None, description="Fin del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
     limit: Optional[int] = Query(10, description="Número máximo de registros a devolver"),
     sort: Optional[str] = Query("desc", description="Orden de los resultados (asc o desc)"),
-    db: Session = Depends(get_db)  
+    db: Session = Depends(get_db),
+    rol: str = Depends(verificar_rol("admin","profesional","cooperativa"))
 ):
     """
     Endpoint para obtener los datos de temperatura actual e histórica.
@@ -115,7 +117,8 @@ def get_humidity_data(
     end_time: Optional[datetime] = Query(None, description="Fin del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
     limit: Optional[int] = Query(10, description="Número máximo de registros a devolver"),
     sort: Optional[str] = Query("desc", description="Orden de los resultados (asc o desc)"),
-    db: Session = Depends(get_db)  
+    db: Session = Depends(get_db),
+    rol: str = Depends(verificar_rol("admin", "profesional","cooperativa"))
 ):
     """
     Endpoint para obtener los datos de humedad actual e histórica.
@@ -173,7 +176,8 @@ def get_pressure_data(
     end_time: Optional[datetime] = Query(None, description="Fin del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
     limit: Optional[int] = Query(10, description="Número máximo de registros a devolver"),
     sort: Optional[str] = Query("desc", description="Orden de los resultados (asc o desc)"),
-    db: Session = Depends(get_db)  
+    db: Session = Depends(get_db),
+    rol: str = Depends(verificar_rol("admin","profesional","cooperativa"))  
 ):
     """
     Endpoint para obtener los datos de presión actual e histórica.
@@ -231,7 +235,8 @@ def get_precipitation_data(
     end_time: Optional[datetime] = Query(None, description="Fin del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
     limit: Optional[int] = Query(10, description="Número máximo de registros a devolver"),
     sort: Optional[str] = Query("desc", description="Orden de los resultados (asc o desc)"),
-    db: Session = Depends(get_db)  
+    db: Session = Depends(get_db),
+    rol: str = Depends(verificar_rol("admin","profesional","cooperativa"))
 ):
     """
     Endpoint para obtener los datos de precipitación actual e histórica.
@@ -289,7 +294,8 @@ def get_wind_data(
     end_time: Optional[datetime] = Query(None, description="Fin del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
     limit: Optional[int] = Query(10, description="Número máximo de registros a devolver"),
     sort: Optional[str] = Query("desc", description="Orden de los resultados (asc o desc)"),
-    db: Session = Depends(get_db)  
+    db: Session = Depends(get_db),
+    rol: str = Depends(verificar_rol("admin","profesional","cooperativa"))
 ):
     """
     Endpoint para obtener los datos de viento actual e histórica.
@@ -339,7 +345,7 @@ def get_wind_data(
     return WindResponse(data=response_data, summary=summary)
 
 @router.get("/clima/nodos/resumen", response_model=NodeSummaryResponse)
-def get_node_summary(db: Session = Depends(get_db)):
+def get_node_summary(db: Session = Depends(get_db), rol: str = Depends(verificar_rol("admin","profesional","cooperativa"))):
     """
     Endpoint para obtener el resumen de todos los nodos con el último valor registrado de cada variable.
     """
@@ -407,7 +413,8 @@ def get_node_historical_data(
     db: Session = Depends(get_db),
     start_date: Optional[datetime] = None,
     end_date: Optional[datetime] = None,
-    variable: Optional[str] = None
+    variable: Optional[str] = None,
+    rol: str = Depends(verificar_rol("admin","invitado","universidad"))
 ):
     # Mapeo de tipos de variables a campos
     type_to_field = {
@@ -505,7 +512,7 @@ def get_node_historical_data(
     return historical_response
 
 @router.get("/mensajes/auditoria")
-def obtener_mensajes_auditoria(tipo_mensaje: str = None, db: Session = Depends(get_db)):
+def obtener_mensajes_auditoria(tipo_mensaje: str = None, db: Session = Depends(get_db), rol: str = Depends(verificar_rol("admin"))):
     query = db.query(MensajeAuditoria)
     if tipo_mensaje:
         query = query.filter(MensajeAuditoria.tipo_mensaje == tipo_mensaje)

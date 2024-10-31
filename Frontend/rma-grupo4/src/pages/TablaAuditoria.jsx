@@ -4,20 +4,21 @@ import {
     Text, Box, Heading, Select, Table, Thead, Tbody, Tr, Th, Td, Flex, Button, useColorMode
 } from '@chakra-ui/react';
 import { format } from 'date-fns';
+import { useAuth } from '../components/AuthContext';
 
 const TablaAuditoria = () => {
   const [mensajes, setMensajes] = useState([]);
   const [tipoFiltro, setTipoFiltro] = useState("correcto");
   const { colorMode } = useColorMode();
   const [sortConfig, setSortConfig] = useState({ key: "value", direction: "asc" });
-  
+  const { token } = useAuth();
   const [paginaActual, setPaginaActual] = useState(0); 
   const mensajesPorPagina = 10;
 
   const obtenerMensajes = async (tipo) => {
     try {
       const params = tipo ? { tipo_mensaje: tipo } : {};
-      const respuesta = await axios.get("http://localhost:8000/api/v1/mensajes/auditoria", { params });
+      const respuesta = await axios.get("http://localhost:8000/api/v1/mensajes/auditoria", {headers: { Authorization: `Bearer ${token}`}}, { params });
       setMensajes(respuesta.data);
       setPaginaActual(0); 
     } catch (error) {

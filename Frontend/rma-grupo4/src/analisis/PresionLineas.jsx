@@ -3,6 +3,7 @@ import { Line } from 'react-chartjs-2';
 import axios from 'axios';
 import { Box,Text,useColorMode ,  Modal, ModalOverlay, ModalContent, ModalBody, ModalCloseButton,Button } from '@chakra-ui/react';
 import { MdZoomOutMap } from 'react-icons/md';
+import { useAuth } from '../components/AuthContext';
 
 const PresionLineas = ({ nodeId1, nodeId2 }) => {
     const [presionData, setPresionData] = useState(null);
@@ -10,13 +11,14 @@ const PresionLineas = ({ nodeId1, nodeId2 }) => {
     const { colorMode } = useColorMode();
     const handleOpen = () => setIsOpen(true);
     const handleClose = () => setIsOpen(false);
+    const { token } = useAuth();
 
     const fetchChartData = async () => {
         try {
-            const presionResponse1 = await axios.get(`http://localhost:8000/api/v1/clima/presion`, {
+            const presionResponse1 = await axios.get(`http://localhost:8000/api/v1/clima/presion`, {headers: { Authorization: `Bearer ${token}`}}, {
                 params: { node_id: nodeId1 }
-            });
-            const presionResponse2 = await axios.get(`http://localhost:8000/api/v1/clima/presion`, {
+            } );
+            const presionResponse2 = await axios.get(`http://localhost:8000/api/v1/clima/presion`, {headers: { Authorization: `Bearer ${token}`}}, {
                 params: { node_id: nodeId2 }
             });
 
