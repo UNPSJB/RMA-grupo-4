@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, FormControl, Heading, FormLabel, Input, Textarea, useToast, VStack, HStack , useColorMode, Table, Thead, Tbody, Tr, Th, Td, IconButton
+  Box, FormControl, Heading, FormLabel, Input, Textarea, useToast, VStack, HStack, useColorMode, Table, Thead, Tbody, Tr, Th, Td, Button, IconButton,
+  Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter
 } from '@chakra-ui/react';
-import { FaTrashAlt, FaPen,FaTimes ,FaCheck} from "react-icons/fa";
+import { FaTrashAlt, FaPen} from "react-icons/fa";
 import MapaNodo from '../analisis/MapaNodo';
 
 const CrearNodo = () => {
@@ -15,6 +16,8 @@ const CrearNodo = () => {
   });
   const [nodos, setNodos] = useState([]);
   const [editingNodeId, setEditingNodeId] = useState(null); // Nodo en edición
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false); // Estado del modal de eliminación
+  const [nodeToDelete, setNodeToDelete] = useState(null); // Nodo a eliminar
   const toast = useToast();
   const { colorMode } = useColorMode();
   const isLight = colorMode === 'light';
@@ -147,58 +150,65 @@ const CrearNodo = () => {
   };
 
   // Maneja la eliminación de nodos
-  const handleDelete = async (alias) => {
-    try {
-      const response = await fetch(`http://localhost:8000/eliminar_nodo/${alias}`, {
-        method: 'DELETE',
-      });
-      if (response.ok) {
-        toast({
-          title: 'Nodo eliminado.',
-          description: 'El nodo ha sido eliminado correctamente.',
-          status: 'success',
-          duration: 3000,
-          isClosable: true,
+    // Maneja la eliminación de nodos
+    const handleDelete = (alias) => {
+      setNodeToDelete(alias);
+      setDeleteModalOpen(true); // Abre el modal de confirmación
+    };
+  
+    const confirmDelete = async () => {
+      setDeleteModalOpen(false);
+      try {
+        const response = await fetch(`http://localhost:8000/eliminar_nodo/${nodeToDelete}`, {
+          method: 'DELETE',
         });
-        setNodos(nodos.filter((nodo) => nodo.alias !== alias));
-      } else {
+        if (response.ok) {
+          toast({
+            title: 'Nodo eliminado.',
+            description: 'El nodo ha sido eliminado correctamente.',
+            status: 'success',
+            duration: 3000,
+            isClosable: true,
+          });
+          setNodos(nodos.filter((nodo) => nodo.alias !== nodeToDelete));
+        } else {
+          toast({
+            title: 'Error.',
+            description: 'No se pudo eliminar el nodo.',
+            status: 'error',
+            duration: 3000,
+            isClosable: true,
+          });
+        }
+      } catch (error) {
         toast({
           title: 'Error.',
-          description: 'No se pudo eliminar el nodo.',
+          description: 'No se pudo conectar con la API.',
           status: 'error',
           duration: 3000,
           isClosable: true,
         });
       }
-    } catch (error) {
-      toast({
-        title: 'Error.',
-        description: 'No se pudo conectar con la API.',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-    }
-  };
+    };
 
   const handleCancelEdit = () => {
     setEditingNodeId(null);
     setFormData({ id_nodo:'',alias: '', longitud: '', latitud: '', descripcion: '' });
   };
 
+
   return (
-    <VStack display="flex" justifyContent="center" alignItems="center" minHeight="100vh" spacing={4} p={4} bg={colorMode === 'light' ? 'white' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'}>
-      <Heading as="h1"textAlign="center">Gestión Nodos</Heading>
-      {/* Fila para el Formulario y el Mapa */}
+    <VStack display="flex" justifyContent="center" alignItems="center" minHeight="20vh" spacing={4} p={4} bg={colorMode === 'light' ? 'white' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'}>
+      <Heading as="h1" textAlign="center">Gestión Nodos</Heading>
       <HStack spacing={4}>
-        {/* Formulario para Crear/Modificar Nodo */}
-        <Box height="525px" maxW="sm" p={4} borderColor={isLight ? 'black' : 'gray.500'} borderWidth="1px" borderRadius="lg" bg={isLight ? 'white' : 'gray.800'}>
+        <Box height="550px" maxW="sm" p={4} borderColor={isLight ? 'black' : 'gray.500'} borderWidth="1px" borderRadius="lg" bg={isLight ? 'white' : 'gray.800'}>
+          <Heading as="h4" fontSize="1.2rem" textAlign="center" >{editingNodeId ? 'Modificar Nodo' : 'Crear Nodo'}</Heading>
           <form onSubmit={handleSubmit}>
-          <FormControl isRequired>
+            <FormControl isRequired>
               <FormLabel color={isLight ? 'black' : 'white'}>Id Nodo</FormLabel>
               <Input
                 name="id_nodo"
-                type='number'
+                type="number"
                 step={1}
                 value={formData.id_nodo}
                 onChange={handleChange}
@@ -261,26 +271,26 @@ const CrearNodo = () => {
               />
             </FormControl>
             <HStack mt={2} display="flex" justifyContent="center" alignItems="center">
-              <IconButton
-                aria-label={editingNodeId ? "Guardar cambios" : "Crear Nodo"}
-                icon={<FaCheck />}
-                onClick={handleSubmit}
+              <Button
+                type="submit"
                 colorScheme="green"
-              />
+              >
+                {editingNodeId ? 'Guardar' : 'Crear Nodo'}
+              </Button>
               {editingNodeId && (
-                <IconButton
-                  aria-label="Cancelar edición"
-                  icon={<FaTimes  />}
+                <Button
                   onClick={handleCancelEdit}
                   colorScheme="red"
-                />
+                >
+                  Cancelar
+                </Button>
               )}
             </HStack>
           </form>
         </Box>
   
         {/* Componente de Mapa */}
-        <Box height="525px" width="700px" p={2} borderColor={isLight ? 'black' : 'gray.500'} borderWidth="1px" borderRadius="lg" bg={isLight ? 'white' : 'gray.800'}>
+        <Box height="550px" width="700px" p={2} borderColor={isLight ? 'black' : 'gray.500'} borderWidth="1px" borderRadius="lg" bg={isLight ? 'white' : 'gray.800'}>
           <MapaNodo onMapClick={handleMapClick}/>
         </Box>
       </HStack>
@@ -290,7 +300,7 @@ const CrearNodo = () => {
         <Table variant="simple">
           <Thead>
             <Tr>
-              <Th textAlign={'center'} color={isLight ? 'black' : 'white'}>Id Nodo</Th>
+              <Th textAlign={'center'} color={isLight ? 'black' : 'white'}>Nodo</Th>
               <Th textAlign={'center'} color={isLight ? 'black' : 'white'}>Alias</Th>
               <Th textAlign={'center'} color={isLight ? 'black' : 'white'}>Latitud</Th>
               <Th textAlign={'center'} color={isLight ? 'black' : 'white'}>Longitud</Th>
@@ -306,24 +316,74 @@ const CrearNodo = () => {
                 <Td textAlign={'center'} color={isLight ? 'black' : 'white'}>{nodo.longitud}</Td>
                 <Td textAlign={'center'}>
                   <IconButton
-                    aria-label="Edit Node"
+                    aria-label="Ediar"
                     icon={<FaPen />}
                     onClick={() => handleEdit(nodo)}
                     mr={2}
                     colorScheme='blue'
                   />
-                  <IconButton
-                    aria-label="Delete Node"
-                    icon={<FaTrashAlt />}
-                    onClick={() => handleDelete(nodo.alias)}
-                    colorScheme='red'
-                  />
+                  <IconButton icon={<FaTrashAlt />} onClick={() => handleDelete(nodo.alias)} aria-label="Eliminar" colorScheme='red'/>
                 </Td>
               </Tr>
             ))}
           </Tbody>
         </Table>
       </Box>
+      <Modal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
+      <ModalOverlay />
+      <ModalContent 
+        bg={colorMode === 'light' ? 'white' : 'gray.700'} 
+        color={colorMode === 'light' ? 'black' : 'white'}
+        maxWidth="500px" // Ajusta el ancho máximo según sea necesario
+      >
+        <ModalHeader bg={colorMode === 'light' ? 'gray.200' : 'gray.800'} color={colorMode === 'light' ? 'black' : 'white'}>
+          Confirmar Eliminación
+        </ModalHeader>
+        <ModalBody>
+          ¿Está seguro de que desea eliminar el nodo con el alias "{nodeToDelete}"?
+        </ModalBody>
+        <ModalFooter>
+          <Button               
+            bg={colorMode === 'light' ? 'rgb(0, 31, 63)' : 'orange.500'}
+            color={colorMode === 'light' ? 'gray.200' : 'white'}
+            border="none"
+            p="6"
+            boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
+            _hover={{
+              bg: colorMode === 'light' ? 'rgb(0, 41, 83)' : 'orange.600',
+              boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)',
+              transform: 'scale(1.05)',
+            }}
+            _active={{
+              bg: colorMode === 'light' ? 'rgb(0, 21, 43)' : 'orange.700',
+              transform: 'translateY(2px)',
+              boxShadow: '10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)',
+            }} 
+            onClick={confirmDelete}>
+            Sí, eliminar
+          </Button>
+          <Button
+            ml={3} 
+            bg="grey.500"
+            border="none"
+            p="6"
+            boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
+            _hover={{
+              bg: 'grey.600',
+              boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)',
+              transform: 'scale(1.05)',
+            }}
+            _active={{
+              bg: 'grey.700',
+              transform: 'translateY(2px)',
+              boxShadow: '10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)',
+            }} 
+            onClick={() => setDeleteModalOpen(false)}>
+            Cancelar
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
     </VStack>
   );    
 };
