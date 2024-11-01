@@ -6,6 +6,7 @@ import EliminarUsuario from './EliminarUsuario';
 import AsignarRol from './AsignarRol';
 import { useAuth } from './AuthContext';
 
+
 export default function Usuarios() {
     const [usuarios, setUsuarios] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -77,7 +78,9 @@ export default function Usuarios() {
     const buttonShadow = useColorModeValue("5px 5px 3px #5a5a5a, -5px -5px 3px #ffffff", "2px 2px 3px rgba(0, 0, 0, 0.3)"); // Sombra tenue en modo oscuro
 
     return (
+       
         <Box bg={bg} borderRadius="md" boxShadow={shadow} p={4}>
+            
             <TableContainer>
                 <Table variant="simple">
                     <Thead>
@@ -100,30 +103,46 @@ export default function Usuarios() {
                                 <Td color={useColorModeValue('black', 'white')} p={1}>{usuario.rol_nombre}</Td>
                                 <Td p={1}>
                                     <Button 
-                                        leftIcon={<Icon as={AiOutlineSetting} />} 
+                                        leftIcon={
+                                            <Icon 
+                                                as={AiOutlineSetting} 
+                                                color="currentColor" // Hereda el color definido en el botón
+                                            />
+                                        } 
                                         background={buttonDefaultColor} // Color gris por defecto
                                         borderRadius="6px"
                                         boxShadow={buttonShadow} // Sombra tenue en modo oscuro
                                         variant="solid"
                                         size="sm"
-                                        _hover={{ background: buttonHoverColor }} // Cambiar a color deseado al pasar el mouse
+                                        _hover={{ 
+                                            background: buttonHoverColor, // Fondo en hover
+                                            color: "lightgray" // Cambia el color del ícono a gris claro
+                                        }}
                                         onClick={() => {
-                                            setUsuarioAModificar(usuario);
+                                            setUsuarioAModificar(usuario); // Sin cambios en la funcionalidad
                                             setIsModalAsignarOpen(true);
                                         }}
                                         mr={2}
                                     >
                                     </Button>
                                     <Button 
-                                        leftIcon={<Icon as={AiOutlineDelete} />} // Icono de tacho de basura
+                                        leftIcon={
+                                            <Icon 
+                                                as={AiOutlineDelete} 
+                                                color="currentColor" // Hereda el color definido en el botón
+                                            />
+                                        }
                                         background={buttonDefaultColor} // Color gris por defecto
                                         borderRadius="6px"
                                         boxShadow={buttonShadow} // Sombra tenue en modo oscuro
                                         variant="solid"
                                         size="sm"
-                                        _hover={{ background: buttonHoverColor }} // Cambiar a color deseado al pasar el mouse
+                                        _hover={{ 
+                                            background: buttonHoverColor, // Fondo en hover
+                                            color: "lightgray" // Cambia el color del ícono a gris claro
+                                        }}
                                         onClick={() => {
-                                            setUsuarioAEliminar(usuario.usuario);
+                                            setUsuarioAEliminar(usuario.usuario); // Sin cambios en la funcionalidad
                                             setIsModalEliminarOpen(true);
                                         }}
                                     >
@@ -150,3 +169,4 @@ export default function Usuarios() {
         </Box>
     );
 }
+
