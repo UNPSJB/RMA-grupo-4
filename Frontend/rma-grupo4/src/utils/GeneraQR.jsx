@@ -1,64 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Box, Grid, GridItem, useColorMode, Heading, Text } from '@chakra-ui/react';
+import { Image, Box, Grid, GridItem, SimpleGrid, useColorMode, Heading, Text } from '@chakra-ui/react';
 import { useAuth } from '../components/AuthContext';
 
 const GeneraQR = () => {
-    const { user } = useAuth();
+    const { userRole, token } = useAuth();
     const [qrImageCanal1, setQrImageCanal1] = useState(null); // QR para canal 1
     const [qrImageCanal2, setQrImageCanal2] = useState(null); // QR para canal 2
-    const [rol, setRol] = useState(null); // Nombre del rol
-    const [rolId, setRolId] = useState(null); // ID del rol
-    const [roles, setRoles] = useState([]); // Lista de roles
     const { colorMode } = useColorMode();
-
-    // Obtiene el rol_id del usuario logueado
-    const obtenerRolUsuario = async () => {
-        try {
-            const response = await fetch(`http://localhost:8000/usuarios/${user}`);
-            if (!response.ok) {
-                throw new Error('Error al obtener el rol del usuario');
-            }
-            const data = await response.json();
-            setRolId(data.rol_id);
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    // Obtiene la lista completa de roles
-    const obtenerRoles = async () => {
-        try {
-            const response = await fetch(`http://localhost:8000/roles/`);
-            if (!response.ok) {
-                throw new Error('Error al obtener roles');
-            }
-            const data = await response.json();
-            setRoles(data); 
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    // Establece el nombre del rol basado en rolId y la lista de roles
-    useEffect(() => {
-        if (rolId && roles.length > 0) {
-            const rolNombre = roles[rolId - 1]; 
-            if (rolNombre) {
-                setRol(rolNombre); 
-            }
-        }
-    }, [rolId, roles]);
 
     // Genera los QR según el nombre del rol del usuario
     const handleGenerateQR = async () => {
-        if (!rol) return;
+        if (!userRole) return;
 
         try {
             // Lógica de generación para rol 'admin'
-            if (rol === 'admin') {
+            if (userRole === 'admin') {
                 const [response1, response2] = await Promise.all([
-                    fetch(`http://localhost:8000/api/v1/generar_qr_telegram/canal_1`),
-                    fetch(`http://localhost:8000/api/v1/generar_qr_telegram/canal_2`)
+                    fetch(`http://localhost:8000/api/v1/generar_qr_telegram/canal_1`, {headers: { Authorization: `Bearer ${token}`}}),
+                    fetch(`http://localhost:8000/api/v1/generar_qr_telegram/canal_2`, {headers: { Authorization: `Bearer ${token}`}})
                 ]);
                 
                 if (!response1.ok || !response2.ok) throw new Error('Error al generar los QR');
@@ -70,14 +29,14 @@ const GeneraQR = () => {
                 setQrImageCanal2(URL.createObjectURL(blob2));
 
 
-            } else if (rol === 'cooperativa') {
-                const response = await fetch(`http://localhost:8000/api/v1/generar_qr_telegram/canal_1`);
+            } else if (userRole === 'cooperativa') {
+                const response = await fetch(`http://localhost:8000/api/v1/generar_qr_telegram/canal_1`, {headers: { Authorization: `Bearer ${token}`}});
                 if (!response.ok) throw new Error('Error al generar el QR del canal 1');
                 const blob = await response.blob();
                 setQrImageCanal1(URL.createObjectURL(blob));
 
-            } else if (rol === 'profesional') {
-                const response = await fetch(`http://localhost:8000/api/v1/generar_qr_telegram/canal_2`);
+            } else if (userRole === 'profesional') {
+                const response = await fetch(`http://localhost:8000/api/v1/generar_qr_telegram/canal_2`, {headers: { Authorization: `Bearer ${token}`}});
                 if (!response.ok) throw new Error('Error al generar el QR del canal 2');
                 const blob = await response.blob();
                 setQrImageCanal2(URL.createObjectURL(blob));
@@ -89,13 +48,8 @@ const GeneraQR = () => {
     };
 
     useEffect(() => {
-        obtenerRolUsuario();
-        obtenerRoles();
-    }, []);
-
-    useEffect(() => {
-        if (rol) handleGenerateQR();
-    }, [rol]);
+        if (userRole) handleGenerateQR();
+    }, [userRole]);
 
     return (
         <Box 
@@ -121,17 +75,17 @@ const GeneraQR = () => {
 
                 <GridItem>
                     {/* Mensaje de orientacion segun el rol */}
-                    {rol === 'cooperativa' && (
+                    {userRole === 'cooperativa' && (
                         <Text mb={4} fontSize="md">
                             Como usuario cooperativa, te unirás al canal de <strong>nivel hidrométrico</strong> para recibir alertas sobre niveles de agua en tu zona.
                         </Text>
                     )}
-                    {rol === 'profesional' && (
+                    {userRole === 'profesional' && (
                         <Text mb={4} fontSize="md">
                             Como usuario profesional, te unirás al canal de <strong>estado de sensores</strong> para recibir alertas sobre el estado de los dispositivos y sensores.
                         </Text>
                     )}
-                    {rol === 'admin' && (
+                    {userRole === 'admin' && (
                         <Text mb={4} fontSize="md">
                             Como administrador, tienes acceso a ambos canales: tanto al canal de <strong>nivel hidrométrico</strong> como al canal de <strong>estado de sensores</strong>.
                         </Text>
@@ -139,32 +93,33 @@ const GeneraQR = () => {
                 </GridItem>
 
                 {/* Renderizado condicional de los QR */}
-                {((rol === 'admin' && qrImageCanal1 && qrImageCanal2) || 
-                  (rol === 'cooperativa' && qrImageCanal1) || 
-                  (rol === 'profesional' && qrImageCanal2)) && (
+                {((userRole === 'admin' && qrImageCanal1 && qrImageCanal2) || 
+                  (userRole === 'cooperativa' && qrImageCanal1) || 
+                  (userRole === 'profesional' && qrImageCanal2)) && (
                     <GridItem
-                        bg={colorMode === 'light' ? 'gray.200' : 'gray.900'} 
-                        borderRadius="md" 
-                        boxShadow="lg" 
-                        display="flex"            
-                        flexDirection="column"
-                        justifyContent="center"   
+                        bg={colorMode === 'light' ? 'gray.200' : 'gray.900'}
+                        borderRadius="md"
+                        boxShadow="lg"
+                        display="flex"
+                        justifyContent="center"
                         alignItems="center"
-                        style={{ width: '400px' }}  
+                        style={{ width: '800px' }}
                         p="4"
                     >
-                        {qrImageCanal1 && (
-                            <Box mb="4">
-                                <Text fontSize="sm" mb="2" color="blue.600">Canal de Nivel Hidrométrico</Text>
-                                <Image src={qrImageCanal1} alt="Código QR Canal 1" m={2} height={{ base: '200px', md: '300px' }} />
-                            </Box>
-                        )}
-                        {qrImageCanal2 && (
-                            <Box mb="4">
-                                <Text fontSize="sm" mb="2" color="green.600">Canal de Estado de Sensores</Text>
-                                <Image src={qrImageCanal2} alt="Código QR Canal 2" m={2} height={{ base: '200px', md: '300px' }} />
-                            </Box>
-                        )}
+                        <SimpleGrid columns={qrImageCanal1 && qrImageCanal2 ? 2 : 1} spacing={24}>
+                            {qrImageCanal1 && (
+                                <Box mb="4" textAlign="center">
+                                    <Text fontSize="sm" mb="2" color="blue.600">Canal de Nivel Hidrométrico</Text>
+                                    <Image src={qrImageCanal1} alt="Código QR Canal 1" m={2} height={{ base: '200px', md: '300px' }} />
+                                </Box>
+                            )}
+                            {qrImageCanal2 && (
+                                <Box mb="4" textAlign="center">
+                                    <Text fontSize="sm" mb="2" color="green.600">Canal de Estado de Sensores</Text>
+                                    <Image src={qrImageCanal2} alt="Código QR Canal 2" m={2} height={{ base: '200px', md: '300px' }} />
+                                </Box>
+                            )}
+                        </SimpleGrid>
                     </GridItem>
                 )}
             </Grid>

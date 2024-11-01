@@ -62,11 +62,11 @@ function Login() {
     
                 // Redirigir basado en el rol
                 if (rol === 'admin') {
-                    navigate('/admin');
+                    navigate('/panel_admin');
                 } else if (rol === 'universidad' || rol === 'invitado') {
-                    navigate('/historicos');
+                    navigate('/graficos_historicos');
                 } else if (rol === 'profesional' || rol === 'cooperativa'){
-                    navigate('/inicio');
+                    navigate('/analisis_actual');
                 }
             }
         } catch (error) {

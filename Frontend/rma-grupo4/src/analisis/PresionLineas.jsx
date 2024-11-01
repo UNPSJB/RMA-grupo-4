@@ -15,11 +15,11 @@ const PresionLineas = ({ nodeId1, nodeId2 }) => {
 
     const fetchChartData = async () => {
         try {
-            const presionResponse1 = await axios.get(`http://localhost:8000/api/v1/clima/presion`, {headers: { Authorization: `Bearer ${token}`}}, {
-                params: { node_id: nodeId1 }
+            const presionResponse1 = await axios.get(`http://localhost:8000/api/v1/clima/presion`, {
+                params: { node_id: nodeId1 }, headers: { Authorization: `Bearer ${token}`}
             } );
-            const presionResponse2 = await axios.get(`http://localhost:8000/api/v1/clima/presion`, {headers: { Authorization: `Bearer ${token}`}}, {
-                params: { node_id: nodeId2 }
+            const presionResponse2 = await axios.get(`http://localhost:8000/api/v1/clima/presion`, {
+                params: { node_id: nodeId2 }, headers: { Authorization: `Bearer ${token}`}
             });
 
             const presionProcessedData1 = presionResponse1.data.data.map(item => ({

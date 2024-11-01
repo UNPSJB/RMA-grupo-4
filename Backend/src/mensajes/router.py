@@ -30,7 +30,11 @@ from src.example.services import *
 router = APIRouter() 
 
 @router.get("/generar_qr_telegram/{canal_id}")
-async def generar_qr_telegram(canal_id: str):
+async def generar_qr_telegram(
+        canal_id: str,
+        db: Session = Depends(get_db),
+        rol: str = Depends(verificar_rol("admin","profesional","cooperativa"))
+    ):
     """
     Genera un código QR a partir del enlace de invitación del canal de Telegram especificado por canal_id.
     """

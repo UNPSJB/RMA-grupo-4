@@ -25,8 +25,8 @@ const TablaSummary = ({ nodeId1, nodeId2 }) => {
             ];
 
             const summaryPromises = endpoints.map(async (endpoint) => {
-                const response1 = await axios.get(endpoint.url, {headers: { Authorization: `Bearer ${token}`}}, { params: { node_id: nodeId1 } });
-                const response2 = await axios.get(endpoint.url, {headers: { Authorization: `Bearer ${token}`}}, { params: { node_id: nodeId2 } });
+                const response1 = await axios.get(endpoint.url,{ params: { node_id: nodeId1 }, headers: { Authorization: `Bearer ${token}`}});
+                const response2 = await axios.get(endpoint.url,{ params: { node_id: nodeId2 }, headers: { Authorization: `Bearer ${token}`}});
 
                 return {
                     [endpoint.title]: {

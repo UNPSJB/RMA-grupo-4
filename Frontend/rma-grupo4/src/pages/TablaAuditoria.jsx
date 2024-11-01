@@ -18,7 +18,7 @@ const TablaAuditoria = () => {
   const obtenerMensajes = async (tipo) => {
     try {
       const params = tipo ? { tipo_mensaje: tipo } : {};
-      const respuesta = await axios.get("http://localhost:8000/api/v1/mensajes/auditoria", {headers: { Authorization: `Bearer ${token}`}}, { params });
+      const respuesta = await axios.get("http://localhost:8000/api/v1/mensajes/auditoria", {params, headers: { Authorization: `Bearer ${token}`}});
       setMensajes(respuesta.data);
       setPaginaActual(0); 
     } catch (error) {
@@ -85,7 +85,7 @@ const TablaAuditoria = () => {
       p={6}
     >
       <Heading as="h1" textAlign="center" mb={8}>
-        Mensajes de Auditoría
+        Tabla Auditoría
       </Heading>
 
       {/* Filtro de tipo de mensaje */}

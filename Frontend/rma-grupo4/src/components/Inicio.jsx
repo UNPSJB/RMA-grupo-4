@@ -74,7 +74,7 @@ export default function Inicio() {
       {/* Contenedor que se descargará como PDF */}
       <Box id="viewToDownload">
         <Box mt={0} p={{ base: 2, md: 4 }}>
-          <Heading as="h1" m={7} textAlign="center">Datos Actualizados</Heading>
+          <Heading as="h1" m={7} textAlign="center">Análisis Actualizado</Heading>
           <Grid
             templateColumns="1fr"
             gap={4}

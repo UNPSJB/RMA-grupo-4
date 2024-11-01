@@ -263,7 +263,7 @@ function HistoricosPage() {
 
   return (
     <Box p={4} bg={colorMode === 'light' ? 'white' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'}>
-      <Heading as="h1" m={7} textAlign="center">Graficos Datos Históricos</Heading>
+      <Heading as="h1" m={7} textAlign="center">Gráficos Datos Históricos</Heading>
       <Flex justify="center" mb={4} mt={5} wrap="wrap" gap={4}>
         <Select
           value={selectedVariable}

@@ -31,7 +31,7 @@ function AppRoutes() {
         
         {/* Ruta protegida */}
         <Route 
-          path="/inicio" 
+          path="/analisis_actual" 
           element={
             <App>
               <PrivateRoute allowedRoles={['admin','cooperativa','profesional']}>
@@ -42,7 +42,7 @@ function AppRoutes() {
         />
         {/* Rutas adicionales protegidas */}
         <Route 
-          path="/historicos" 
+          path="/graficos_historicos" 
           element={
             <App>
               <PrivateRoute allowedRoles={['admin', 'invitado', 'universidad']}>
@@ -52,7 +52,7 @@ function AppRoutes() {
           } 
         />
         <Route 
-          path="/comparativo" 
+          path="/analisis_avanzado" 
           element={
             <App>
               <PrivateRoute allowedRoles={['admin', 'profesional', 'cooperativa']}>
@@ -62,7 +62,7 @@ function AppRoutes() {
           } 
         />
         <Route 
-          path="/tabla_datos_historicos" 
+          path="/tabla_historicos" 
           element={
             <App>
               <PrivateRoute allowedRoles={['admin', 'invitado', 'universidad']}>
@@ -72,7 +72,7 @@ function AppRoutes() {
           } 
         />
          <Route 
-          path="/auditoria" 
+          path="/tabla_auditoria" 
           element={
             <App>
               <PrivateRoute allowedRoles={['admin']}>
@@ -142,7 +142,7 @@ function AppRoutes() {
           } 
         />
         <Route 
-          path="/generar_qr" 
+          path="/suscripcion_alertas" 
           element={
             <App>
               <PrivateRoute allowedRoles={['admin','cooperativa','profesional']}>
@@ -152,7 +152,7 @@ function AppRoutes() {
           } 
         />
         <Route 
-          path="/crear_nodo" 
+          path="/gestion_nodos" 
           element={
             <App>
               <PrivateRoute allowedRoles={['admin','cooperativa','profesional']}>
@@ -162,7 +162,7 @@ function AppRoutes() {
           } 
         />
         <Route 
-          path="/admin" 
+          path="/panel_admin" 
           element={
             <App>
               <PrivateRoute allowedRoles={['admin']}>

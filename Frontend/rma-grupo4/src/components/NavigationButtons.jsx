@@ -34,13 +34,13 @@ function NavigationButtons() {
 
   // Definir permisos para cada rol
   const navItems = [
-    { text: "Analisis Actual", route: "/inicio", allowedRoles: ["admin"] },
-    { text: "Gráficos Datos Históricos", route: "/historicos", allowedRoles: ["admin", "invitado", "universidad"] },
-    { text: "Tabla Datos Historicos", route: "/tabla_datos_historicos", allowedRoles: ["admin", "invitado", "universidad"] },
-    { text: "Analisis Avanzado", route: "/comparativo", allowedRoles: ["admin", "profesional", "cooperativa"] },
-    { text: "Suscripcion a alertas", route: "/generar_qr", allowedRoles: ["admin", "profesional", "cooperativa"] },
-    { text: "Tabla auditoria", route: "/auditoria", allowedRoles: ["admin"] },
-    { text: "Gestión Nodo", route: "/crear_nodo", allowedRoles: ["admin", "profesional", "cooperativa"] }
+    { text: "Análisis Actual", route: "/analisis_actual", allowedRoles: ["admin"] },
+    { text: "Gráficos Datos Históricos", route: "/graficos_historicos", allowedRoles: ["admin", "invitado", "universidad"] },
+    { text: "Tabla Datos Históricos", route: "/tabla_historicos", allowedRoles: ["admin", "invitado", "universidad"] },
+    { text: "Análisis Avanzado", route: "/analisis_avanzado", allowedRoles: ["admin", "profesional", "cooperativa"] },
+    { text: "Suscripción a Alertas", route: "/suscripcion_alertas", allowedRoles: ["admin", "profesional", "cooperativa"] },
+    { text: "Tabla Auditoría", route: "/tabla_auditoria", allowedRoles: ["admin"] },
+    { text: "Gestión Nodos", route: "/gestion_nodos", allowedRoles: ["admin", "profesional", "cooperativa"] }
   ];
 
   // Filtrar los items según el rol del usuario

@@ -24,13 +24,13 @@ function NavBar() {
     const handleHomeClick = () => {
         if (isAuthenticated) {
             if (userRole === "admin"){
-                navigate('/admin'); 
+                navigate('/panel_admin'); 
             }else if (userRole === "profesional" || userRole === "cooperativa"){
-                navigate('/inicio');
+                navigate('/analisis_actual');
             }else if (userRole === "universidad"){
-                navigate('/historicos');
+                navigate('/graficos_historicos');
             }else{
-                navigate('/historicos');
+                navigate('/graficos_historicos');
             }
         } else {
             navigate('/');

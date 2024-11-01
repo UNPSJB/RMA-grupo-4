@@ -16,11 +16,11 @@ const VientoRosa = ({ nodeId1, nodeId2 }) => {
     const fetchChartData = async () => {
         try {
             // Fetch Viento Data
-            const vientoResponse1 = await axios.get(`http://localhost:8000/api/v1/clima/viento`, {headers: { Authorization: `Bearer ${token}`}}, {
-                params: { node_id: nodeId1 }
+            const vientoResponse1 = await axios.get(`http://localhost:8000/api/v1/clima/viento`,{
+                params: { node_id: nodeId1 }, headers: { Authorization: `Bearer ${token}`}
             });
-            const vientoResponse2 = await axios.get(`http://localhost:8000/api/v1/clima/viento`, {headers: { Authorization: `Bearer ${token}`}}, {
-                params: { node_id: nodeId2 }
+            const vientoResponse2 = await axios.get(`http://localhost:8000/api/v1/clima/viento`,{
+                params: { node_id: nodeId2 }, headers: { Authorization: `Bearer ${token}`}
             });
 
             const vientoProcessedData1 = vientoResponse1.data.data.map(item => ({

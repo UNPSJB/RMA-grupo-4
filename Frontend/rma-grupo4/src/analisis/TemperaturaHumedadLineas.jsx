@@ -16,10 +16,10 @@ const TemperaturaHumedadLineas = ({ nodeId1, nodeId2 }) => {
     const fetchChartData = async () => {
         try {
             const [temperaturaResponse1, temperaturaResponse2, humedadResponse1, humedadResponse2] = await Promise.all([
-                axios.get('http://localhost:8000/api/v1/clima/temperatura', {headers: { Authorization: `Bearer ${token}`}}, { params: { node_id: nodeId1 } }),
-                axios.get('http://localhost:8000/api/v1/clima/temperatura', {headers: { Authorization: `Bearer ${token}`}}, { params: { node_id: nodeId2 } }),
-                axios.get('http://localhost:8000/api/v1/clima/humedad', {headers: { Authorization: `Bearer ${token}`}}, { params: { node_id: nodeId1 } }),
-                axios.get('http://localhost:8000/api/v1/clima/humedad', {headers: { Authorization: `Bearer ${token}`}}, { params: { node_id: nodeId2 } })
+                axios.get('http://localhost:8000/api/v1/clima/temperatura', { params: { node_id: nodeId1 }, headers: { Authorization: `Bearer ${token}`}}),
+                axios.get('http://localhost:8000/api/v1/clima/temperatura', { params: { node_id: nodeId2 }, headers: { Authorization: `Bearer ${token}`}}),
+                axios.get('http://localhost:8000/api/v1/clima/humedad', { params: { node_id: nodeId1 }, headers: { Authorization: `Bearer ${token}`}}),
+                axios.get('http://localhost:8000/api/v1/clima/humedad', { params: { node_id: nodeId2 },headers: { Authorization: `Bearer ${token}`} })
             ]);
 
             const extractData = (response) => {
