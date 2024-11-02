@@ -8,15 +8,15 @@ export default function Nodos() {
   const { colorMode } = useColorMode();
 
   const cards = [
-    { id: 1, title: 'Agregar Nodo', route: '/gestion_nodos', icon: FaPlus },
-    { id: 2, title: 'Modificar Nodo', route: '/modificar-nodo', icon: FaEdit },
-    { id: 3, title: 'Eliminar Nodo', route: '/eliminar-nodo', icon: FaTrash },
-    { id: 4, title: 'Lista de Nodos', route: '/lista-nodos', icon: FaList },
+    { id: 1, title: 'Gestión Nodos', route: '/gestion_nodos', icon: FaPlus },
+    //{ id: 2, title: 'Modificar Nodo', route: '/modificar-nodo', icon: FaEdit },
+    //{ id: 3, title: 'Eliminar Nodo', route: '/eliminar-nodo', icon: FaTrash },
+    //{ id: 4, title: 'Lista de Nodos', route: '/lista-nodos', icon: FaList },
   ];
 
   return (
     <Box p={5}>
-      <Button
+       {/*<Button
         onClick={() => navigate(-1)} // Navegación hacia atrás
         leftIcon={<FaArrowLeft />}
         colorScheme={colorMode === 'dark' ? 'orange' : 'teal'} // Cambia según tu paleta de colores
@@ -30,7 +30,7 @@ export default function Nodos() {
         }}
       >
         Volver
-      </Button>
+      </Button>*/}
 
       <SimpleGrid
         columns={{ base: 1, md: 2, lg: 4 }}

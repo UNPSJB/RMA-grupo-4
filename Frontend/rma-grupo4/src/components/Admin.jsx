@@ -13,7 +13,7 @@ export default function Admin() {
     { id: 2, title: 'Roles', route: '/roles', icon: FaKey },
     { id: 3, title: 'Nodos', route: '/nodos', icon: FaNetworkWired },
     { id: 4, title: 'Alertas', route: '/alertaAdmin', icon: FaBell },
-    { id: 5, title: 'Configuración', route: '/configuracion', icon: FaCog },
+    //{ id: 5, title: 'Configuración', route: '/configuracion', icon: FaCog },
   ];
 
   return (

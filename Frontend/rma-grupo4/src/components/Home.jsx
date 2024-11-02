@@ -6,15 +6,21 @@ import { useAuth } from './AuthContext'; // Importar el contexto de autenticaci�
 
 export default function Home() {
     const navigate = useNavigate();
-    const { isAuthenticated } = useAuth(); // Obtener estado de autenticación
+    const { isAuthenticated, userRole } = useAuth(); // Obtener estado de autenticación
     const { colorMode } = useColorMode(); // Hook para obtener el modo de color actual
 
     // Redirigir al usuario a /inicio si ya está autenticado
     useEffect(() => {
         if (isAuthenticated) {
-            navigate('/inicio');
+            if (userRole === 'admin') {
+                navigate('/panel_admin');
+            } else if (userRole === 'universidad' || userRole === 'invitado') {
+                navigate('/graficos_historicos');
+            } else if (userRole === 'profesional' || userRole === 'cooperativa'){
+                navigate('/analisis_actual');
+            }
         }
-    }, [isAuthenticated, navigate]);
+    }, [isAuthenticated, navigate, userRole]);
 
     return (
         <Box

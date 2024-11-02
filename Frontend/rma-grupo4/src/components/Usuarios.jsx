@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Box, Spinner, Button, Icon, Center, useColorModeValue } from '@chakra-ui/react';
+import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Box, Spinner, Button, Icon, IconButton, Center, useColorModeValue } from '@chakra-ui/react';
 import { AiOutlineSetting, AiOutlineClose, AiOutlineDelete } from 'react-icons/ai'; // Importa el icono de tacho de basura
+import { FaTrashAlt, FaPen} from "react-icons/fa";
 import axios from 'axios';
 import EliminarUsuario from './EliminarUsuario';
 import AsignarRol from './AsignarRol';
@@ -102,51 +103,24 @@ export default function Usuarios() {
                                 <Td color={useColorModeValue('black', 'white')} p={1}>{usuario.edad}</Td>
                                 <Td color={useColorModeValue('black', 'white')} p={1}>{usuario.rol_nombre}</Td>
                                 <Td p={1}>
-                                    <Button 
-                                        leftIcon={
-                                            <Icon 
-                                                as={AiOutlineSetting} 
-                                                color="currentColor" // Hereda el color definido en el botón
-                                            />
-                                        } 
-                                        background={buttonDefaultColor} // Color gris por defecto
-                                        borderRadius="6px"
-                                        boxShadow={buttonShadow} // Sombra tenue en modo oscuro
-                                        variant="solid"
-                                        size="sm"
-                                        _hover={{ 
-                                            background: buttonHoverColor, // Fondo en hover
-                                            color: "lightgray" // Cambia el color del ícono a gris claro
-                                        }}
+                                    <IconButton
+                                        aria-label="Ediar"
+                                        icon={<FaPen />}
                                         onClick={() => {
                                             setUsuarioAModificar(usuario); // Sin cambios en la funcionalidad
                                             setIsModalAsignarOpen(true);
                                         }}
                                         mr={2}
-                                    >
-                                    </Button>
-                                    <Button 
-                                        leftIcon={
-                                            <Icon 
-                                                as={AiOutlineDelete} 
-                                                color="currentColor" // Hereda el color definido en el botón
-                                            />
-                                        }
-                                        background={buttonDefaultColor} // Color gris por defecto
-                                        borderRadius="6px"
-                                        boxShadow={buttonShadow} // Sombra tenue en modo oscuro
-                                        variant="solid"
-                                        size="sm"
-                                        _hover={{ 
-                                            background: buttonHoverColor, // Fondo en hover
-                                            color: "lightgray" // Cambia el color del ícono a gris claro
-                                        }}
+                                        colorScheme='blue'
+                                    />
+                                    <IconButton 
+                                        icon={<FaTrashAlt />} 
+                                        aria-label="Eliminar" colorScheme='red'
                                         onClick={() => {
                                             setUsuarioAEliminar(usuario.usuario); // Sin cambios en la funcionalidad
                                             setIsModalEliminarOpen(true);
-                                        }}
-                                    >
-                                    </Button>
+                                        }}    
+                                    />      
                                 </Td>
                             </Tr>
                         ))}

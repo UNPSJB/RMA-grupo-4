@@ -47,7 +47,7 @@ const TablaAuditoria = () => {
         return 0;
       });
     }
-    return sortedMessages;
+    return sortedMessages.reverse();
   }, [mensajes, sortConfig]);
 
   const mensajesPaginados = useMemo(() => {

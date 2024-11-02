@@ -56,7 +56,7 @@ function Login() {
                     isClosable: true,
                 });
                 login(usuario);
-                navigate('/inicio');
+                navigate('/analisis_actual');
 
                 login(usuario, rol, response.data.token); // Pasar el rol al contexto
     
