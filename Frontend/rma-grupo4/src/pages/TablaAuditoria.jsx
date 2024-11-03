@@ -9,6 +9,7 @@ import { useAuth } from '../components/AuthContext';
 const TablaAuditoria = () => {
   const [mensajes, setMensajes] = useState([]);
   const [tipoFiltro, setTipoFiltro] = useState("correcto");
+  const [selectNodo, setSelectNodo] = useState("");
   const { colorMode } = useColorMode();
   const [sortConfig, setSortConfig] = useState({ key: "value", direction: "asc" });
   const { token } = useAuth();
@@ -38,8 +39,13 @@ const TablaAuditoria = () => {
     setSortConfig({ key: columnKey, direction });
   };
 
+  
+  const mensajesFiltrados = useMemo(() => {
+    return mensajes.filter(msg => selectNodo ? msg.id_nodo === Number(selectNodo) : true);
+  }, [mensajes, selectNodo]);
+
   const mensajesOrdenados = useMemo(() => {
-    const sortedMessages = [...mensajes];
+    const sortedMessages = [...mensajesFiltrados];
     if (sortConfig.key) {
       sortedMessages.sort((a, b) => {
         if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === "asc" ? -1 : 1;
@@ -48,7 +54,7 @@ const TablaAuditoria = () => {
       });
     }
     return sortedMessages.reverse();
-  }, [mensajes, sortConfig]);
+  }, [mensajesFiltrados, sortConfig]);
 
   const mensajesPaginados = useMemo(() => {
     const startIndex = paginaActual * mensajesPorPagina;
@@ -56,7 +62,8 @@ const TablaAuditoria = () => {
     return mensajesOrdenados.slice(startIndex, endIndex);
   }, [mensajesOrdenados, paginaActual]);
 
-  const totalPaginas = Math.ceil(mensajesOrdenados.length / mensajesPorPagina);
+  
+  const totalPaginas = Math.ceil(mensajesFiltrados.length / mensajesPorPagina);
 
   const cambiarVariable = (type) => {
     switch (type) {
@@ -74,6 +81,11 @@ const TablaAuditoria = () => {
         return type
     }
   };
+  
+  const nodosUnicos = useMemo(() => {
+    const nodos = mensajes.map(msg => msg.id_nodo);
+    return [...new Set(nodos)];
+  }, [mensajes]);
 
   return (
     <Box
@@ -92,7 +104,7 @@ const TablaAuditoria = () => {
       <Flex justify="center" mb={8} wrap="wrap" gap={4}>
         <Box>
           <label htmlFor="tipo-filtro" style={{ fontWeight: 'bold', fontSize: '18px' }}>
-            Filtrar por:
+            Filtrar por tipo:
           </label>
           <Select
             id="tipo-filtro"
@@ -104,8 +116,25 @@ const TablaAuditoria = () => {
           >
             <option value="correcto">Correctos</option>
             <option value="duplicado">Duplicados</option>
-            
             <option value="incorrecto">Incorrectos</option>
+          </Select>
+        </Box>
+        <Box>
+          <label htmlFor="nodo-filtro" style={{ fontWeight: 'bold', fontSize: '18px' }}>
+            Filtrar por nodo:
+          </label>
+          <Select
+            id="nodo-filtro"
+            value={selectNodo}
+            onChange={(e) => setSelectNodo(e.target.value)}
+            mt={2}
+            bg={colorMode === 'light' ? 'white' : 'gray.700'}
+            color={colorMode === 'light' ? 'black' : 'white'}
+          >
+            <option value="">Todos</option>
+            {nodosUnicos.map((nodo, index) => (
+              <option key={index} value={nodo}>{nodo}</option>
+            ))}
           </Select>
         </Box>
       </Flex>
@@ -124,13 +153,12 @@ const TablaAuditoria = () => {
                 <Th textAlign={'center'} color={colorMode === 'light' ? 'black' : 'white'}>Tipo</Th>
                 <Th textAlign={'center'} color={colorMode === 'light' ? 'black' : 'white'}>Fecha</Th>
                 <Th textAlign={'center'} color={colorMode === 'light' ? 'black' : 'white'}>Hora</Th>
-                
               </Tr>
             </Thead>
             <Tbody>
               {mensajesPaginados.length === 0 ? (
                 <Tr>
-                  <Td colSpan={5} textAlign="center">No hay mensajes disponibles</Td>
+                  <Td colSpan={6} textAlign="center">No hay mensajes disponibles</Td>
                 </Tr>
               ) : (
                 mensajesPaginados.map((msg, index) => {
@@ -149,7 +177,6 @@ const TablaAuditoria = () => {
                       <Td textAlign={'center'}>{msg.tipo_mensaje}</Td>
                       <Td textAlign={'center'}>{fechaFormateada}</Td>
                       <Td textAlign={'center'}>{horaFormateada}</Td>
-                      
                     </Tr>
                   );
                 })
@@ -159,24 +186,18 @@ const TablaAuditoria = () => {
         </Box>
       </Box>
 
-      {/* Controles de paginación */}
-      <Flex justify="center" align="center" mt={4}>
+      {/* Paginación */}
+      <Flex justify="center" mt={6}>
         <Button
           onClick={() => setPaginaActual((prev) => Math.max(prev - 1, 0))}
           isDisabled={paginaActual === 0}
-          mr={4}
         >
           Anterior
         </Button>
-        
-        <Text fontWeight="bold">
-          Página {paginaActual + 1} de {totalPaginas}
-        </Text>
-        
+        <Text mx={4}>Página {paginaActual + 1} de {totalPaginas}</Text>
         <Button
           onClick={() => setPaginaActual((prev) => Math.min(prev + 1, totalPaginas - 1))}
-          isDisabled={paginaActual === totalPaginas - 1}
-          ml={4}
+          isDisabled={paginaActual === totalPaginas - 1 || totalPaginas === 0}
         >
           Siguiente
         </Button>
