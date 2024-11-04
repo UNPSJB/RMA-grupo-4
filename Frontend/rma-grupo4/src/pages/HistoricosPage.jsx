@@ -111,18 +111,18 @@ function HistoricosPage() {
 
   useEffect(() => {
     if (historicalData.length === 0) return;
-
+  
     const sortedData = historicalData.sort((a, b) => {
       const dateA = new Date(a.year, a.month - 1, a.day, a.hour);
       const dateB = new Date(b.year, b.month - 1, b.day, b.hour);
       return dateA - dateB;
     });
-
+  
     const labels = sortedData.map(row => `${row.hour}:00`);
     const data = sortedData.map(row => (typeof row[selectedVariable] === 'number' ? row[selectedVariable] : null));
-
+  
     const filteredData = data.filter(d => d !== null);
-
+  
     const newChartData = {
       labels: labels.slice(0, filteredData.length),
       datasets: [
@@ -137,7 +137,10 @@ function HistoricosPage() {
         },
       ],
     };
-
+  
+    // Muestra el titulo segun la variable que se selecciona
+    const yAxisTitle = `${selectedVariable} (${selectedVariable === 'Temperatura' ? '°C' : selectedVariable === 'Humedad' ? '%' : selectedVariable === 'Presión' ? 'hPa' : selectedVariable === 'Viento' ? 'km/h' : selectedVariable === 'Precipitacion' ? 'mm' : ''})`;
+  
     const chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
@@ -177,54 +180,32 @@ function HistoricosPage() {
             color: colorMode === 'light' ? 'black' : 'white',
             font: { size: 12 }
           },
-          title: { display: true, color: 'white' },
+          title: { 
+            display: true, 
+            text: yAxisTitle, 
+            color: colorMode === 'light' ? 'black' : 'white',
+            font: { size: 14 },
+        
+          },
           grid: { 
             color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'
           }
         },
       },
     };
-
+  
     const chartOptionsPolar = {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: {
-        duration: 1000,
-        easing: 'easeInOutQuad',
-      },
+      ...chartOptions,
       plugins: {
-        tooltip: {
-          callbacks: {
-            label: function (context) {
-              const row = sortedData[context.dataIndex];
-              return `Nodo ${row.id}: ${context.formattedValue} ${selectedVariable}`;
-            },
-          },
-        },
-        legend: { 
-          position: 'right',
-          labels: { 
-            color: colorMode === 'light' ? 'black' : 'white',
-            font: { size: 12 } 
-          }
-        },
+        ...chartOptions.plugins,
+        legend: { position: 'right' },
       },
       scales: {
-        y: { 
-          ticks: { 
-            color: colorMode === 'light' ? 'black' : 'white',
+        ...chartOptions.scales,
+        r: { 
+          pointLabels: {
+            color: colorMode === 'light' ? 'black' : 'white', 
             font: { size: 12 }
-          },
-          title: { display: true, color: 'white' },
-          grid: { 
-            color: colorMode === 'light' ? 'rgba(0, 0, 0, 0.1)' : 'rgba(255, 255, 255, 0.1)'
-          }
-        },
-        r: { // Para la escala radial del gráfico Radar
-          pointLabels: { // Controla las etiquetas de las horas alrededor del gráfico
-            color: colorMode === 'light' ? 'black' : 'white',  // Cambia este valor para ajustar el color de las etiquetas
-            font: { size: 12
-             } // Tamaño de las etiquetas de las horas
           },
           angleLines: {
             display: true,
@@ -239,8 +220,8 @@ function HistoricosPage() {
           }
         }
       },
-    }
-
+    };
+  
     setChartData(newChartData);
     setOptions(chartOptions);
     setOptionsPolar(chartOptionsPolar);
