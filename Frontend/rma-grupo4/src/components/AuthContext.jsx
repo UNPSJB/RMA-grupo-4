@@ -37,11 +37,11 @@ export function AuthProvider({ children }) {
         } else {
             localStorage.removeItem('userRole');
         }
-        if (token) {
-            localStorage.setItem('token', token);
-        } else {
-            localStorage.removeItem('token');
-        }
+        // if (token) {
+        //     localStorage.setItem('token', token);
+        // } else {
+        //     localStorage.removeItem('token');
+        // }
     }, [isAuthenticated, user, userRole, token]);
 
     const login = (username, role, authToken) => {
@@ -59,6 +59,7 @@ export function AuthProvider({ children }) {
         localStorage.removeItem('user');
         localStorage.removeItem('userRole');
         localStorage.removeItem('token'); // Elimina el token de localStorage
+        localStorage.removeItem(`token_${user}`); // NO TOCAR
     };
 
     return (

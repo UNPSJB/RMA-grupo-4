@@ -80,13 +80,12 @@ def get_roles(db: Session = Depends(get_db)):
 
 @router.put("/asignar_rol/{usuario_id}", response_model=RespuestaUsuario)
 def asignar_rol(usuario_id: int, rol_asignacion: RolAsignacion, db: Session = Depends(get_db), rol: str = Depends(verificar_rol("admin"))):
-#def asignar_rol(usuario_id: int, rol_asignacion: RolAsignacion, db: Session = Depends(get_db)):
     """Endpoint para que un admin asigne un rol a un usuario."""
     return asignar_rol_usuario(db, usuario_id, rol_asignacion.nuevo_rol_id)
 
-@router.get("/test_rol", dependencies=[Depends(verificar_rol("profesional", "universidad"))])
-def acceso_roles(db: Session = Depends(get_db)):
-    return {"mensaje": "Acceso permitido "}
+# @router.get("/test_rol", dependencies=[Depends(verificar_rol("profesional", "universidad"))])
+# def acceso_roles(db: Session = Depends(get_db)):
+#     return {"mensaje": "Acceso permitido "}
 
 @router.get("/lista_usuarios", response_model=List[ListaUsuarios])
 def lista_usuarios(db: Session = Depends(get_db)):

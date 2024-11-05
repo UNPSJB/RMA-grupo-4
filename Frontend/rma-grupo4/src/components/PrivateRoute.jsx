@@ -12,7 +12,7 @@ const PrivateRoute = ({ children, allowedRoles }) => {
 
     // Verifica si el rol del usuario está permitido
     if (!allowedRoles.includes(userRole)) {
-        return <Navigate to="/unauthorized" replace />;
+        return <Navigate to="/error403" replace />;
     }
 
     return children; // Si está autenticado y tiene el rol correcto, muestra el contenido

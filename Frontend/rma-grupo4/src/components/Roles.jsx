@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import {Table,Thead,Tbody,Tr,Th,Td,TableContainer,Spinner,Center,Box,useColorModeValue,} from '@chakra-ui/react';
+import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Spinner, Center, Box, useColorModeValue } from '@chakra-ui/react';
 
 export default function Roles() {
   const [roles, setRoles] = useState([]);
@@ -17,7 +17,6 @@ export default function Roles() {
         setIsLoading(false);
       }
     }
-
     fetchRoles();
   }, []);
 
@@ -29,41 +28,32 @@ export default function Roles() {
     );
   }
 
-  const bg = useColorModeValue('gray.100', 'gray.700');
-  const textColor = useColorModeValue('black', 'white');
-  const headerBg = useColorModeValue('gray.300', 'gray.600'); // Color para el encabezado sin cambio
-  const hoverBg = useColorModeValue('rgb(0, 31, 63)', 'orange.400'); // Color para el hover de las filas
-  const shadow = useColorModeValue('6px 6px 10px rgba(0, 0, 0, 0.1), -6px -6px 10px rgba(255, 255, 255, 0.7)', '6px 6px 10px rgba(0, 0, 0, 0.5), -6px -6px 10px rgba(50, 50, 50, 0.5)');
+ 
+  const bg = useColorModeValue('gray.100', 'gray.800'); // Fondo
+  const tableBg = useColorModeValue('gray.200', 'gray.700'); // Fondo de la tabla
+  const textColor = useColorModeValue('black', 'white'); // Color del texto
+  const headerBg = useColorModeValue('gray.300', 'gray.600'); // Fondo del encabezado
 
   return (
-    <Box
-      bg={bg}
-      borderRadius="md"
-      boxShadow={shadow}
-      p={5}
-      maxW="600px"
-      mx="auto" // Centrar en el contenedor
-      mt={5} // Margen superior
-    >
+    <Box bg={bg} p="6" borderRadius="md" boxShadow="lg" m="4">
       <TableContainer>
-        <Table variant="simple" bg={bg} borderRadius="md" boxShadow={shadow} textAlign="left">
+        <Table variant="unstyled">
           <Thead>
-            <Tr bg={headerBg} boxShadow="0px 4px 8px rgba(0, 0, 0, 0.2)"> {/* Efecto de relieve*/}
-              <Th color={textColor}>ID</Th>
-              <Th color={textColor}>Nombre del Rol</Th>
+            <Tr bg={headerBg}>
+              <Th color={textColor} fontWeight="bold" textAlign="center">ID</Th>
+              <Th color={textColor} fontWeight="bold" textAlign="center">Nombre del Rol</Th>
             </Tr>
           </Thead>
           <Tbody>
             {roles.map((role) => (
-              <Tr key={role.id} _hover={{ bg: useColorModeValue('rgb(0, 31, 63)', 'orange.400'), color: 'white' }}color={textColor} >
-                <Td>{role.id}</Td>
-                <Td>{role.nombre}</Td>
+              <Tr key={role.id} bg={tableBg} borderBottom="1px solid lightgray">
+                <Td color={textColor} textAlign="center">{role.id}</Td>
+                <Td color={textColor} textAlign="center">{role.nombre}</Td>
               </Tr>
             ))}
           </Tbody>
         </Table>
       </TableContainer>
-      
     </Box>
   );
 }

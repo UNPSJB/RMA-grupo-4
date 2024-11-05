@@ -19,6 +19,7 @@ import Usuarios from './components/Usuarios';
 import Roles from './components/Roles';
 import ListaNodos from './components/ListaNodos';
 import AlertasAdmin from './components/AlertasAdmin';
+import Error403 from './components/Error403';
 
 function AppRoutes() {
   return (
@@ -26,8 +27,11 @@ function AppRoutes() {
       <Routes>
         {/* Rutas públicas */}
         <Route path="/" element={<App><Home /></App>} />
+        <Route path="/*" element={<Error403 />} />
         <Route path="/login" element={<App><Login /></App>} />
         <Route path="/registrar" element={<App><Registrar /></App>} />
+        <Route path="/error403" element={<Error403 />} />
+        
         
         {/* Ruta protegida */}
         <Route 
