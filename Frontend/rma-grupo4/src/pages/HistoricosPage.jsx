@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, Select, Flex, useColorMode, Table, Thead, Tbody, Tr, Th, Td, Input} from '@chakra-ui/react';
+import { Box, Heading, Select, Flex, useColorMode, Table, Thead, Tbody, Tr, Th, Td, Input, useToast, Center} from '@chakra-ui/react';
 import { Chart as ChartJS, registerables } from 'chart.js';
-import { Line, Bar, PolarArea } from 'react-chartjs-2'; 
+import { Line, Bar, PolarArea } from 'react-chartjs-2';
+import { FaTemperatureHigh, FaTint, FaWind, FaClock } from 'react-icons/fa';
+import { GiSpeedometer, GiWaterDrop } from 'react-icons/gi';
 import axios from 'axios';
 import { useAuth } from '../components/AuthContext';
 
@@ -37,6 +39,7 @@ function HistoricosPage() {
   const { token } = useAuth();
   const [availableDates, setAvailableDates] = useState([]);
   const [noData, setNoData] = useState(false);
+  const toast = useToast();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -184,7 +187,7 @@ function HistoricosPage() {
             display: true, 
             text: yAxisTitle, 
             color: colorMode === 'light' ? 'black' : 'white',
-            font: { size: 14 },
+            font: { size: 12 },
         
           },
           grid: { 
@@ -266,7 +269,22 @@ function HistoricosPage() {
               if (availableDates.includes(newDate)) {
                 setSelectedDate(newDate);
               } else {
-                alert("No hay datos disponibles para la fecha seleccionada.");
+                toast({
+                    render: () => (
+                      <Box 
+                      color="white" 
+                      bg="red.600" 
+                      borderRadius="md" 
+                      p={5} mb={4} 
+                      boxShadow="md" 
+                      fontSize="lg"
+                    >
+                      No hay datos disponibles para esta fecha.
+                    </Box>
+                  ),
+                  duration: 2000,
+                  isClosable: true,
+                })
               }
             }}
             min="2024-10-01" 
@@ -274,26 +292,61 @@ function HistoricosPage() {
           />
         </Box>
       </Flex>
-
-      <Box borderRadius="md" boxShadow="md" height="400px" maxHeight="400px" overflow="hidden" bg={colorMode === 'light' ? 'white' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
-        {renderChart()}
+      <Box
+        bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} 
+        p={{ base: 2, md: 4 }} 
+        borderRadius="md" 
+        boxShadow="lg"
+      >
+        <Box 
+          borderRadius="md" 
+          boxShadow="lg" 
+          height="400px" 
+          maxHeight="400px" 
+          overflow="hidden" 
+          bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} 
+          color={colorMode === 'light' ? 'black' : 'white'}
+          p={{ base: 2, md: 4 }}
+        >
+          {renderChart()}
+        </Box>
       </Box>
-      <Box mt={10} borderRadius="md" boxShadow="md" overflow="hidden" bg={colorMode === 'light' ? 'white' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
-        <Table  size="sm" variant="striped" colorScheme="teal">
+      <Box overflowX="auto" mt={10} borderRadius="md" boxShadow="lg" p={7} bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
+        <Table  variant="simple" colorScheme="whiteAlpha">
           <Thead>
             <Tr>
-              <Th textAlign={'center'}>Nodo</Th>
-              <Th textAlign={'center'}>Fecha</Th>
-              <Th textAlign={'center'}>Hora</Th>
-              <Th textAlign={'center'}>{selectedVariable}</Th>
+              <Th textAlign={'center'} color={colorMode === 'light' ? 'black' : 'white'}>Nodo</Th>
+              <Th>
+                <Center color={colorMode === 'light' ? 'black' : 'white'}>
+                  <FaClock size="1.5em" style={{ marginRight: "5px" }} />
+                  Fecha
+                </Center>
+              </Th>
+              <Th>
+                <Center color={colorMode === 'light' ? 'black' : 'white'}>
+                  {
+                    selectedVariable === 'Temperatura'
+                    ? <FaTemperatureHigh style={{ marginRight: "5px" }} />
+                    : selectedVariable === 'Viento'
+                    ? <FaWind size="1.5em" style={{ marginRight: "5px" }} />
+                    : selectedVariable === 'Humedad'
+                    ? <FaTint size="1.5em" style={{ marginRight: "5px" }} />
+                    : selectedVariable === 'Presión'
+                    ? <GiSpeedometer size="1.5em" style={{ marginRight: "5px" }} />
+                    : selectedVariable === 'Precipitacion'
+                    ? <GiWaterDrop size="1.5em" style={{ marginRight: "5px" }} />
+                    : ''
+                  }
+                  {selectedVariable}
+                </Center>
+              </Th>
             </Tr>
           </Thead>
           <Tbody>
             {historicalData.map((item, index) => (
-              <Tr key={index}>
+              <Tr key={index} bg={colorMode === 'light' ? 'white' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
                 <Td textAlign={'center'}>{item.id}</Td>
-                <Td textAlign={'center'}>{item.year}-{item.month}-{item.day}</Td>
-                <Td textAlign={'center'}>{item.hour}:00</Td>
+                <Td textAlign={'center'}>{item.year}-{item.month}-{item.day} {item.hour}:00</Td>
                 <Td textAlign={'center'}>
                 {
                   typeof item[selectedVariable] === 'number' && !isNaN(item[selectedVariable])
@@ -306,6 +359,8 @@ function HistoricosPage() {
                           ? '%'
                           : selectedVariable === 'Presión'
                           ? 'hPa'
+                          : selectedVariable === 'Precipitacion'
+                          ? 'mm'
                           : ''
                       }`
                     : '-'

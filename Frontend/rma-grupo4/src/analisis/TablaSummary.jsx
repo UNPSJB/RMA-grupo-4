@@ -59,14 +59,14 @@ const TablaSummary = ({ nodeId1, nodeId2 }) => {
             width="100%" 
             overflowX="auto" 
         >
-            <Table variant="striped" colorScheme={colorMode === 'dark' ? 'teal' : 'blackAlpha'} size={{ base: "sm", md: "md" }} height={{ base: '300px', md: '400px' }}>
+            <Table variant="simple" colorScheme="whiteAlpha" size={{ base: "sm", md: "md" }} height={{ base: '300px', md: '400px' }}>
                 <Thead>
                     <Tr>
-                        <Th color={colorMode === 'dark' ? 'gray.300' : 'gray.700'}>Variable</Th>
-                        <Th color={colorMode === 'dark' ? 'gray.300' : 'gray.700'}>
+                        <Th color={colorMode === 'light' ? 'black' : 'white'}>Variable</Th>
+                        <Th color={colorMode === 'light' ? 'black' : 'white'}>
                             <Text align="center">Nodo {nodeId1}</Text>
                         </Th>
-                        <Th color={colorMode === 'dark' ? 'gray.300' : 'gray.700'}>
+                        <Th color={colorMode === 'light' ? 'black' : 'white'}>
                             <Text align="center">Nodo {nodeId2}</Text>
                         </Th>
                     </Tr>
@@ -95,10 +95,10 @@ const TablaSummary = ({ nodeId1, nodeId2 }) => {
                             <Tr>
                                 <Td></Td>
                                 <Td>
-                                    <Text align="center">Prom: {values.node1.average_value?.toFixed(2) ?? 'N/A'}</Text>
+                                    <Text align="center">Media: {values.node1.average_value?.toFixed(2) ?? 'N/A'}</Text>
                                 </Td>
                                 <Td>
-                                    <Text align="center">Prom: {values.node2.average_value?.toFixed(2) ?? 'N/A'}</Text>
+                                    <Text align="center">Media: {values.node2.average_value?.toFixed(2) ?? 'N/A'}</Text>
                                 </Td>
                             </Tr>
                         </React.Fragment>
