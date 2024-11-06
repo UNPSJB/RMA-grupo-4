@@ -10,6 +10,7 @@ const TablaAuditoria = () => {
   const [mensajes, setMensajes] = useState([]);
   const [tipoFiltro, setTipoFiltro] = useState("correcto");
   const [selectNodo, setSelectNodo] = useState("");
+  const [selectVariable, setSelectVariable] = useState("");
   const { colorMode } = useColorMode();
   const [sortConfig, setSortConfig] = useState({ key: "value", direction: "asc" });
   const { token } = useAuth();
@@ -38,11 +39,35 @@ const TablaAuditoria = () => {
     }
     setSortConfig({ key: columnKey, direction });
   };
-
+  const cambiarVariable = (type) => {
+    console.log("Type:", type); // Agrega este log
+    switch (type) {
+      case "temp_t":
+        return "Temperatura";
+      case "humidity_t":
+        return "Humedad";
+      case "pressure_t":
+        return "Presión";
+      case "rainfall_t":
+        return "Precipitación";
+      case "windspd_t":
+        return "Viento";
+      case "altitude_t":
+        return "Nivel";
+      default:
+        return "Desconocido"; // Devuelve "Desconocido" si el tipo no coincide
+    }
+  };
   
   const mensajesFiltrados = useMemo(() => {
-    return mensajes.filter(msg => selectNodo ? msg.id_nodo === Number(selectNodo) : true);
-  }, [mensajes, selectNodo]);
+    const filtrados = mensajes.filter(msg => 
+      (selectNodo ? msg.id_nodo === Number(selectNodo) : true) &&
+      (selectVariable ? cambiarVariable(msg.type) === selectVariable : true)
+    );
+    console.log("Mensajes filtrados:", filtrados); // Agrega este log
+    return filtrados;
+  }, [mensajes, selectNodo, selectVariable]);
+  
 
   const mensajesOrdenados = useMemo(() => {
     const sortedMessages = [...mensajesFiltrados];
@@ -65,22 +90,15 @@ const TablaAuditoria = () => {
   
   const totalPaginas = Math.ceil(mensajesFiltrados.length / mensajesPorPagina);
 
-  const cambiarVariable = (type) => {
-    switch (type) {
-      case "temp_t":
-        return "Temperatura";
-      case "humidity_t":
-        return "Humedad";
-      case "pressure_t":
-        return "Presión";
-      case "rainfall_t":
-        return "Precipitación";
-      case "windspd_t":
-        return "Viento";
-      default:
-        return type
-    }
-  };
+  
+  
+  
+  const variablesUnicas = useMemo(() => {
+    const variables = mensajes.map(msg => cambiarVariable(msg.type));
+  
+    // Filtrar valores válidos y excluir "Desconocido"
+    return [...new Set(variables.filter(variable => variable !== "Desconocido"))];
+  }, [mensajes]);
   
   const nodosUnicos = useMemo(() => {
     const nodos = mensajes.map(msg => msg.id_nodo);
@@ -134,6 +152,25 @@ const TablaAuditoria = () => {
             <option value="">Todos</option>
             {nodosUnicos.map((nodo, index) => (
               <option key={index} value={nodo}>{nodo}</option>
+            ))}
+          </Select>
+          
+        </Box>
+        <Box>
+          <label htmlFor="variable-filtro" style={{ fontWeight: 'bold', fontSize: '18px' }}>
+          Filtrar por variable:
+          </label>
+          <Select
+            id="variable-filtro"
+            value={selectVariable}
+            onChange={(e) => setSelectVariable(e.target.value)}
+            mt={2}
+            bg={colorMode === 'light' ? 'white' : 'gray.700'} 
+            color={colorMode === 'light' ? 'black' : 'white'}
+          >
+            <option value="">Todas</option>
+            {variablesUnicas.map((variable, index) => (
+              <option key={index} value={variable}>{variable}</option>
             ))}
           </Select>
         </Box>

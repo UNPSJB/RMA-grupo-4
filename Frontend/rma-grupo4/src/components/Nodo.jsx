@@ -51,7 +51,7 @@ const CrearNodo = () => {
 
   useEffect(() => {
     fetchNodos();
-  }, );
+  }, []);
 
   // Maneja los cambios en el formulario
   const handleChange = (e) => {

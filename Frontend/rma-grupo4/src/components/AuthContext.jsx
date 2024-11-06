@@ -37,11 +37,11 @@ export function AuthProvider({ children }) {
         } else {
             localStorage.removeItem('userRole');
         }
-        // if (token) {
-        //     localStorage.setItem('token', token);
-        // } else {
-        //     localStorage.removeItem('token');
-        // }
+        if (token) {
+             localStorage.setItem('token', token);
+        } else {
+             localStorage.removeItem('token');
+         }
     }, [isAuthenticated, user, userRole, token]);
 
     const login = (username, role, authToken) => {
@@ -68,3 +68,4 @@ export function AuthProvider({ children }) {
         </AuthContext.Provider>
     );
 }
+export default AuthContext;
