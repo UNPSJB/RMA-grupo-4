@@ -23,11 +23,11 @@ const GraficoLinea = ({ title, url, nodeId }) => {
 
         const dataArray = response.data.data;
         const summaryData = response.data.summary;
-
+        console.log("ACA", response.data.data);
         setSummary(summaryData);
 
         const processedData = dataArray
-          .filter(item => item.type === 'temp_t')  
+          .filter(item => item.type === 'Temperatura')  
           .map(item => ({
             ...item,
             data: parseFloat(item.data)  

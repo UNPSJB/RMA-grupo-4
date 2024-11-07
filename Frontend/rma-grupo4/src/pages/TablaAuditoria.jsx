@@ -42,17 +42,17 @@ const TablaAuditoria = () => {
   const cambiarVariable = (type) => {
     console.log("Type:", type); // Agrega este log
     switch (type) {
-      case "temp_t":
+      case "Temperatura":
         return "Temperatura";
-      case "humidity_t":
+      case "Humedad":
         return "Humedad";
-      case "pressure_t":
+      case "Presión":
         return "Presión";
-      case "rainfall_t":
+      case "Precipitación":
         return "Precipitación";
-      case "windspd_t":
+      case "Viento":
         return "Viento";
-      case "altitude_t":
+      case "Nivel":
         return "Nivel";
       default:
         return "Desconocido"; // Devuelve "Desconocido" si el tipo no coincide

@@ -5,7 +5,7 @@ from typing import List, Optional
 from datetime import datetime, time, timedelta
 from collections import defaultdict
 from src.database import get_db  
-from src.models import Mensaje, MensajeAuditoria
+from src.models import Mensaje
 from src.mensajes.schemas import (
     TemperatureData, 
     TemperatureResponse,
@@ -63,21 +63,20 @@ def get_temperature_data(
     # Valida que el parámetro `sort` sea 'asc' o 'desc'
     if sort not in ["asc", "desc"]:
         raise HTTPException(status_code=400, detail="El parámetro 'sort' debe ser 'asc' o 'desc'.")
-
-    # Construye la consulta base a la tabla Mensaje
-    query = db.query(Mensaje).filter(Mensaje.type == "temp_t")
-
-    # Agrega filtro por `node_id` si se proporciona
+    
+    query = db.query(Mensaje).filter(
+        Mensaje.type == "Temperatura",
+        Mensaje.tipo_mensaje == "correcto" 
+    )
+    
     if node_id is not None:
         query = query.filter(Mensaje.id_nodo == node_id)
 
-    # Agrega filtro por `start_time` y `end_time` si se proporcionan
     if start_time:
         query = query.filter(Mensaje.time >= start_time)
     if end_time:
         query = query.filter(Mensaje.time <= end_time)
 
-    # Ordena los resultados por `time`
     if sort == "asc":
         query = query.order_by(Mensaje.time.asc())
     else:
@@ -87,7 +86,6 @@ def get_temperature_data(
 
     results = query.all() # Ejecutar la consulta y obtener los resultados
 
-    # Verificar si se encontraron registros
     if not results:
         raise HTTPException(status_code=404, detail="No se encontraron registros para los filtros proporcionados.")
 
@@ -100,7 +98,6 @@ def get_temperature_data(
         "average_value": sum(temperatures) / len(temperatures)
     }
 
-    # Formatear los datos de la respuesta
     response_data = [
         TemperatureData(
             id_nodo=record.id_nodo,
@@ -110,7 +107,6 @@ def get_temperature_data(
         ) for record in results
     ]
 
-    # Devolver la respuesta formateada
     return TemperatureResponse(data=response_data, summary=summary)
 
 # Endpoint para obtener los datos de humedad
@@ -130,7 +126,10 @@ def get_humidity_data(
     if sort not in ["asc", "desc"]:
         raise HTTPException(status_code=400, detail="El parámetro 'sort' debe ser 'asc' o 'desc'.")
 
-    query = db.query(Mensaje).filter(Mensaje.type == "humidity_t")
+    query = db.query(Mensaje).filter(
+        Mensaje.type == "Humedad",
+        Mensaje.tipo_mensaje == "correcto" 
+    )
 
     if node_id is not None:
         query = query.filter(Mensaje.id_nodo == node_id)
@@ -189,7 +188,10 @@ def get_pressure_data(
     if sort not in ["asc", "desc"]:
         raise HTTPException(status_code=400, detail="El parámetro 'sort' debe ser 'asc' o 'desc'.")
         
-    query = db.query(Mensaje).filter(Mensaje.type == "pressure_t")
+    query = db.query(Mensaje).filter(
+        Mensaje.type == "Presión",
+        Mensaje.tipo_mensaje == "correcto" 
+    )
 
     if node_id is not None:
         query = query.filter(Mensaje.id_nodo == node_id)
@@ -248,7 +250,10 @@ def get_precipitation_data(
     if sort not in ["asc", "desc"]:
         raise HTTPException(status_code=400, detail="El parámetro 'sort' debe ser 'asc' o 'desc'.")
 
-    query = db.query(Mensaje).filter(Mensaje.type == "rainfall_t")
+    query = db.query(Mensaje).filter(
+        Mensaje.type == "Precipitación",
+        Mensaje.tipo_mensaje == "correcto" 
+    )
 
     if node_id is not None:
         query = query.filter(Mensaje.id_nodo == node_id)
@@ -307,7 +312,10 @@ def get_wind_data(
     if sort not in ["asc", "desc"]:
         raise HTTPException(status_code=400, detail="El parámetro 'sort' debe ser 'asc' o 'desc'.")
 
-    query = db.query(Mensaje).filter(Mensaje.type == "windspd_t")
+    query = db.query(Mensaje).filter(
+        Mensaje.type == "Viento",
+        Mensaje.tipo_mensaje == "correcto" 
+    )
 
     if node_id is not None:
         query = query.filter(Mensaje.id_nodo == node_id)
@@ -349,9 +357,10 @@ def get_wind_data(
     return WindResponse(data=response_data, summary=summary)
 
 @router.get("/clima/nodos/resumen", response_model=NodeSummaryResponse)
-def get_node_summary(db: Session = Depends(get_db), rol: str = Depends(verificar_rol("admin","profesional","cooperativa"))):
+def get_node_summary(db: Session = Depends(get_db), rol: str = Depends(verificar_rol("admin", "profesional", "cooperativa"))):
     """
     Endpoint para obtener el resumen de todos los nodos con el último valor registrado de cada variable.
+    Solo incluye mensajes cuyo tipo de mensaje es 'correcto'.
     """
     subquery = (
         db.query(
@@ -360,6 +369,7 @@ def get_node_summary(db: Session = Depends(get_db), rol: str = Depends(verificar
             Mensaje.data,
             func.max(Mensaje.time).label("latest_time")
         )
+        .filter(Mensaje.tipo_mensaje == "correcto")  
         .group_by(Mensaje.id_nodo, Mensaje.type)
         .subquery()
     )
@@ -377,11 +387,11 @@ def get_node_summary(db: Session = Depends(get_db), rol: str = Depends(verificar
 
     node_data = {}
     type_to_field = {
-        "temp_t": "last_temperature",
-        "humidity_t": "last_humidity",
-        "pressure_t": "last_pressure",
-        "rainfall_t": "last_precipitation",
-        "windspd_t": "last_wind"
+        "Temperatura": "last_temperature",
+        "Humedad": "last_humidity",
+        "Presión": "last_pressure",
+        "Precipitación": "last_precipitation",
+        "Viento": "last_wind"
     }
 
     for record in results:
@@ -422,11 +432,11 @@ def get_node_historical_data(
 ):
     # Mapeo de tipos de variables a campos
     type_to_field = {
-        "temp_t": "temperature",
-        "humidity_t": "humidity",
-        "pressure_t": "pressure",
-        "rainfall_t": "precipitation",
-        "windspd_t": "wind"
+        "Temperatura": "temperature",
+        "Humedad": "humidity",
+        "Presión": "pressure",
+        "Precipitación": "precipitation",
+        "Viento": "wind"
     }
 
     # Ajustes de fechas (sin cambios)
@@ -517,7 +527,7 @@ def get_node_historical_data(
 
 @router.get("/mensajes/auditoria")
 def obtener_mensajes_auditoria(tipo_mensaje: str = None, db: Session = Depends(get_db), rol: str = Depends(verificar_rol("admin"))):
-    query = db.query(MensajeAuditoria)
+    query = db.query(Mensaje)
     if tipo_mensaje:
-        query = query.filter(MensajeAuditoria.tipo_mensaje == tipo_mensaje)
+        query = query.filter(Mensaje.tipo_mensaje == tipo_mensaje)
     return query.all()

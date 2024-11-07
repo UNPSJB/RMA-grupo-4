@@ -24,7 +24,7 @@ function TablaPage({ onRowSelection }) {
       try {
         const response = await axios.get('http://localhost:8000/api/v1/clima/nodos/resumen' , {headers: { Authorization: `Bearer ${token}`}});
         const resumenData = response.data.summary;
-
+        
         const formattedData = resumenData.map((item) => ({
           Nodo: item.id_nodo,
           Temperatura: item.last_temperature ?? '--',

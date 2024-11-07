@@ -29,7 +29,7 @@ const GraficoMedidor = ({ title, url, nodeId }) => {
 
         // Procesar los datos para obtener la presión más reciente
         const lastPressureData = dataArray
-          .filter(item => item.type === 'pressure_t') 
+          .filter(item => item.type === 'Presión') 
           .map(item => ({
             ...item,
             data: parseFloat(item.data)  

@@ -28,7 +28,7 @@ const GraficoRosa = ({ title, url, nodeId }) => {
 
         // Procesar los datos
         const processedData = dataArray
-          .filter(item => item.type === 'windspd_t')  // Filtrar por el tipo "viento"
+          .filter(item => item.type === 'Viento')  // Filtrar por el tipo "viento"
           .map(item => ({
             ...item,
             data: parseFloat(item.data)  // Convertir el valor de `data` a número

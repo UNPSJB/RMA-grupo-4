@@ -33,7 +33,7 @@ const GraficoArea = ({ title, url, nodeId }) => {
 
         // Procesar los datos para obtener la humedad
         const processedData = dataArray
-          .filter(item => item.type === 'humidity_t')  // Filtrar por tipo, en este caso "humedad"
+          .filter(item => item.type === 'Humedad')  // Filtrar por tipo, en este caso "humedad"
           .map(item => ({
             ...item,
             data: parseFloat(item.data)  // Convertir el valor de `data` a número

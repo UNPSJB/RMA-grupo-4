@@ -2,11 +2,9 @@ import json
 import paho.mqtt.client as mqtt
 from datetime import datetime, timedelta
 from src.database import SessionLocal
-from src.models import Mensaje, MensajeIncorrecto, MensajeAuditoria
+from src.models import Mensaje, Variable
 from src.rma_receptor.validaciones import validar_mensaje, validar_fecha_hora_actual, validar_duplicado
 from src.rma_receptor.telegram_bot import analizar_alerta
-    
-    
     
 def mensaje_recibido(client, userdata, msg):
     """Callback para procesar los mensajes recibidos en los tópicos suscritos."""
@@ -16,50 +14,48 @@ def mensaje_recibido(client, userdata, msg):
         mensaje_json = json.loads(mensaje_str)
         print(f"Mensaje recibido en {msg.topic}: {mensaje_json}")
 
+        # Convertir el timestamp Unix a datetime
+        time_received = datetime.fromtimestamp(mensaje_json['time'])
+
         # Crear una sesión de base de datos
         db = SessionLocal()
+        variable = db.query(Variable).filter(Variable.numero == mensaje_json['type']).first()
+
+        if variable:
+            nombre_variable = variable.nombre
+        else:
+            nombre_variable = "Desconocido"  # O algún valor por defecto en caso de que no se encuentre
+        
         try:
-            if validar_duplicado(db,mensaje_json):
-                nuevo_mensaje1 = MensajeAuditoria(
-                    id_nodo=mensaje_json['id'],
-                    type=mensaje_json['type'],
-                    data=mensaje_json['data'],
-                    time=datetime.strptime(mensaje_json['time'], "%Y-%m-%d %H:%M:%S.%f"),
-                    tipo_mensaje= 'duplicado'
-                )
-                analizar_alerta(mensaje_json)
-            if validar_mensaje(mensaje_json) and validar_fecha_hora_actual(mensaje_json['time']):
-            # Crear un nuevo objeto Mensaje
+            if validar_duplicado(db, mensaje_json):
                 nuevo_mensaje = Mensaje(
                     id_nodo=mensaje_json['id'],
-                    type=mensaje_json['type'],
+                    type= nombre_variable,
                     data=mensaje_json['data'],
-                    time=datetime.strptime(mensaje_json['time'], "%Y-%m-%d %H:%M:%S.%f")
+                    time=time_received,
+                    tipo_mensaje='duplicado'
                 )
-                nuevo_mensaje1 = MensajeAuditoria(
+                analizar_alerta(mensaje_json)
+
+            # Validar el mensaje y el tiempo
+            if validar_mensaje(mensaje_json) and validar_fecha_hora_actual(time_received):
+                nuevo_mensaje = Mensaje(
                     id_nodo=mensaje_json['id'],
-                    type=mensaje_json['type'],
+                    type=nombre_variable,
                     data=mensaje_json['data'],
-                    time=datetime.strptime(mensaje_json['time'], "%Y-%m-%d %H:%M:%S.%f"),
-                    tipo_mensaje= 'correcto'
+                    time=time_received,
+                    tipo_mensaje='correcto'
                 )
                 analizar_alerta(mensaje_json)
             else:
-                nuevo_mensaje = MensajeIncorrecto(
+                nuevo_mensaje = Mensaje(
                     id_nodo=mensaje_json['id'],
-                    type=mensaje_json['type'],
+                    type=nombre_variable,
                     data=mensaje_json['data'],
-                    time=datetime.strptime(mensaje_json['time'], "%Y-%m-%d %H:%M:%S.%f")
-                )
-                nuevo_mensaje1 = MensajeAuditoria(
-                    id_nodo=mensaje_json['id'],
-                    type=mensaje_json['type'],
-                    data=mensaje_json['data'],
-                    time=datetime.strptime(mensaje_json['time'], "%Y-%m-%d %H:%M:%S.%f"),
-                    tipo_mensaje= 'incorrecto'
+                    time=time_received,
+                    tipo_mensaje='incorrecto'
                 )                         
             db.add(nuevo_mensaje)
-            db.add(nuevo_mensaje1)
             db.commit()
         finally:
             db.close()

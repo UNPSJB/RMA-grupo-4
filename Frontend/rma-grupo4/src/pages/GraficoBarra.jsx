@@ -31,7 +31,7 @@ const GraficoBarra = ({ title, url, nodeId }) => {
 
         // Procesar los datos para obtener la precipitación
         const processedData = dataArray
-          .filter(item => item.type === 'rainfall_t')  // Filtrar por tipo, en este caso "precipitación"
+          .filter(item => item.type === 'Precipitación')  // Filtrar por tipo, en este caso "precipitación"
           .map(item => ({
             ...item,
             data: parseFloat(item.data)  // Convertir el valor de `data` a número

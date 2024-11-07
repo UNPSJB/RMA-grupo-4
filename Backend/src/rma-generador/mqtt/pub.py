@@ -13,9 +13,9 @@ from mqtt.config import config
 
 class Mensaje(BaseModel):
     id: int
-    type: str
+    type: int
     data: str
-    time: str
+    time: int
 
 @dataclass
 class Nodo:
@@ -92,7 +92,10 @@ class Nodo:
 
     def formatear_mensaje(self, topic: str, tipo: TipoMensaje, mensaje: str) -> str:
         mensaje = Mensaje(
-            id=self.id, type=tipo, data=str(mensaje), time=str(datetime.now())
+            id=self.id, 
+            type=int(tipo), 
+            data=mensaje, 
+            time=int(datetime.now().timestamp()) 
         ).model_dump()
         return str(mensaje)
 
@@ -115,8 +118,8 @@ class Nodo:
             return str(random.uniform(10.0, 13.5))
         elif tipo == TipoMensaje.RAINFALL_T:
             return str(random.uniform(0.0, 170.0))
-        elif tipo == TipoMensaje.ALTITUDE_T:
-            return str(random.uniform(0.0, 2.5))
+        elif tipo == TipoMensaje.LEVEL_T:
+            return str(random.uniform(0.0, 250))
         else:
             # Por defecto, devuelve un número aleatorio
             return str(random.uniform(0.0, 100.0))

@@ -70,27 +70,16 @@ class BaseModel(Base):
         params = ", ".join(f"{k}={v}" for k, v in keyvalgen(self))
         return f"{self.__class__.__name__}({params})"
     
-# configuracion del modelo de mensaje que recibimos
+class Variable(Base):
+    __tablename__ = 'variables'
+    
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    numero = Column(Integer)
+    nombre = Column(String)
+    unidad = Column(String)
+
 class Mensaje(Base):
     __tablename__ = 'mensajes'
-
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True) #creamos un id para cada mensaje
-    id_nodo = Column(Integer, index=True)
-    type = Column(String)
-    data = Column(String)
-    time = Column(DateTime)
-    
-class MensajeIncorrecto(Base):
-    __tablename__ = 'mensajesIncorretos'
-
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True) #creamos un id para cada mensaje
-    id_nodo = Column(Integer, index=True)
-    type = Column(String)
-    data = Column(String)
-    time = Column(DateTime)
-    
-class MensajeAuditoria(Base):
-    __tablename__ = 'mensajeAuditoria'
     
     id = Column(Integer, primary_key=True, index=True, autoincrement=True) #creamos un id para cada mensaje
     id_nodo = Column(Integer, index=True)
