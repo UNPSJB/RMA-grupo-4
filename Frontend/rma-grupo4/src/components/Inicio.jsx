@@ -1,4 +1,4 @@
-import { Box, Grid, GridItem, useColorMode, Heading, Button } from '@chakra-ui/react';
+import { Box, Grid, GridItem, useColorMode, Heading, Button, Select} from '@chakra-ui/react';
 import { useState } from 'react';
 import SelectorNodo from './SelectorNodo';
 import ResumenVariable from '../pages/ResumenVariable'; 
@@ -13,8 +13,13 @@ import Breadcrumbs from './Breadcrumbs';
 
 export default function Inicio() {
   const [selectedNode, setSelectedNode] = useState(0);
-
+  const [dateRange, setDateRange] = useState(24);
   const { colorMode } = useColorMode(); // Modo de color actual
+
+  const handleRangeChange = (event) => {
+    const hours = parseInt(event.target.value, 10);
+    setDateRange(hours);
+  };
 
   const downloadPDF = () => {
     const element = document.getElementById('viewToDownload');
@@ -72,7 +77,6 @@ export default function Inicio() {
       color={colorMode === 'light' ? 'black' : 'white'}
       boxShadow="md"
     >
-
       {/* Contenedor que se descargará como PDF */}
       <Box id="viewToDownload">
         <Box mt={0} p={{ base: 2, md: 4 }}>
@@ -97,10 +101,34 @@ export default function Inicio() {
           </Grid>
         </Box>
 
-        <Heading as="h1" m={7} textAlign="center">Últimos Diez Actualizados</Heading>  
-        <SelectorNodo onChange={(nodeId) => setSelectedNode(nodeId)} />
-
+        <Heading as="h1" m={7} textAlign="center">Últimos Actualizados</Heading>  
         <Box p={{ base: 2, md: 4 }}>
+          <Box gap={4} mb={4} display="flex" justifyContent="center">
+            <SelectorNodo onChange={(nodeId) => setSelectedNode(nodeId)} />
+            <Select 
+              placeholder="Selecciona un rango de tiempo" 
+              onChange={handleRangeChange}
+              size="md"  
+              bg={colorMode === 'light' ? 'white' : 'gray.800'}
+              color={colorMode === 'light' ? 'black' : 'white'} 
+              borderColor={colorMode === 'light' ? 'gray.300' : 'gray.600'}
+              _hover={{ borderColor: 'teal.300' }}  
+              _focus={{ borderColor: 'teal.500', boxShadow: '0 0 0 1px teal.500' }}  
+              borderRadius="md"  
+              w="300px"
+              sx={{
+                option: {
+                  backgroundColor: colorMode === 'light' ? 'white' : 'gray.900',
+                  color: colorMode === 'light' ? 'black' : 'white',
+                },
+              }}
+            >
+              <option value={1}>1 Hora</option>
+              <option value={24}>1 Día</option>
+              <option value={72}>3 Días</option>
+              <option value={168}>7 Días</option>
+            </Select>
+          </Box>
           <Grid
             templateColumns={{ base: 'repeat(2, 1fr)', md: 'repeat(5, 1fr)' }}
             gap={4}
@@ -109,11 +137,11 @@ export default function Inicio() {
             p={{ base: 2, md: 6 }}
             borderRadius="md"
           >
-            <ResumenVariable title="Temperatura" url="http://localhost:8000/api/v1/clima/temperatura" nodeId={selectedNode} unidad="C°"/>
-            <ResumenVariable title="Humedad" url="http://localhost:8000/api/v1/clima/humedad" nodeId={selectedNode} unidad="%"/>
-            <ResumenVariable title="Precipitación" url="http://localhost:8000/api/v1/clima/precipitacion" nodeId={selectedNode} unidad="mm"/>
-            <ResumenVariable title="Viento" url="http://localhost:8000/api/v1/clima/viento" nodeId={selectedNode} unidad="km/h"/>
-            <ResumenVariable title="Presión" url="http://localhost:8000/api/v1/clima/presion" nodeId={selectedNode} unidad="hPa"/>
+            <ResumenVariable title="Temperatura" url="http://localhost:8000/api/v1/clima/temperatura" nodeId={selectedNode} unidad="C°" dateRange={dateRange}/>
+            <ResumenVariable title="Humedad" url="http://localhost:8000/api/v1/clima/humedad" nodeId={selectedNode} unidad="%" dateRange={dateRange}/>
+            <ResumenVariable title="Precipitación" url="http://localhost:8000/api/v1/clima/precipitacion" nodeId={selectedNode} unidad="mm" dateRange={dateRange}/>
+            <ResumenVariable title="Viento" url="http://localhost:8000/api/v1/clima/viento" nodeId={selectedNode} unidad="km/h" dateRange={dateRange}/>
+            <ResumenVariable title="Presión" url="http://localhost:8000/api/v1/clima/presion" nodeId={selectedNode} unidad="hPa" dateRange={dateRange}/>
           </Grid>
         </Box>
 
