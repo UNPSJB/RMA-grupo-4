@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from src.database import engine
 from src.models import BaseModel
 from src.example.router import router as example_router
+from src.variables.router import router as variables_router
 from src.nodos.router import router as nodos_router
 from src.rma_receptor.mqtt_client import conectar_mqtt, detener_mqtt  # Importar las funciones de conexión y desconexión de MQTT
 from src.mensajes.router import router as mensajes_router # para endpoint que devuelve todos los mensajes de la base de datos como una lista de objetos JSON.
@@ -45,5 +46,5 @@ app.add_middleware(
 # Incluir los routers de los módulos en la aplicación
 app.include_router(example_router)
 app.include_router(nodos_router)
-
+app.include_router(variables_router)
 app.include_router(mensajes_router, prefix="/api/v1")

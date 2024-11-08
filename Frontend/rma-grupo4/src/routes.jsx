@@ -20,6 +20,7 @@ import Roles from './components/Roles';
 import ListaNodos from './components/ListaNodos';
 import AlertasAdmin from './components/AlertasAdmin';
 import Error403 from './components/Error403';
+import CrearVariable from './components/Variables';
 
 function AppRoutes() {
   return (
@@ -185,6 +186,17 @@ function AppRoutes() {
             </App>
           } 
         />
+         <Route 
+          path="/gestionVariables" 
+          element={
+            <App>
+              <PrivateRoute allowedRoles={['admin']}>
+                <CrearVariable />
+              </PrivateRoute>
+            </App>
+          } 
+        />
+        
       </Routes>  
     </Router>
   );

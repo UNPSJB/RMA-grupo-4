@@ -40,7 +40,8 @@ function NavigationButtons() {
     { text: "Análisis Avanzado", route: "/analisis_avanzado", allowedRoles: ["admin", "profesional", "cooperativa"] },
     { text: "Suscripción a Alertas", route: "/suscripcion_alertas", allowedRoles: ["admin", "profesional", "cooperativa"] },
     { text: "Tabla Auditoría", route: "/tabla_auditoria", allowedRoles: ["admin"] },
-    { text: "Gestión Nodos", route: "/gestion_nodos", allowedRoles: ["admin", "profesional", "cooperativa"] }
+    { text: "Gestión Nodos", route: "/gestion_nodos", allowedRoles: ["admin", "profesional", "cooperativa"] },
+    { text: "Gestión Variables", route: "/gestionVariables", allowedRoles: ["admin", "profesional", "cooperativa"] }
   ];
 
   // Filtrar los items según el rol del usuario
