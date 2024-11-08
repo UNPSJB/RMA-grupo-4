@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, SimpleGrid, Text, VStack, Icon, Button, useColorMode } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { FaUser, FaKey, FaNetworkWired, FaBell, FaCog, FaArrowLeft } from 'react-icons/fa';
+import { FaUser, FaKey, FaNetworkWired, FaBell, FaCog, FaArrowLeft, FaThermometerHalf  } from 'react-icons/fa';
 
 export default function Admin() {
   const navigate = useNavigate();
@@ -13,7 +13,8 @@ export default function Admin() {
     { id: 2, title: 'Roles', route: '/roles', icon: FaKey },
     { id: 3, title: 'Nodos', route: '/nodos', icon: FaNetworkWired },
     { id: 4, title: 'Alertas', route: '/alertaAdmin', icon: FaBell },
-    //{ id: 5, title: 'Configuración', route: '/configuracion', icon: FaCog },
+    { id: 5, title: 'Variables', route: '/gestionVariables', icon: FaThermometerHalf },
+    //{ id: 6, title: 'Configuración', route: '/configuracion', icon: FaCog },
   ];
 
   return (

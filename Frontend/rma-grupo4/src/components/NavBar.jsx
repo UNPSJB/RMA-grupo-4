@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link as RouterLink} from 'react-router-dom';
 import {Box,Flex,Button,Icon,Menu,MenuButton,MenuList,MenuItem,Text,useColorMode,} from '@chakra-ui/react';
 import { useAuth } from './AuthContext';
 import { FaHome, FaUserCircle, FaSignInAlt, FaSignOutAlt, FaQuestionCircle } from 'react-icons/fa';
@@ -11,6 +11,7 @@ import ButtonTheme from './ButtonTheme';
 
 function NavBar() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { isAuthenticated, user, logout, userRole } = useAuth();
     const [isModalOpen, setModalOpen] = useState(false);
     const [isHelpOpen, setHelpOpen] = useState(false);
@@ -69,7 +70,25 @@ function NavBar() {
             },
         },
     };
+    const pathSegments = location.pathname.split('/').filter(Boolean);
+    const breadcrumbLinks = pathSegments.map((segment, index) => {
+        const path = `/${pathSegments.slice(0, index + 1).join('/')}`;
+        const isLast = index === pathSegments.length - 1;
 
+        return (
+            <Text
+                key={path}
+                as={isLast ? 'span' : RouterLink} // Si es el último, no es un enlace
+                to={!isLast ? path : undefined}
+                color={colorMode === 'dark' ? 'gray.300' : 'gray.600'}
+                fontWeight={isLast ? 'bold' : 'normal'}
+                mx={1}
+                _hover={!isLast ? { textDecoration: 'underline', color: 'blue.500' } : undefined}
+            >
+                {segment.charAt(0).toUpperCase() + segment.slice(1).replace(/([A-Z])/g, ' $1').replace('_', ' ')}
+            </Text>
+        );
+    });
     return (
         <Box
             bg={colorMode === 'dark' ? 'gray.900' : 'white'}
@@ -97,12 +116,20 @@ function NavBar() {
                             _focus={{ boxShadow: 'none' }}
                             {...buttonStyle}
                             leftIcon={<Icon as={FaHome} />}
-                            mr={4}
                         >
                             Inicio
                         </Button>
                     )}
-
+                    {breadcrumbLinks.length > 0 && (
+                        <Flex as="nav" align="center">
+                            <Text color={colorMode === 'dark' ? 'white' : 'black'}>/</Text>
+                            {breadcrumbLinks.reduce((prev, curr, index) => [
+                                prev,
+                                <Text key={`separator-${index}`}>/</Text>, 
+                                curr
+                            ])}
+                        </Flex>
+                    )}
                     {isAuthenticated && <NavigationButtons />}
                 </Flex>
 

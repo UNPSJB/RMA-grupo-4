@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, FormControl, Heading, FormLabel, Input, Textarea, useToast, VStack, HStack, useColorMode, Table, Thead, Tbody, Tr, Th, Td, Button, IconButton,
-  Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter
+  Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, useColorModeValue
 } from '@chakra-ui/react';
 import { FaTrashAlt, FaPen } from "react-icons/fa";
 
@@ -18,6 +18,9 @@ const CrearVariable = () => {
   const toast = useToast();
   const { colorMode } = useColorMode();
   const isLight = colorMode === 'light';
+  const buttonDefaultColor = useColorModeValue('gray.300', 'gray.600');
+  const buttonHoverColor = useColorModeValue('rgb(0, 31, 63)', 'rgb(255, 130, 37)');
+  const buttonShadow = useColorModeValue("5px 5px 3px #5a5a5a, -5px -5px 3px #ffffff", "2px 2px 3px rgba(0, 0, 0, 0.3)");
 
   // Fetch variables
   const fetchVariables = async () => {
@@ -230,30 +233,59 @@ const CrearVariable = () => {
         </Box>
 
         {/* Tabla */}
-        <Box width="100%" p={4} borderColor={isLight ? 'black' : 'gray.500'} borderWidth="1px" borderRadius="lg" bg={isLight ? 'white' : 'gray.800'} overflowX="auto">
-          <Table variant="striped" colorScheme="teal">
-            <Thead>
-              <Tr>
-                <Th>Nombre</Th>
-                <Th>Número</Th>
-                <Th>Unidad</Th>
-                <Th>Acciones</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {variables.map((variable) => (
-                <Tr key={variable.id}>
-                  <Td>{variable.nombre}</Td>
-                  <Td>{variable.numero}</Td>
-                  <Td>{variable.unidad}</Td>
-                  <Td>
-                    <IconButton icon={<FaPen />} onClick={() => handleEdit(variable)} aria-label="Editar" />
-                    <IconButton icon={<FaTrashAlt />} onClick={() => handleDelete(variable.nombre)} aria-label="Eliminar" colorScheme="red" />
-                  </Td>
+        <Box width="100%" bg={colorMode === 'light' ? 'gray.300' : 'gray.600'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
+          <Box width="100%" p={4} bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} borderRadius="md" boxShadow="lg" overflowX="auto">
+            <Table variant="simple" colorScheme="whiteAlpha">
+              <Thead>
+                <Tr>
+                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Nombre</Th>
+                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Número</Th>
+                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Unidad</Th>
+                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Acciones</Th>
                 </Tr>
-              ))}
-            </Tbody>
-          </Table>
+              </Thead>
+              <Tbody>
+                {variables.map((variable) => (
+                  <Tr 
+                    key={variable.id}
+                    bg={colorMode === 'light' ? 'white' : 'gray.700'} 
+                    color={colorMode === 'light' ? 'black' : 'white'}
+                  >
+                    <Td textAlign="center">{variable.nombre}</Td>
+                    <Td textAlign="center">{variable.numero}</Td>
+                    <Td textAlign="center">{variable.unidad}</Td>
+                    <Td textAlign="center">
+                      <IconButton 
+                        icon={<FaPen />} 
+                        onClick={() => handleEdit(variable)} 
+                        aria-label="Editar" 
+                        background={buttonDefaultColor}
+                        borderRadius="6px"
+                        boxShadow={buttonShadow}
+                        _hover={{ 
+                            background: buttonHoverColor, 
+                            color: "lightgray"
+                        }}
+                        mr={2}
+                      />
+                      <IconButton 
+                        icon={<FaTrashAlt />} 
+                        onClick={() => handleDelete(variable.nombre)} 
+                        aria-label="Eliminar"
+                        background={buttonDefaultColor}
+                        borderRadius="6px"
+                        boxShadow={buttonShadow}
+                        _hover={{ 
+                            background: buttonHoverColor, 
+                            color: "lightgray"
+                        }}
+                      />
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </Box>
         </Box>
       </VStack>
 
@@ -268,10 +300,6 @@ const CrearVariable = () => {
                 <Button colorScheme="red" onClick={confirmDelete}>Eliminar</Button>
                 <Button onClick={() => setDeleteModalOpen(false)} colorScheme="blue" >Cancelar</Button>
             </HStack>
-            
-            
-            
-            
           </ModalFooter>
         </ModalContent>
       </Modal>

@@ -9,7 +9,6 @@ import GraficoArea from '../pages/GraficoArea';
 import GraficoRosa from '../pages/GraficoRosa';
 import GraficoMedidor from '../pages/GraficoMedidor';
 import html2pdf from 'html2pdf.js';
-import Breadcrumbs from './Breadcrumbs';
 
 export default function Inicio() {
   const [selectedNode, setSelectedNode] = useState(0);

@@ -7,7 +7,6 @@ import { useAuth } from '../components/AuthContext';
 
 const GraficoLinea = ({ title, url, nodeId }) => {
   const [chartData, setChartData] = useState(null);
-  const [summary, setSummary] = useState(null);  
   const { colorMode } = useColorMode();
   const [isOpen, setIsOpen] = useState(false);
   const handleOpen = () => setIsOpen(true);
@@ -22,9 +21,6 @@ const GraficoLinea = ({ title, url, nodeId }) => {
         const response = await axios.get(finalUrl, {headers: { Authorization: `Bearer ${token}`}});
 
         const dataArray = response.data.data;
-        const summaryData = response.data.summary;
-        console.log("ACA", response.data.data);
-        setSummary(summaryData);
 
         const processedData = dataArray
           .filter(item => item.type === 'Temperatura')  

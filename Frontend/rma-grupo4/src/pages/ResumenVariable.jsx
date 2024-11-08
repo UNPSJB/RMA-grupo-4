@@ -21,7 +21,6 @@ const ResumenVariable = ({ title, url, nodeId, unidad, dateRange }) => {
     const formattedStartTime = startTime.toISOString().split('.')[0] + 'Z';
     const formattedEndTime = now.toISOString().split('.')[0] + 'Z';
 
-    console.log("Rango de fechas:", formattedStartTime, formattedEndTime);
     return { startTime: formattedStartTime, endTime: formattedEndTime };
   };
 
