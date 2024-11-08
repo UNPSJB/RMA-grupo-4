@@ -89,6 +89,18 @@ const CrearNodo = () => {
   // Maneja el envío del formulario (crear/modificar)
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const isDuplicate = nodos.some(nodo => parseInt(nodo.id_nodo) === parseInt(formData.id_nodo));
+    if (isDuplicate) {
+      toast({
+        title: 'ID nodo duplicado.',
+        description: 'Ya existe un nodo con el mismo id. Ingrese  otro id.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return; 
+    }
     try {
       const method = editingNodeId ? 'PUT' : 'POST';
       const endpoint = editingNodeId
@@ -124,6 +136,7 @@ const CrearNodo = () => {
           isClosable: true,
         });
       }
+    
     } catch (error) {
       toast({
         title: 'Error.',
