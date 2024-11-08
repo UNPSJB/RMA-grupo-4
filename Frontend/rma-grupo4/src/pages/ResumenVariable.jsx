@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Text, useColorMode } from '@chakra-ui/react'; // Importar useColorMode
+import { Box, Text, useColorMode } from '@chakra-ui/react';
 import axios from 'axios';
 import { useAuth } from '../components/AuthContext';
 
-const ResumenVariable = ({ title, url, nodeId, unidad }) => {
+const ResumenVariable = ({ title, url, nodeId, unidad, dateRange }) => {
   const { colorMode } = useColorMode();
   const [summary, setSummary] = useState({
     max_value: null,
@@ -12,11 +12,25 @@ const ResumenVariable = ({ title, url, nodeId, unidad }) => {
   });
   const { token } = useAuth();
 
+  // Función para calcular el rango de fechas en UTC sin ajustar manualmente la zona horaria
+  const calculateDateRange = () => {
+    const now = new Date();
+    const startTime = new Date(now.getTime() - dateRange * 60 * 60 * 1000); // Hace el cálculo en UTC por defecto
+
+    // Formateamos las fechas en UTC sin milisegundos
+    const formattedStartTime = startTime.toISOString().split('.')[0] + 'Z';
+    const formattedEndTime = now.toISOString().split('.')[0] + 'Z';
+
+    console.log("Rango de fechas:", formattedStartTime, formattedEndTime);
+    return { startTime: formattedStartTime, endTime: formattedEndTime };
+  };
+
   useEffect(() => {
     let timeoutId;
     const fetchData = async () => {
       try {
-        const finalUrl = nodeId !== undefined ? `${url}?node_id=${nodeId}` : url;
+        const { startTime, endTime } = calculateDateRange();
+        const finalUrl = `${url}?node_id=${nodeId}&start_time=${startTime}&end_time=${endTime}`;
 
         const response = await axios.get(finalUrl , {headers: { Authorization: `Bearer ${token}`}});
         const resumenData = response.data.summary; 
@@ -36,7 +50,7 @@ const ResumenVariable = ({ title, url, nodeId, unidad }) => {
     setupTimeout();
 
     return () => clearTimeout(timeoutId);
-  }, [url, title, nodeId]);
+  }, [url, title, nodeId, dateRange, token]); 
 
   return (
     <Box

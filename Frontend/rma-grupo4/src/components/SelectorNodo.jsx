@@ -10,10 +10,11 @@ function SelectorNodo({ onChange }) {
   const { token } = useAuth();
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/v1/clima/nodos/resumen', {headers: { Authorization: `Bearer ${token}`}})
+    axios.get('http://localhost:8000/api/v1/clima/nodos', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
       .then((response) => {
-        const nodos = response.data.summary.map((item) => item.id_nodo);  
-        
+        const nodos = response.data;  
         if (nodos.length > 0) {
           setNodos(nodos); 
           setSelectedNode(nodos[0]); 
@@ -33,7 +34,7 @@ function SelectorNodo({ onChange }) {
   };
 
   return (
-  <Box display="flex" justifyContent="center">
+  <Box>
     <Select
       value={selectedNode}
       onChange={handleNodeChange}
