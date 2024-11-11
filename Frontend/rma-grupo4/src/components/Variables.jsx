@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, FormControl, Heading, FormLabel, Input, Textarea, useToast, VStack, HStack, useColorMode, Table, Thead, Tbody, Tr, Th, Td, Button, IconButton,
-  Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, useColorModeValue
+  Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, useColorModeValue, Select
 } from '@chakra-ui/react';
-import { FaTrashAlt, FaPen } from "react-icons/fa";
+import { FaTrashAlt, FaPen, FaPencilAlt } from "react-icons/fa";
 
 const CrearVariable = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +12,7 @@ const CrearVariable = () => {
     unidad: '',
   });
   const [variables, setVariables] = useState([]);
+  const [selectedTipo, setSelectedTipo] = useState("");
   const [editingVariableId, setEditingVariableId] = useState(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [variableToDelete, setVariableToDelete] = useState(null);
@@ -21,6 +22,36 @@ const CrearVariable = () => {
   const buttonDefaultColor = useColorModeValue('gray.300', 'gray.600');
   const buttonHoverColor = useColorModeValue('rgb(0, 31, 63)', 'rgb(255, 130, 37)');
   const buttonShadow = useColorModeValue("5px 5px 3px #5a5a5a, -5px -5px 3px #ffffff", "2px 2px 3px rgba(0, 0, 0, 0.3)");
+
+
+  const tiposMensaje = [
+    
+    { nombre: "TEMP_T", valor: 1 },
+    { nombre: "TEMP2_T", valor: 2 },
+    { nombre: "HUMIDITY_T", valor: 3 },
+    { nombre: "PRESSURE_T", valor: 4 },
+    { nombre: "LIGHT_T", valor: 5 },
+    { nombre: "SOIL_T", valor: 6 },
+    { nombre: "SOIL2_T", valor: 7 },
+    { nombre: "SOILR_T", valor: 8 },
+    { nombre: "SOILR2_T", valor: 9 },
+    { nombre: "OXYGEN_T", valor: 10 },
+    { nombre: "CO2_T", valor: 11 },
+    { nombre: "WINDSPD_T", valor: 12 },
+    { nombre: "WINDHDG_T", valor: 13 },
+    { nombre: "RAINFALL_T", valor: 14 },
+    { nombre: "MOTION_T", valor: 15 },
+    { nombre: "VOLTAGE_T", valor: 16 },
+    { nombre: "VOLTAGE2_T", valor: 17 },
+    { nombre: "CURRENT_T", valor: 18 },
+    { nombre: "CURRENT2_T", valor: 19 },
+    { nombre: "IT_T", valor: 20 },
+    { nombre: "LATITUDE_T", valor: 21 },
+    { nombre: "LONGITUDE_T", valor: 22 },
+    { nombre: "ALTITUDE_T", valor: 23 },
+    { nombre: "HDOP_T", valor: 24 },
+    { nombre: "LEVEL_T", valor: 25 },
+  ];
 
   // Fetch variables
   const fetchVariables = async () => {
@@ -77,43 +108,57 @@ const CrearVariable = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
     // Validación para evitar números duplicados
-    const isDuplicate = variables.some(variable => parseInt(variable.numero) === parseInt(formData.numero));
-    if (isDuplicate) {
+ 
+  
+    // Asegurarte de que 'numero' es un valor numérico válido
+    const numero = parseInt(selectedTipo, 10); // Eliminamos espacios innecesarios
+    if (isNaN(numero)) {
       toast({
-        title: 'Número duplicado.',
-        description: 'Ya existe una variable con el mismo número. Ingrese un número único.',
+        title: 'Número inválido.',
+        description: 'Por favor ingresa un número válido.',
         status: 'error',
         duration: 3000,
         isClosable: true,
       });
-      return; 
+      return;
     }
-    const esNegativo = formData.numero <= 0;
-    if (esNegativo) {
-        toast({
-          title: 'Número negativo.',
-          description: 'Ingrese un número mayor a 0.',
-          status: 'error',
-          duration: 3000,
-          isClosable: true,
-        });
-        return; 
-    }
+    const isDuplicate = variables.some(variable => parseInt(variable.numero) === numero);
 
+  if (isDuplicate) {
+    toast({
+      title: 'Número duplicado.',
+      description: 'Ya existe una variable con el mismo número. Ingrese un número único.',
+      status: 'error',
+      duration: 3000,
+      isClosable: true,
+    });
+    return; // Si el número es duplicado, no procedemos con la creación
+  }
+  
+    // Crear el objeto con los datos que vas a enviar
+    const formDataToSend = {
+      ...formData,
+      numero: numero, // Asegurarse de que 'numero' es un número entero
+    };
+  
+    console.log(formDataToSend); // Verifica que 'numero' es un número y que el objeto está correcto
+  
     try {
       const method = editingVariableId ? 'PUT' : 'POST';
       const endpoint = editingVariableId
         ? `http://localhost:8000/modificar_variable/${editingVariableId}`
         : 'http://localhost:8000/crear_variable';
-
+  
       const response = await fetch(endpoint, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formDataToSend), // Enviar formDataToSend
       });
+  
       const data = await response.json();
       if (response.ok) {
         toast({
@@ -147,6 +192,10 @@ const CrearVariable = () => {
     }
     setFormData({ nombre: '', numero: '', unidad: '' });
   };
+  
+  
+  
+  
 
   const handleEdit = (variable) => {
     setEditingVariableId(variable.id);
@@ -218,9 +267,21 @@ const CrearVariable = () => {
               <Input name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Ingrese el nombre de la variable" color={isLight ? 'black' : 'white'} borderColor={isLight ? 'black' : 'white'} />
             </FormControl>
             <FormControl isRequired>
-              <FormLabel color={isLight ? 'black' : 'white'}>Número</FormLabel>
-              <Input name="numero" type="number" value={formData.numero} onChange={handleChange} placeholder="Ingrese el número" color={isLight ? 'black' : 'white'} borderColor={isLight ? 'black' : 'white'} />
-            </FormControl>
+  <FormLabel color={isLight ? 'black' : 'white'}>Número</FormLabel>
+  <Select
+    placeholder="Selecciona un tipo de mensaje"
+    value={selectedTipo}
+    onChange={(e) => setSelectedTipo(e.target.value)} // Asegúrate de que selectedTipo sea un número
+  >
+    {tiposMensaje.map((tipo) => (
+      <option key={tipo.valor} value={tipo.valor}>
+        {tipo.valor} - {tipo.nombre}
+      </option>
+    ))}
+  </Select>
+</FormControl>
+          
+       
             <FormControl isRequired>
               <FormLabel color={isLight ? 'black' : 'white'}>Unidad</FormLabel>
               <Input name="unidad" value={formData.unidad} onChange={handleChange} placeholder="Ingrese la unidad" color={isLight ? 'black' : 'white'} borderColor={isLight ? 'black' : 'white'} />
@@ -255,7 +316,8 @@ const CrearVariable = () => {
                     <Td textAlign="center">{variable.numero}</Td>
                     <Td textAlign="center">{variable.unidad}</Td>
                     <Td textAlign="center">
-                      <IconButton 
+                      <IconButton
+                        FaPencilAlt title='Editar'
                         icon={<FaPen />} 
                         onClick={() => handleEdit(variable)} 
                         aria-label="Editar" 
@@ -268,7 +330,8 @@ const CrearVariable = () => {
                         }}
                         mr={2}
                       />
-                      <IconButton 
+                      <IconButton
+                        FaPencilAlt title='Eliminar'
                         icon={<FaTrashAlt />} 
                         onClick={() => handleDelete(variable.nombre)} 
                         aria-label="Eliminar"
