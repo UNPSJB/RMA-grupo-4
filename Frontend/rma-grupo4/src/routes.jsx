@@ -13,7 +13,8 @@ import PantallaComparativa from './analisis/PantallaComparativa';
 import GeneraQR from './utils/GeneraQR';
 import TablaDatosHistoricos from './pages/TablaDatosHistoricos'; 
 import TablaAuditoria from './pages/TablaAuditoria';
-import CrearNodo from './components/Nodo';
+import TablaNodo from './components/TablaNodos';
+import FormNodo from './components/FormNodo';
 import Admin from './components/Admin';
 import Usuarios from './components/Usuarios';
 import Roles from './components/Roles';
@@ -161,7 +162,17 @@ function AppRoutes() {
           element={
             <App>
               <PrivateRoute allowedRoles={['admin','cooperativa','profesional']}>
-                <CrearNodo/>
+                <TablaNodo/>
+              </PrivateRoute>
+            </App>
+          } 
+        />
+        <Route 
+          path="/form_nodo" 
+          element={
+            <App>
+              <PrivateRoute allowedRoles={['admin','cooperativa','profesional']}>
+                <FormNodo/>
               </PrivateRoute>
             </App>
           } 

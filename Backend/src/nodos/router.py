@@ -9,10 +9,18 @@ router = APIRouter()
 
 @router.post("/CrearNodo")
 def Crear_Nodo(alias: CrearNodo, db: Session = Depends(get_db)):
-    db_nodo = get_nodo(db, alias = alias.alias)
-    if db_nodo:
-        raise HTTPException(status_code=400, detail="Ya existe ese alias")
-    return crear_nodo(db = db, alias = alias)
+    # Validar si existe un nodo con el mismo alias
+    db_nodo_alias = get_alias(db, alias=alias.alias)
+    if db_nodo_alias:
+        raise HTTPException(status_code=400, detail="Ya existe un nodo con ese alias.")
+    # Validar si existe un nodo con el mismo id_nodo
+    db_nodo_id = get_nodo_por_id(db, id_nodo=alias.id_nodo)
+    if db_nodo_id:
+        raise HTTPException(status_code=400, detail="Ya existe un nodo con ese ID.")
+    
+    # Crear el nodo si pasa ambas validaciones
+    nuevo_nodo = crear_nodo(db=db, alias=alias)
+    return {"message": "Nodo creado con éxito.", "nodo": nuevo_nodo}
 
 
 @router.put("/modificar_datos_nodo/{id}", response_model=RespuestaNodo)
@@ -30,7 +38,7 @@ def modificar_datos_nodo(id: int, datos: ModificarNodo, db: Session = Depends(ge
 
 @router.delete("/eliminar_nodo/{alias}", response_model=RespuestaNodo)
 def eliminar_nodo(alias: str, db: Session = Depends(get_db)):
-    db_nodo = get_nodo(db, alias)
+    db_nodo = get_alias(db, alias)
     if db_nodo is None:
         raise HTTPException(status_code=404, detail="Nodo no encontrado")
     
@@ -43,3 +51,14 @@ def eliminar_nodo(alias: str, db: Session = Depends(get_db)):
 def obtener_nodos(db: Session = Depends(get_db)):
     nodos = get_all_nodos(db)
     return nodos
+
+@router.get("/obtenerNodo/{id}", response_model=RespuestaNodo)
+def obtener_nodo_por_id(id: int, db: Session = Depends(get_db)):
+    # Buscar el nodo por ID
+    nodo = db.query(Nodo).filter(Nodo.id_nodo == id).first()
+    
+    # Si no se encuentra el nodo, lanzar una excepción
+    if not nodo:
+        raise HTTPException(status_code=404, detail="Nodo no encontrado")
+    
+    return nodo
