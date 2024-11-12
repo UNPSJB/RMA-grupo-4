@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Heading, Button, Input, Flex, Table, Text, Thead, Tr, Th, Tbody, Td, Center, useColorMode } from '@chakra-ui/react';
+import { Box, Heading, Button, Input, Flex, Table, Text, Thead, Tr, Th, Tbody, Td, Center, useColorMode, useColorModeValue } from '@chakra-ui/react';
 import { FaTemperatureHigh, FaTint, FaWind, FaClock } from 'react-icons/fa';
 import { GiSpeedometer, GiWaterDrop } from 'react-icons/gi';
 import axios from 'axios';
@@ -21,6 +21,10 @@ const DescargasHistoricas = () => {
   const [startDate, setStartDate] = useState(argentinaDate); 
   const [endDate, setEndDate] = useState(argentinaDate);
   const { token } = useAuth();
+
+  const buttonDefaultColor = useColorModeValue('gray.300', 'gray.600');
+  const buttonHoverColor = useColorModeValue('rgb(0, 31, 63)', 'rgb(255, 130, 37)');
+  const buttonShadow = useColorModeValue("5px 5px 3px #5a5a5a, -5px -5px 3px #ffffff", "2px 2px 3px rgba(0, 0, 0, 0.3)");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -137,7 +141,7 @@ const DescargasHistoricas = () => {
   };
   
   return (
-    <Box bg={colorMode === 'light' ? 'gray.100' : 'gray.800'} color={colorMode === 'light' ? 'black' : 'white'} borderRadius="md" boxShadow="md" width="100%">
+    <Box bg={colorMode === 'light' ? 'gray.100' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'} borderRadius="md" boxShadow="md" width="100%" p={4}>
       <Heading as="h1" textAlign="center" p="8">Tabla Datos Históricos</Heading>
 
       <Flex justify="space-evenly" mb={8} wrap="wrap" gap={4} >
@@ -149,12 +153,22 @@ const DescargasHistoricas = () => {
             <label htmlFor="end-date" style={{ fontWeight: 'bold', marginBottom: '8px', display: 'block', fontSize:"20px"}}>Fecha Fin:</label>
             <Input id="end-date" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} min={startDate} max={argentinaDate}/>
           </Box>
-            <Button  mt="10" colorScheme="teal" size="md" onClick={downloadCSV}>Descargar CSV</Button>
+            <Button  
+              mt="10" 
+              background={buttonDefaultColor}
+              borderRadius="6px"
+              boxShadow={buttonShadow}
+              _hover={{ 
+                  background: buttonHoverColor, 
+                  color: "lightgray"
+              }} 
+              onClick={downloadCSV}
+            >Descargar CSV</Button>
         </Flex>
 
-      <Box bg={colorMode === 'light' ? 'gray.300' : 'gray.600'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
-        <Box overflowX="auto" bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} borderRadius="md" boxShadow="lg" p={7} >
-          <Table variant="simple" colorScheme="whiteAlpha" >
+      <Box bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
+        <Box overflowX="auto" bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'} borderRadius="md" boxShadow="lg" p={7} >
+          <Table variant="simple" colorScheme={colorMode === 'light' ? "blackAlpha" : "whiteAlpha"} >
             <Thead>
               <Tr>
                 <Th onClick={() => handleSort("id_nodo")} textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>
@@ -186,10 +200,16 @@ const DescargasHistoricas = () => {
                   <Center color={colorMode === 'light' ? 'black' : 'white'}>
                     <FaTemperatureHigh style={{ marginRight: "5px" }} /> Temperatura
                     <Button
+                      title={isFahrenheit ? "Convertir a °C" : "Convertir a °F"}
                       size="xs"
-                      colorScheme="teal"
+                      ml={2} 
+                      background={buttonDefaultColor}
+                      boxShadow={buttonShadow}
+                      _hover={{ 
+                          background: buttonHoverColor, 
+                          color: "lightgray"
+                      }}
                       onClick={() => setIsFahrenheit(!isFahrenheit)}
-                      ml={2}
                     >
                       {isFahrenheit ? "°C" : "°F"}
                     </Button>
@@ -206,10 +226,16 @@ const DescargasHistoricas = () => {
                     <FaWind size="1.5em" style={{ marginRight: "5px" }} />
                     Viento
                     <Button
+                      title={isMtsXSegundo ? "Convertir a km/h" : "Convertir a m/s"}
                       size="xs"
-                      colorScheme="teal"
+                      ml={2} 
+                      background={buttonDefaultColor}
+                      boxShadow={buttonShadow}
+                      _hover={{ 
+                          background: buttonHoverColor, 
+                          color: "lightgray"
+                      }}
                       onClick={() => setIsMtsXSegundo(!isMtsXSegundo)}
-                      ml={2}
                     >
                       {isMtsXSegundo ? "km/h" : "m/s"}
                     </Button>
@@ -220,10 +246,16 @@ const DescargasHistoricas = () => {
                   <GiWaterDrop size="1.5em" style={{ marginRight: "5px" }} />
                   Precipitación
                   <Button
+                    title={isCm ? "Convertir a mm" : "Convertir a cm"}
                     size="xs"
-                    colorScheme="teal"
+                    ml={2} 
+                    background={buttonDefaultColor}
+                    boxShadow={buttonShadow}
+                    _hover={{ 
+                        background: buttonHoverColor, 
+                        color: "lightgray"
+                    }}
                     onClick={() => setIsCm(!isCm)}
-                    ml={2}
                   >
                     {isCm ? "mm" : "cm"}
                   </Button>
@@ -242,6 +274,7 @@ const DescargasHistoricas = () => {
                     key={`${row.id_nodo}-${index}`}
                     bg={colorMode === 'light' ? 'white' : 'gray.700'} 
                     color={colorMode === 'light' ? 'black' : 'white'}
+                    _hover={{ backgroundColor: colorMode === 'light' ? "gray.100" : "gray.700" }}
                   >
                     <Td textAlign="center">{row.id_nodo}</Td>
                     <Td textAlign="center">{formatDate(row.timestamp)} {formatHour(row.timestamp)}</Td>
@@ -270,14 +303,38 @@ const DescargasHistoricas = () => {
               )}
             </Tbody>
           </Table>
-          <Flex justify="center" mt={4}>
-            <Button p={4}onClick={handlePreviousPage} disabled={page === 1} colorScheme="teal" size="sm" mr={2}>
+          <Flex justify="center" mt={6}>
+            <Button
+              onClick={handlePreviousPage}
+              isDisabled={page === 1}
+              size="sm"
+              mr={2}
+              background={page === 1 ? 'gray.500' : buttonDefaultColor}
+              color={page === 1 ? 'gray.200' : (colorMode === 'light' ? 'black' : 'white')}
+              borderRadius="6px"
+              boxShadow={page === 1 ? "none" : buttonShadow}
+              _hover={page === 1 ? {} : { 
+                background: buttonHoverColor, 
+                color: "lightgray"
+              }}
+            >
               Anterior
             </Button>
-            <Text fontSize="sm" alignSelf="center">
-              Página {page} de {totalPages}
-            </Text>
-            <Button p={4} onClick={handleNextPage} disabled={page === totalPages} colorScheme="teal" size="sm" ml={2}>
+            <Text mx={4}>Página {page} de {totalPages}</Text>
+            <Button
+              onClick={handleNextPage}
+              isDisabled={page === totalPages || totalPages === 0}
+              size="sm"
+              ml={2}
+              background={(page === totalPages || totalPages === 0) ? 'gray.500' : buttonDefaultColor}
+              color={(page === totalPages || totalPages === 0) ? 'gray.200' : (colorMode === 'light' ? 'black' : 'white')}
+              borderRadius="6px"
+              boxShadow={(page === totalPages || totalPages === 0) ? "none" : buttonShadow}
+              _hover={(page === totalPages || totalPages === 0) ? {} : { 
+                background: buttonHoverColor, 
+                color: "lightgray"
+              }}
+            >
               Siguiente
             </Button>
           </Flex>

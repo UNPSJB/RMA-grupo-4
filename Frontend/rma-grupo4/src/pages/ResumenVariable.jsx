@@ -62,7 +62,7 @@ const ResumenVariable = ({ title, url, nodeId, unidad, dateRange }) => {
       transition="all 0.4s ease"
       _hover={{ boxShadow: 'xl', bg: colorMode === 'dark' ? 'gray.600' : 'gray.300', fontWeight: "bold" }}
     >
-      <Text fontSize="1.25rem" fontWeight="bold" color="teal.300" mb={2}>
+      <Text fontSize="1.25rem" fontWeight="bold" color={colorMode === 'light' ? 'black' : 'white'} mb={2}>
         {title}:
       </Text>
       <Text fontSize="lg" color={colorMode === 'dark' ? 'white' : 'black'} mb="1" textAlign="center">

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Box, Spinner, IconButton, Center, useColorModeValue } from '@chakra-ui/react';
-import { FaTrashAlt, FaPen } from "react-icons/fa";
+import { Table, Thead, Tbody, Tr, Th, Td, TableContainer, Box, Spinner, IconButton, Center, useColorMode, useColorModeValue, Heading } from '@chakra-ui/react';
+import { FaTrashAlt, FaPen, FaPencilAlt } from "react-icons/fa";
 import axios from 'axios';
 import EliminarUsuario from './EliminarUsuario';
 import AsignarRol from './AsignarRol';
 import { useAuth } from './AuthContext';
 
 export default function Usuarios() {
+    const { colorMode } = useColorMode();
     const [usuarios, setUsuarios] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -52,11 +53,6 @@ export default function Usuarios() {
         }
     };
 
-    const bg = useColorModeValue('gray.100', 'gray.700');
-    const headerBg = useColorModeValue('gray.300', 'gray.600');
-    const textColor = useColorModeValue('black', 'white'); 
-    const shadow = useColorModeValue('6px 6px 10px rgba(0, 0, 0, 0.1), -6px -6px 10px rgba(255, 255, 255, 0.7)', '6px 6px 10px rgba(0, 0, 0, 0.3), -6px -6px 10px rgba(0, 0, 0, 0.2)');
-    
     const buttonDefaultColor = useColorModeValue('gray.300', 'gray.600');
     const buttonHoverColor = useColorModeValue('rgb(0, 31, 63)', 'rgb(255, 130, 37)');
     const buttonShadow = useColorModeValue("5px 5px 3px #5a5a5a, -5px -5px 3px #ffffff", "2px 2px 3px rgba(0, 0, 0, 0.3)");
@@ -74,66 +70,76 @@ export default function Usuarios() {
     }
 
     return (
-        <Box bg={bg} borderRadius="md" boxShadow={shadow} p={4}>
-            <TableContainer>
-                <Table variant="simple">
-                    <Thead>
-                        <Tr bg={headerBg}>
-                            <Th color={textColor} p={1}>ID</Th>
-                            <Th color={textColor} p={1}>Usuario</Th>
-                            <Th color={textColor} p={1}>Email</Th>
-                            <Th color={textColor} p={1}>Edad</Th>
-                            <Th color={textColor} p={1}>Rol</Th>
-                            <Th color={textColor} p={1}>Acciones</Th>
-                        </Tr>
-                    </Thead>
-                    <Tbody>
-                        {usuarios.map(usuario => (
-                            <Tr key={usuario.id}>
-                                <Td color={useColorModeValue('black', 'white')} p={1}>{usuario.id}</Td>
-                                <Td color={useColorModeValue('black', 'white')} p={1}>{usuario.usuario}</Td>
-                                <Td color={useColorModeValue('black', 'white')} p={1}>{usuario.email}</Td>
-                                <Td color={useColorModeValue('black', 'white')} p={1}>{usuario.edad}</Td>
-                                <Td color={useColorModeValue('black', 'white')} p={1}>{usuario.rol_nombre}</Td>
-                                <Td p={1}>
-                                    <IconButton
-                                        icon={<FaPen />}
-                                        aria-label="Editar"
-                                        background={buttonDefaultColor}
-                                        borderRadius="6px"
-                                        boxShadow={buttonShadow}
-                                        _hover={{ 
-                                            background: buttonHoverColor, 
-                                            color: "lightgray"
-                                        }}
-                                        onClick={() => {
-                                            setUsuarioAModificar(usuario); 
-                                            setIsModalAsignarOpen(true);
-                                        }}
-                                        mr={2}
-                                    />
-                                    <IconButton 
-                                        icon={<FaTrashAlt />}
-                                        aria-label="Eliminar"
-                                        background={buttonDefaultColor}
-                                        borderRadius="6px"
-                                        boxShadow={buttonShadow}
-                                        _hover={{ 
-                                            background: buttonHoverColor, 
-                                            color: "lightgray"
-                                        }}
-                                        onClick={() => {
-                                            setUsuarioAEliminar(usuario.usuario); 
-                                            setIsModalEliminarOpen(true);
-                                        }}
-                                    />
-                                </Td>
+        <Box  bg={colorMode === 'light' ? 'gray.200' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'} borderRadius="md" boxShadow="md" width="100%" p={4}>
+            <Heading as="h1" textAlign="center" p="8">Usuarios</Heading>
+            <Box bg={colorMode === 'light' ? 'gray.300' : 'gray.800'}  p={2} borderRadius="md">
+                <TableContainer overflowX="auto" bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'} borderRadius="md" boxShadow="lg" p={2}>
+                    <Table variant="simple" colorScheme={colorMode === 'light' ? "blackAlpha" : "whiteAlpha"}>
+                        <Thead display={{ base: "none", md: "table-header-group" }}>
+                            <Tr>
+                                <Th color={colorMode === 'light' ? 'black' : 'white'} fontWeight="bold" textAlign="center">ID</Th>
+                                <Th color={colorMode === 'light' ? 'black' : 'white'} fontWeight="bold" textAlign="center">Usuario</Th>
+                                <Th color={colorMode === 'light' ? 'black' : 'white'} fontWeight="bold" textAlign="center">Email</Th>
+                                <Th color={colorMode === 'light' ? 'black' : 'white'} fontWeight="bold" textAlign="center">Edad</Th>
+                                <Th color={colorMode === 'light' ? 'black' : 'white'} fontWeight="bold" textAlign="center">Rol</Th>
+                                <Th color={colorMode === 'light' ? 'black' : 'white'} fontWeight="bold" textAlign="center">Acciones</Th>
                             </Tr>
-                        ))}
-                    </Tbody>
-                </Table>
-            </TableContainer>
-
+                        </Thead>
+                        <Tbody>
+                            {usuarios.map(usuario => (
+                                <Tr 
+                                    key={usuario.id} 
+                                    bg={colorMode === 'light' ? 'white' : 'gray.700'} 
+                                    color={colorMode === 'light' ? 'black' : 'white'}
+                                    _hover={{ backgroundColor: colorMode === 'light' ? "gray.100" : "gray.700" }}
+                                >
+                                    <Td color={colorMode === 'light' ? 'black' : 'white'} textAlign="center">{usuario.id}</Td>
+                                    <Td color={colorMode === 'light' ? 'black' : 'white'} textAlign="center">{usuario.usuario}</Td>
+                                    <Td color={colorMode === 'light' ? 'black' : 'white'} textAlign="center">{usuario.email}</Td>
+                                    <Td color={colorMode === 'light' ? 'black' : 'white'} textAlign="center">{usuario.edad}</Td>
+                                    <Td color={colorMode === 'light' ? 'black' : 'white'} textAlign="center">{usuario.rol_nombre}</Td>
+                                    <Td color={colorMode === 'light' ? 'black' : 'white'} textAlign="center">
+                                        <IconButton
+                                            FaPencilAlt title = "Editar Usuario"
+                                            icon={<FaPen />}
+                                            aria-label="Editar"
+                                            background={buttonDefaultColor}
+                                            borderRadius="6px"
+                                            boxShadow={buttonShadow}
+                                            _hover={{ 
+                                                background: buttonHoverColor, 
+                                                color: "lightgray"
+                                            }}
+                                            onClick={() => {
+                                                setUsuarioAModificar(usuario); 
+                                                setIsModalAsignarOpen(true);
+                                            }}
+                                            mr={2}
+                                        />
+                                        <IconButton 
+                                            FaPencilAlt title = "Eliminar Usuario"
+                                            icon={<FaTrashAlt />}
+                                            aria-label="Eliminar"
+                                            background={buttonDefaultColor}
+                                            borderRadius="6px"
+                                            boxShadow={buttonShadow}
+                                            _hover={{ 
+                                                background: buttonHoverColor, 
+                                                color: "lightgray"
+                                            }}
+                                            onClick={() => {
+                                                setUsuarioAEliminar(usuario.usuario); 
+                                                setIsModalEliminarOpen(true);
+                                            }}
+                                        />
+                                    </Td>
+                                </Tr>
+                            ))}
+                        </Tbody>
+                    </Table>
+                </TableContainer>
+            </Box>
+                
             {/* Modales */}
             <EliminarUsuario 
                 isOpen={isModalEliminarOpen} 

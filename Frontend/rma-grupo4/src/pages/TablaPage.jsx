@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Table, Thead, Tr, Th, Tbody, Td, Button, Flex, Text, Center, useMediaQuery, useColorMode } from "@chakra-ui/react";
+import { Box, Table, Thead, Tr, Th, Tbody, Td, Button, Flex, Text, Center, useMediaQuery, useColorMode, useColorModeValue } from "@chakra-ui/react";
 import { FaTemperatureHigh, FaTint, FaWind, FaClock } from "react-icons/fa";
 import { GiWaterDrop, GiSpeedometer } from "react-icons/gi";
 import axios from 'axios';
@@ -17,6 +17,10 @@ function TablaPage({ onRowSelection }) {
   const { colorMode } = useColorMode();  // Hook para el modo de color
   const rowsPerPage = isMobile ? 1 : 3;
   const { token } = useAuth();
+
+  const buttonDefaultColor = useColorModeValue('gray.300', 'gray.600');
+  const buttonHoverColor = useColorModeValue('rgb(0, 31, 63)', 'rgb(255, 130, 37)');
+  const buttonShadow = useColorModeValue("5px 5px 3px #5a5a5a, -5px -5px 3px #ffffff", "2px 2px 3px rgba(0, 0, 0, 0.3)");
 
   useEffect(() => {
     let timeoutId;
@@ -73,14 +77,6 @@ function TablaPage({ onRowSelection }) {
 
   const paginatedData = sortedData.slice((page - 1) * rowsPerPage, page * rowsPerPage);
   const totalPages = Math.ceil(sortedData.length / rowsPerPage);
-
-  const handlePreviousPage = () => {
-    if (page > 1) setPage(page - 1);
-  };
-
-  const handleNextPage = () => {
-    if (page < totalPages) setPage(page + 1);
-  };
 
   const handleRowClick = (index) => {
     if (selectedRowIndex === index) {
@@ -153,10 +149,16 @@ function TablaPage({ onRowSelection }) {
                   <FaTemperatureHigh size="1.5em" style={{ marginRight: "5px" }} />
                   Temperatura
                   <Button
+                    title={isFahrenheit ? "Convertir a °C" : "Convertir a °F"}
                     size="xs"
-                    colorScheme="teal"
+                    ml={2} 
+                    background={buttonDefaultColor}
+                    boxShadow={buttonShadow}
+                    _hover={{ 
+                        background: buttonHoverColor, 
+                        color: "lightgray"
+                    }}
                     onClick={() => setIsFahrenheit(!isFahrenheit)}
-                    ml={2}
                   >
                     {isFahrenheit ? "°C" : "°F"}
                   </Button>
@@ -173,10 +175,16 @@ function TablaPage({ onRowSelection }) {
                   <FaWind size="1.5em" style={{ marginRight: "5px" }} />
                   Viento
                   <Button
+                    title={isMtsXSegundo ? "Convertir a km/h" : "Convertir a m/s"}
                     size="xs"
-                    colorScheme="teal"
+                    ml={2} 
+                    background={buttonDefaultColor}
+                    boxShadow={buttonShadow}
+                    _hover={{ 
+                        background: buttonHoverColor, 
+                        color: "lightgray"
+                    }}
                     onClick={() => setIsMtsXSegundo(!isMtsXSegundo)}
-                    ml={2}
                   >
                     {isMtsXSegundo ? "km/h" : "m/s"}
                   </Button>
@@ -187,10 +195,16 @@ function TablaPage({ onRowSelection }) {
                   <GiWaterDrop size="1.5em" style={{ marginRight: "5px" }} />
                   Precipitación
                   <Button
+                    title={isCm ? "Convertir a mm" : "Convertir a cm"}
                     size="xs"
-                    colorScheme="teal"
+                    ml={2} 
+                    background={buttonDefaultColor}
+                    boxShadow={buttonShadow}
+                    _hover={{ 
+                        background: buttonHoverColor, 
+                        color: "lightgray"
+                    }}
                     onClick={() => setIsCm(!isCm)}
-                    ml={2}
                   >
                     {isCm ? "mm" : "cm"}
                   </Button>
@@ -221,7 +235,8 @@ function TablaPage({ onRowSelection }) {
                 <Tr
                   key={index}
                   onClick={() => handleRowClick(index)}
-                  bg={selectedRowIndex === index ? (colorMode === 'light' ? "gray.100" : "gray.700") : "transparent"}
+                  bg={colorMode === 'light' ? 'white' : 'gray.700'} 
+                  color={colorMode === 'light' ? 'black' : 'white'}
                   _hover={{ backgroundColor: colorMode === 'light' ? "gray.100" : "gray.700" }}
                   display={{ base: "flex", md: "table-row" }} 
                   flexDirection={{ base: "column", md: "row" }} 
@@ -313,14 +328,38 @@ function TablaPage({ onRowSelection }) {
           </Tbody>
         </Table>
       </Box>
-      <Flex justify="center" mt={4}>
-        <Button onClick={handlePreviousPage} disabled={page === 1} colorScheme="teal" size="sm" mr={2}>
+      <Flex justify="center" mt={6}>
+        <Button
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+          isDisabled={page === 1}
+          size="sm" 
+          mr={2} 
+          background={page === 1 ? 'gray.500' : buttonDefaultColor} 
+          color={page === 1 ? 'gray.200' : (colorMode === 'light' ? 'black' : 'white')}
+          borderRadius="6px"
+          boxShadow={page === 1 ? "none" : buttonShadow}
+          _hover={page === 1 ? {} : { 
+            background: buttonHoverColor, 
+            color: "lightgray"
+          }}
+        >
           Anterior
         </Button>
-        <Text fontSize="sm" alignSelf="center">
-          Página {page} de {totalPages}
-        </Text>
-        <Button onClick={handleNextPage} disabled={page === totalPages} colorScheme="teal" size="sm" ml={2}>
+        <Text mx={4}>Página {page} de {totalPages}</Text>
+        <Button
+          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+          isDisabled={page === totalPages || totalPages === 0}
+          size="sm" 
+          ml={2} 
+          background={(page === totalPages || totalPages === 0) ? 'gray.500' : buttonDefaultColor}
+          color={(page === totalPages || totalPages === 0) ? 'gray.200' : (colorMode === 'light' ? 'black' : 'white')}
+          borderRadius="6px"
+          boxShadow={(page === totalPages || totalPages === 0) ? "none" : buttonShadow}
+          _hover={(page === totalPages || totalPages === 0) ? {} : { 
+            background: buttonHoverColor, 
+            color: "lightgray"
+          }}
+        >
           Siguiente
         </Button>
       </Flex>

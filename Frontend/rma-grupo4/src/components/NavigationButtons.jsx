@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Box, Button, Flex, IconButton, useColorMode } from "@chakra-ui/react";
+import { Box, Button, Flex, IconButton, useColorMode, useColorModeValue } from "@chakra-ui/react";
 import { FaBars, FaTimes } from 'react-icons/fa';
 import { useAuth } from './AuthContext';
 
@@ -9,6 +9,10 @@ function NavigationButtons() {
   const { colorMode } = useColorMode(); 
   const { userRole } = useAuth(); 
   const menuRef = useRef(); 
+
+  const buttonDefaultColor = useColorModeValue('gray.900', 'gray.600');
+  const buttonHoverColor = useColorModeValue('rgb(0, 31, 63)', 'rgb(255, 130, 37)');
+  const buttonShadow = useColorModeValue("5px 5px 3px #5a5a5a, -5px -5px 3px #ffffff", "2px 2px 3px rgba(0, 0, 0, 0.3)");
 
   const toggleVisibility = () => {
     setIsVisible((prev) => !prev);
@@ -55,10 +59,13 @@ function NavigationButtons() {
         left="20px"
         zIndex="1000"
         icon={isVisible ? <FaTimes /> : <FaBars />}
-        colorScheme="gray"
-        bg={colorMode === 'light' ? 'gray.800' : 'gray.600'} // Cambiar fondo según el tema
-        color="white"
-        _hover={{ bg: colorMode === 'light' ? 'gray.700' : 'gray.500' }}
+        color= "lightgray"
+        background={buttonDefaultColor}
+        boxShadow={buttonShadow}
+        _hover={{ 
+          background: buttonHoverColor, 
+          color: "lightgray"
+        }}
         onClick={toggleVisibility}
         aria-label="Toggle Navigation"
       />
@@ -92,7 +99,7 @@ function NavigationButtons() {
             to={item.route}
             variant="ghost"
             color={colorMode === 'light' ? 'black' : 'white'} // Color del texto según el tema
-            _hover={{ bg: colorMode === 'light' ? 'gray.200' : 'gray.700' }} // Hover según el tema
+            _hover={{ color:'white' , bg: colorMode === 'light' ? "rgb(0, 31, 63)" : "orange.500"}} // Hover según el tema
             _active={{ bg: colorMode === 'light' ? 'gray.300' : 'gray.600' }} // Active según el tema
             width="100%"
             mb={3}

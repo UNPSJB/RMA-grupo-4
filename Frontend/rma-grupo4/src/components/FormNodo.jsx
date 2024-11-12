@@ -32,7 +32,7 @@ const CrearNodo = () => {
 
   useEffect(() => {
     const { id_nodo } = location.state || {}; // Obtener la ID del nodo desde state
-    if (id_nodo) {
+    if (id_nodo != null) {
       setEditingNodeId(id_nodo); // Establecer el nodo en modo edición
       fetchNodeData(id_nodo); // Cargar los datos del nodo para edición
     }
@@ -196,7 +196,7 @@ const CrearNodo = () => {
           bg={isLight ? "white" : "gray.800"}
         >
           <Heading textAlign="center">
-            {editingNodeId ? "Editar Nodo" : "Agregar Nodo"}
+            {editingNodeId != null ? "Editar Nodo" : "Agregar Nodo"}
           </Heading>
           <form onSubmit={handleSubmit}>
             <FormControl isRequired mt={2}>

@@ -170,22 +170,22 @@ const ModificarDatos = () => {
                     </FormControl>
                     <Button
                         type="submit"
-                        size="lg"
+                        colorScheme={colorMode === 'light' ? "orange" : undefined} // Cambiar colorScheme en modo claro
+                        size="lg" 
                         w="full"
-                        bg={colorMode === 'light' ? "rgb(0, 31, 63)" : "orange.500"} // Cambiar color de fondo según tema
-                        color={colorMode === 'light' ? "white" : "black"} // Cambiar color del texto del botón
+                        bg={colorMode === 'light' ? "rgb(0, 31, 63)" : "orange.500"} // Cambiar fondo según modo
                         borderRadius="30px"
                         border="none"
                         zIndex="10"
                         position="relative"
                         boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), inset 4px 4px 10px rgba(0,0,0,0.3)"
                         _hover={{
-                            bg: colorMode === 'light' ? "rgb(0, 41, 73)" : 'orange.600',
+                            bg: colorMode === 'light' ? "rgb(0, 51, 80)" : 'orange.600', // Cambiar color en hover según modo
                             boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), inset 6px 6px 12px rgba(0,0,0,0.3)',
                             transform: 'scale(1.05)',
                         }}
                         _active={{
-                            bg: colorMode === 'light' ? "rgb(0, 51, 93)" : 'orange.700',
+                            bg: colorMode === 'light' ? "rgb(0, 71, 100)" : 'orange.700', // Cambiar color en active según modo
                             transform: 'translateY(2px)',
                             boxShadow: 'inset 6px 6px 12px rgba(0,0,0,0.2)',
                         }}

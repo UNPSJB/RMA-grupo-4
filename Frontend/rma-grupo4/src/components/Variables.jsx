@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Box, FormControl, Heading, FormLabel, Input, Textarea, useToast, VStack, HStack, useColorMode, Table, Thead, Tbody, Tr, Th, Td, Button, IconButton,
-  Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, useColorModeValue, Select
+  Box, FormControl, Heading, FormLabel, Input, useToast, VStack, HStack, useColorMode, Table, Thead, Tbody, Tr, Th, Td, Button, IconButton,
+  Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, useColorModeValue, Select, TableContainer
 } from '@chakra-ui/react';
-import { FaTrashAlt, FaPen, FaPencilAlt } from "react-icons/fa";
+import { FaTrashAlt, FaPen, FaPlus } from "react-icons/fa";
 
 const CrearVariable = () => {
   const [formData, setFormData] = useState({
@@ -22,10 +22,9 @@ const CrearVariable = () => {
   const buttonDefaultColor = useColorModeValue('gray.300', 'gray.600');
   const buttonHoverColor = useColorModeValue('rgb(0, 31, 63)', 'rgb(255, 130, 37)');
   const buttonShadow = useColorModeValue("5px 5px 3px #5a5a5a, -5px -5px 3px #ffffff", "2px 2px 3px rgba(0, 0, 0, 0.3)");
-
+  const [isFormModalOpen, setFormModalOpen] = useState(false);
 
   const tiposMensaje = [
-    
     { nombre: "TEMP_T", valor: 1 },
     { nombre: "TEMP2_T", valor: 2 },
     { nombre: "HUMIDITY_T", valor: 3 },
@@ -62,8 +61,19 @@ const CrearVariable = () => {
         setVariables(data);
       } else {
         toast({
-          title: 'Error al cargar variables.',
-          description: data.message || 'No se pudieron cargar las variables.',
+          render: () => (
+            <Box 
+              color="white" 
+              bg="red.600" 
+              borderRadius="md" 
+              p={5} 
+              mb={4}
+              boxShadow="md"
+              fontSize="lg" 
+            >
+              Error al cargar variables: No se pudieron cargar las variables.
+            </Box>
+          ),
           status: 'error',
           duration: 3000,
           isClosable: true,
@@ -71,8 +81,19 @@ const CrearVariable = () => {
       }
     } catch (error) {
       toast({
-        title: 'Error de conexión.',
-        description: 'No se pudo conectar con la API.',
+        render: () => (
+          <Box 
+            color="white" 
+            bg="red.600" 
+            borderRadius="md" 
+            p={5} 
+            mb={4}
+            boxShadow="md"
+            fontSize="lg" 
+          >
+            Error de conexión.: No se pudo conectar con la API.
+          </Box>
+        ),
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -84,7 +105,6 @@ const CrearVariable = () => {
     fetchVariables();
   }, []);
 
-  // Handle form changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
@@ -104,53 +124,67 @@ const CrearVariable = () => {
     }
   };
   
-
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Validación para evitar números duplicados
- 
-  
-    // Asegurarte de que 'numero' es un valor numérico válido
-    const numero = parseInt(selectedTipo, 10); // Eliminamos espacios innecesarios
+
+    const numero = parseInt(selectedTipo, 10); 
     if (isNaN(numero)) {
       toast({
-        title: 'Número inválido.',
-        description: 'Por favor ingresa un número válido.',
+        render: () => (
+          <Box 
+            color="white" 
+            bg="red.600" 
+            borderRadius="md" 
+            p={5} 
+            mb={4}
+            boxShadow="md"
+            fontSize="lg" 
+          >
+            Número negativo: Ingrese un número mayor a 0.
+          </Box>
+        ),
         status: 'error',
         duration: 3000,
         isClosable: true,
       });
       return;
     }
-    const isDuplicate = variables.some(variable => parseInt(variable.numero) === numero);
 
-  if (isDuplicate) {
-    toast({
-      title: 'Número duplicado.',
-      description: 'Ya existe una variable con el mismo número. Ingrese un número único.',
-      status: 'error',
-      duration: 3000,
-      isClosable: true,
-    });
-    return; // Si el número es duplicado, no procedemos con la creación
-  }
-  
-    // Crear el objeto con los datos que vas a enviar
+    const isDuplicate = variables.some(variable => parseInt(variable.numero) === numero && variable.id !== editingVariableId);
+
+    if (isDuplicate) {
+      toast({
+        render: () => (
+          <Box 
+            color="white" 
+            bg="red.600" 
+            borderRadius="md" 
+            p={5} 
+            mb={4}
+            boxShadow="md"
+            fontSize="lg" 
+          >
+            Número duplicado: Ya existe una variable con el mismo número.
+          </Box>
+        ),
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return; 
+    }
+
     const formDataToSend = {
       ...formData,
-      numero: numero, // Asegurarse de que 'numero' es un número entero
+      numero: numero, 
     };
-  
-    console.log(formDataToSend); // Verifica que 'numero' es un número y que el objeto está correcto
-  
+
     try {
       const method = editingVariableId ? 'PUT' : 'POST';
       const endpoint = editingVariableId
         ? `http://localhost:8000/modificar_variable/${editingVariableId}`
         : 'http://localhost:8000/crear_variable';
-  
+
       const response = await fetch(endpoint, {
         method,
         headers: {
@@ -158,14 +192,25 @@ const CrearVariable = () => {
         },
         body: JSON.stringify(formDataToSend), // Enviar formDataToSend
       });
-  
+
       const data = await response.json();
       if (response.ok) {
         toast({
-          title: editingVariableId ? 'Variable modificada.' : 'Variable creada.',
-          description: editingVariableId
-            ? 'La variable se ha modificado correctamente.'
-            : 'La variable se ha creado correctamente.',
+          render: () => (
+            <Box 
+              color="white" 
+              bg="green.600" 
+              borderRadius="md" 
+              p={5} 
+              mb={4}
+              boxShadow="md"
+              fontSize="lg" 
+            >
+              {editingVariableId
+                ? 'La variable se ha modificado correctamente.'
+                : 'La variable se ha creado correctamente.'}
+            </Box>
+          ),
           status: 'success',
           duration: 3000,
           isClosable: true,
@@ -191,11 +236,8 @@ const CrearVariable = () => {
       });
     }
     setFormData({ nombre: '', numero: '', unidad: '' });
+    setFormModalOpen(false); 
   };
-  
-  
-  
-  
 
   const handleEdit = (variable) => {
     setEditingVariableId(variable.id);
@@ -204,6 +246,7 @@ const CrearVariable = () => {
       numero: variable.numero,
       unidad: variable.unidad,
     });
+    setFormModalOpen(true); 
   };
 
   const handleDelete = (nombre) => {
@@ -219,8 +262,19 @@ const CrearVariable = () => {
       });
       if (response.ok) {
         toast({
-          title: 'Variable eliminada.',
-          description: 'La variable ha sido eliminada correctamente.',
+          render: () => (
+            <Box 
+              color="white" 
+              bg="red.600" 
+              borderRadius="md" 
+              p={5} 
+              mb={4}
+              boxShadow="md"
+              fontSize="lg" 
+            >
+              La variable ha sido eliminada correctamente.
+            </Box>
+          ),
           status: 'success',
           duration: 3000,
           isClosable: true,
@@ -228,8 +282,19 @@ const CrearVariable = () => {
         setVariables(variables.filter((variable) => variable.nombre !== variableToDelete));
       } else {
         toast({
-          title: 'Error.',
-          description: 'No se pudo eliminar la variable.',
+          render: () => (
+            <Box 
+              color="white" 
+              bg="red.600" 
+              borderRadius="md" 
+              p={5} 
+              mb={4}
+              boxShadow="md"
+              fontSize="lg" 
+            >
+              Error: No se pudo eliminar la variable.
+            </Box>
+          ),
           status: 'error',
           duration: 3000,
           isClosable: true,
@@ -237,8 +302,19 @@ const CrearVariable = () => {
       }
     } catch (error) {
       toast({
-        title: 'Error.',
-        description: 'No se pudo conectar con la API.',
+        render: () => (
+          <Box 
+            color="white" 
+            bg="red.600" 
+            borderRadius="md" 
+            p={5} 
+            mb={4}
+            boxShadow="md"
+            fontSize="lg" 
+          >
+            Error: No se pudo conectar con la API.
+          </Box>
+        ),
         status: 'error',
         duration: 3000,
         isClosable: true,
@@ -249,119 +325,222 @@ const CrearVariable = () => {
   const handleCancelEdit = () => {
     setEditingVariableId(null);
     setFormData({ nombre: '', numero: '', unidad: '' });
+    setFormModalOpen(false);
   };
   
-
   return (
     <VStack display="flex" justifyContent="center" alignItems="center" minHeight="20vh" spacing={4} p={4} bg={colorMode === 'light' ? 'white' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'}>
-      <Heading as="h1" textAlign="center">Gestión Variables</Heading>
-      
-      
-      <VStack width="100%" spacing={8}>
-        {/* Formulario */}
-        <Box width="50%" p={4} borderColor={isLight ? 'black' : 'gray.500'} borderWidth="1px" borderRadius="lg" bg={isLight ? 'white' : 'gray.800'}>
-          <Heading as="h4" fontSize="1.2rem" textAlign="center">{editingVariableId ? 'Modificar Variable' : 'Crear Variable'}</Heading>
-          <form onSubmit={handleSubmit}>
-            <FormControl isRequired>
-              <FormLabel color={isLight ? 'black' : 'white'}>Nombre</FormLabel>
-              <Input name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Ingrese el nombre de la variable" color={isLight ? 'black' : 'white'} borderColor={isLight ? 'black' : 'white'} />
-            </FormControl>
-            <FormControl isRequired>
-  <FormLabel color={isLight ? 'black' : 'white'}>Número</FormLabel>
-  <Select
-    placeholder="Selecciona un tipo de mensaje"
-    value={selectedTipo}
-    onChange={(e) => setSelectedTipo(e.target.value)} // Asegúrate de que selectedTipo sea un número
-  >
-    {tiposMensaje.map((tipo) => (
-      <option key={tipo.valor} value={tipo.valor}>
-        {tipo.valor} - {tipo.nombre}
-      </option>
-    ))}
-  </Select>
-</FormControl>
-          
-       
-            <FormControl isRequired>
-              <FormLabel color={isLight ? 'black' : 'white'}>Unidad</FormLabel>
-              <Input name="unidad" value={formData.unidad} onChange={handleChange} placeholder="Ingrese la unidad" color={isLight ? 'black' : 'white'} borderColor={isLight ? 'black' : 'white'} />
-            </FormControl>
-            <HStack justify="center" spacing={4} mt={4}>
-              <Button colorScheme="blue" type="submit">{!editingVariableId ? 'Crear' : 'Guardar'}</Button>
-              <Button colorScheme="gray" onClick={handleCancelEdit}>Cancelar</Button>
-            </HStack>
-          </form>
-        </Box>
-
+      <Heading as="h1" m={7} textAlign="center">Gestión Variables</Heading>
+      <VStack width="100%" spacing={2}>
         {/* Tabla */}
-        <Box width="100%" bg={colorMode === 'light' ? 'gray.300' : 'gray.600'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
-          <Box width="100%" p={4} bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} borderRadius="md" boxShadow="lg" overflowX="auto">
-            <Table variant="simple" colorScheme="whiteAlpha">
-              <Thead>
-                <Tr>
-                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Nombre</Th>
-                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Número</Th>
-                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Unidad</Th>
-                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Acciones</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {variables.map((variable) => (
-                  <Tr 
-                    key={variable.id}
-                    bg={colorMode === 'light' ? 'white' : 'gray.700'} 
-                    color={colorMode === 'light' ? 'black' : 'white'}
-                  >
-                    <Td textAlign="center">{variable.nombre}</Td>
-                    <Td textAlign="center">{variable.numero}</Td>
-                    <Td textAlign="center">{variable.unidad}</Td>
-                    <Td textAlign="center">
-                      <IconButton
-                        FaPencilAlt title='Editar'
-                        icon={<FaPen />} 
-                        onClick={() => handleEdit(variable)} 
-                        aria-label="Editar" 
-                        background={buttonDefaultColor}
-                        borderRadius="6px"
-                        boxShadow={buttonShadow}
-                        _hover={{ 
-                            background: buttonHoverColor, 
-                            color: "lightgray"
-                        }}
-                        mr={2}
-                      />
-                      <IconButton
-                        FaPencilAlt title='Eliminar'
-                        icon={<FaTrashAlt />} 
-                        onClick={() => handleDelete(variable.nombre)} 
-                        aria-label="Eliminar"
-                        background={buttonDefaultColor}
-                        borderRadius="6px"
-                        boxShadow={buttonShadow}
-                        _hover={{ 
-                            background: buttonHoverColor, 
-                            color: "lightgray"
-                        }}
-                      />
-                    </Td>
+        <Box width="100%" bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} p={2} borderRadius="md">
+          <Box width="100%" p={10} bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} borderRadius="md" boxShadow="lg" overflowX="auto">
+            <Box textAlign="right" mb={4}>
+              <IconButton 
+                FaPencilAlt title = "Agregar Variable"
+                icon={<FaPlus />} 
+                aria-label="Agregar Variable"
+                onClick={() => { 
+                  setFormModalOpen(true); 
+                  setEditingVariableId(null); 
+                  setFormData({ nombre: '', numero: '', unidad: '' }); 
+                }}
+                background={buttonDefaultColor}
+                borderRadius="6px"
+                boxShadow={buttonShadow}
+                _hover={{ 
+                    background: buttonHoverColor, 
+                    color: "lightgray"
+                }}
+              />
+            </Box>
+            <TableContainer overflowX="auto">
+              <Table variant="simple" colorScheme={colorMode === 'light' ? "blackAlpha" : "whiteAlpha"}>
+                <Thead>
+                  <Tr>
+                    <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Nombre</Th>
+                    <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Número</Th>
+                    <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Unidad</Th>
+                    <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Acciones</Th>
                   </Tr>
-                ))}
-              </Tbody>
-            </Table>
+                </Thead>
+                <Tbody>
+                  {variables
+                  .slice()
+                  .sort((a, b) => a.numero - b.numero)
+                  .map((variable) => (
+                    <Tr 
+                      key={variable.id}
+                      bg={colorMode === 'light' ? 'white' : 'gray.700'} 
+                      color={colorMode === 'light' ? 'black' : 'white'}
+                      _hover={{ backgroundColor: colorMode === 'light' ? "gray.100" : "gray.700" }}
+                    >
+                      <Td textAlign="center">{variable.nombre}</Td>
+                      <Td textAlign="center">{variable.numero}</Td>
+                      <Td textAlign="center">{variable.unidad}</Td>
+                      <Td textAlign="center">
+                        <IconButton 
+                          FaPencilAlt title = "Editar Variable"
+                          icon={<FaPen />} 
+                          onClick={() => handleEdit(variable)} 
+                          aria-label="Editar" 
+                          background={buttonDefaultColor}
+                          borderRadius="6px"
+                          boxShadow={buttonShadow}
+                          _hover={{ 
+                              background: buttonHoverColor, 
+                              color: "lightgray"
+                          }}
+                          mr={2}
+                        />
+                        <IconButton 
+                          FaPencilAlt title = "Eliminar Variable"
+                          icon={<FaTrashAlt />} 
+                          onClick={() => handleDelete(variable.nombre)} 
+                          aria-label="Eliminar"
+                          background={buttonDefaultColor}
+                          borderRadius="6px"
+                          boxShadow={buttonShadow}
+                          _hover={{ 
+                            background: buttonHoverColor, 
+                            color: "lightgray"
+                          }}
+                        />
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
           </Box>
         </Box>
       </VStack>
+
+      {/* Modal de Formulario para Crear/Modificar Variable */}
+      <Modal isOpen={isFormModalOpen} onClose={handleCancelEdit}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader
+            bg={colorMode === 'light' ? 'gray.200' : 'gray.800'}
+            color={colorMode === 'light' ? 'black' : 'white'}
+          >{editingVariableId ? 'Modificar Variable' : 'Crear Variable'}</ModalHeader>
+          <ModalBody>
+            <form onSubmit={handleSubmit}>
+              <FormControl isRequired>
+                <FormLabel>Nombre</FormLabel>
+                <Input name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Ingrese el nombre de la variable" />
+              </FormControl>
+              <FormControl isRequired>
+              <FormLabel color={isLight ? 'black' : 'white'}>Número</FormLabel>
+                <Select
+                  placeholder="Selecciona un tipo de mensaje"
+                  value={selectedTipo}
+                  onChange={(e) => setSelectedTipo(e.target.value)} 
+                >
+                  {tiposMensaje.map((tipo) => (
+                    <option key={tipo.valor} value={tipo.valor}>
+                      {tipo.valor} - {tipo.nombre}
+                    </option>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel>Unidad</FormLabel>
+                <Input name="unidad" value={formData.unidad} onChange={handleChange} placeholder="Ingrese la unidad" />
+              </FormControl>
+            </form>
+          </ModalBody>
+          <ModalFooter>
+            <HStack spacing={4}>
+              <Button 
+                type="submit" 
+                onClick={handleSubmit}
+                bg={colorMode === 'light' ? 'rgb(0, 31, 63)' : 'orange.500'}
+                color={colorMode === 'light' ? 'gray.200' : 'white'}
+                border="none"
+                p="6"
+                boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
+                _hover={{
+                    bg: colorMode === 'light' ? 'rgb(0, 41, 83)' : 'orange.600',
+                    boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)',
+                    transform: 'scale(1.05)',
+                }}
+                _active={{
+                    bg: colorMode === 'light' ? 'rgb(0, 21, 43)' : 'orange.700',
+                    transform: 'translateY(2px)',
+                    boxShadow: '10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)',
+                }}
+              >{!editingVariableId ? 'Crear' : 'Guardar'}</Button>
+              <Button 
+                onClick={handleCancelEdit}
+                ml={3} 
+                bg="grey.500"
+                border="none"
+                p="6"
+                boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
+                _hover={{
+                    bg: 'grey.600',
+                    boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)',
+                    transform: 'scale(1.05)',
+                }}
+                _active={{
+                    bg: 'grey.700',
+                    transform: 'translateY(2px)',
+                    boxShadow: '10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)',
+                }}
+              >Cancelar</Button>
+            </HStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
 
       {/* Modal de confirmación de eliminación */}
       <Modal isOpen={isDeleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Eliminar Variable</ModalHeader>
+          <ModalHeader
+            bg={colorMode === 'light' ? 'gray.200' : 'gray.800'}
+            color={colorMode === 'light' ? 'black' : 'white'}
+          >Eliminar Variable</ModalHeader>
           <ModalBody>¿Estás seguro de que deseas eliminar esta variable?</ModalBody>
-          <ModalFooter >
+          <ModalFooter>
             <HStack spacing={4}>
-                <Button colorScheme="red" onClick={confirmDelete}>Eliminar</Button>
-                <Button onClick={() => setDeleteModalOpen(false)} colorScheme="blue" >Cancelar</Button>
+              <Button 
+                onClick={confirmDelete}
+                bg={colorMode === 'light' ? 'rgb(0, 31, 63)' : 'orange.500'}
+                color={colorMode === 'light' ? 'gray.200' : 'white'}
+                border="none"
+                p="6"
+                boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
+                _hover={{
+                    bg: colorMode === 'light' ? 'rgb(0, 41, 83)' : 'orange.600',
+                    boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)',
+                    transform: 'scale(1.05)',
+                }}
+                _active={{
+                    bg: colorMode === 'light' ? 'rgb(0, 21, 43)' : 'orange.700',
+                    transform: 'translateY(2px)',
+                    boxShadow: '10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)',
+                }}
+              >Eliminar</Button>
+              <Button 
+                onClick={() => setDeleteModalOpen(false)} 
+                ml={3} 
+                bg="grey.500"
+                border="none"
+                p="6"
+                boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
+                _hover={{
+                    bg: 'grey.600',
+                    boxShadow: '10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)',
+                    transform: 'scale(1.05)',
+                }}
+                _active={{
+                    bg: 'grey.700',
+                    transform: 'translateY(2px)',
+                    boxShadow: '10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)',
+                }}
+              >Cancelar</Button>
             </HStack>
           </ModalFooter>
         </ModalContent>
@@ -371,4 +550,3 @@ const CrearVariable = () => {
 };
 
 export default CrearVariable;
-

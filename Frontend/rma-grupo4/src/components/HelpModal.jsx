@@ -8,20 +8,14 @@ import {
   ModalBody, 
   ModalFooter, 
   Button, 
-  Box, 
-  Text, 
-  Heading, 
   Stack, 
-  useColorMode 
+  useColorMode
 } from '@chakra-ui/react';
 import usoAyuda from './usoAyuda';
 
 const HelpModal = ({ isOpen, onClose, userRole }) => {
   const { colorMode } = useColorMode();
-  const customColor = colorMode === 'light' ? 'rgb(0, 31, 63)' : 'orange.300';
   const botonAyuda = usoAyuda(userRole, onClose);
-
-  console.log(botonAyuda);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size={{ base: 'sm', md: 'lg', lg: 'xl' }}>

@@ -57,7 +57,6 @@ const GeneraQR = () => {
             bg={colorMode === 'light' ? 'gray.100' : 'gray.900'}
             color={colorMode === 'light' ? 'black' : 'white'}
             boxShadow="md"
-            p={4}
         >
             <Grid
                 bg={colorMode === 'light' ? 'gray.200' : 'gray.900'}

@@ -2,6 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Loader = () => {
+  const handleBackClick = () => {
+    window.history.back();
+  };
+
   return (
     <CenteredWrapper>
       <Title>¡Ups! Parece que has intentado acceder a una página restringida</Title>
@@ -72,6 +76,7 @@ const Loader = () => {
           </g>
         </svg>
       </StyledWrapper>
+      <BackButton onClick={handleBackClick}>Volver a página anterior</BackButton>
     </CenteredWrapper>
   );
 }
@@ -217,6 +222,20 @@ const StyledWrapper = styled.div`
     36% {
       stroke-dashoffset: 0;
     }
+  }
+`;
+
+const BackButton = styled.button`
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 18px;
+  color: #fff;
+  background-color: #334;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: rgb(255, 130, 37);
   }
 `;
 

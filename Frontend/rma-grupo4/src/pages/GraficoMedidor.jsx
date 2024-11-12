@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Doughnut } from 'react-chartjs-2'; 
 import axios from 'axios';
 import { MdZoomOutMap } from "react-icons/md";
-import { Box,Text,useColorMode ,  Modal, ModalOverlay, ModalContent, ModalBody, ModalCloseButton,Button } from '@chakra-ui/react';
+import { Box,Text,useColorMode ,  Modal, ModalOverlay, ModalContent, ModalBody, ModalCloseButton,Button, useColorModeValue} from '@chakra-ui/react';
 import { useAuth } from '../components/AuthContext';
 
 const GraficoMedidor = ({ title, url, nodeId }) => {
@@ -14,6 +14,10 @@ const GraficoMedidor = ({ title, url, nodeId }) => {
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
   const { token } = useAuth();
+
+  const buttonDefaultColor = useColorModeValue('gray.300', 'gray.600');
+  const buttonHoverColor = useColorModeValue('rgb(0, 31, 63)', 'rgb(255, 130, 37)');
+  const buttonShadow = useColorModeValue("5px 5px 3px #5a5a5a, -5px -5px 3px #ffffff", "2px 2px 3px rgba(0, 0, 0, 0.3)");
 
   useEffect(() => {
     let timeoutId;
@@ -110,7 +114,16 @@ const GraficoMedidor = ({ title, url, nodeId }) => {
       borderRadius="md" 
       boxShadow="lg"
     >
-    <Button onClick={handleOpen} display="flex"><MdZoomOutMap /></Button>
+    <Button 
+        onClick={handleOpen} 
+        display="flex"
+        background={buttonDefaultColor}
+        boxShadow={buttonShadow}
+        _hover={{ 
+            background: buttonHoverColor, 
+            color: "lightgray"
+        }}
+      ><MdZoomOutMap /></Button>
       {chartData ? (
         <Box height={{ base: '100px', md: '150px' }}>
           <Doughnut data={chartData} options={chartOptions} /> {/* Gráfico tipo Doughnut para el medidor */}

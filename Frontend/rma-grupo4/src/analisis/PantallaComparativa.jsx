@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Select, Box, Flex , Grid, GridItem, Heading, Button, useColorMode } from '@chakra-ui/react';
+import { Select, Box, Flex , Grid, GridItem, Heading, Button, useColorMode, useColorModeValue } from '@chakra-ui/react';
 import TemperaturaHumedadLineas from './TemperaturaHumedadLineas';
 import TemperaturaPrecipitacionBarra from './TemperaturaPrecipitacionBarra';
 import HumedadPrecipitacionArea from './HumedadPrecipitacionArea';
@@ -19,6 +19,10 @@ const PantallaComparativa = () => {
     const { colorMode } = useColorMode(); // Usar hook para manejar modos de color
     const { token } = useAuth();
 
+    const buttonDefaultColor = useColorModeValue('gray.300', 'gray.600');
+    const buttonHoverColor = useColorModeValue('rgb(0, 31, 63)', 'rgb(255, 130, 37)');
+    const buttonShadow = useColorModeValue("5px 5px 3px #5a5a5a, -5px -5px 3px #ffffff", "2px 2px 3px rgba(0, 0, 0, 0.3)");
+    
     useEffect(() => {
         const fetchAvailableNodes = async () => {
             try {
@@ -187,8 +191,17 @@ const PantallaComparativa = () => {
                     </Grid>
                 </Box>
             </Box>
-
-            <Button colorScheme="blue" m={4} onClick={downloadPDF}>
+            <Button 
+                background={buttonDefaultColor}
+                borderRadius="6px"
+                boxShadow={buttonShadow}
+                _hover={{ 
+                    background: buttonHoverColor, 
+                    color: "lightgray"
+                }} 
+                m={4} 
+                onClick={downloadPDF}
+            >
                 Descargar PDF
             </Button>
         </Box>

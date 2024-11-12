@@ -48,7 +48,7 @@ const EliminarUsuario = ({ isOpen, onClose, onConfirm }) => {
                             boxShadow: '10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)',
                         }}
                     >
-                        Si
+                        Eliminar
                     </Button>
                     <Button 
                         onClick={onClose} 
@@ -68,7 +68,7 @@ const EliminarUsuario = ({ isOpen, onClose, onConfirm }) => {
                             boxShadow: '10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)',
                         }}
                     >
-                        No
+                        Cancelar
                     </Button>
                 </ModalFooter>
             </ModalContent>

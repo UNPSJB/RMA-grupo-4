@@ -59,7 +59,7 @@ const TablaSummary = ({ nodeId1, nodeId2 }) => {
             width="100%" 
             overflowX="auto" 
         >
-            <Table variant="simple" colorScheme="whiteAlpha" size={{ base: "sm", md: "md" }} height={{ base: '300px', md: '400px' }}>
+            <Table variant="simple" colorScheme={colorMode === 'light' ? "blackAlpha" : "whiteAlpha"} size={{ base: "sm", md: "md" }} height={{ base: '300px', md: '400px' }}>
                 <Thead>
                     <Tr>
                         <Th color={colorMode === 'light' ? 'black' : 'white'}>Variable</Th>

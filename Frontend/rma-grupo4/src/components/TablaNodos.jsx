@@ -19,10 +19,9 @@ import {
   AlertDialogBody,
   AlertDialogFooter,
   useColorModeValue,
-  Tooltip,
   TableContainer,
 } from "@chakra-ui/react";
-import { FaTrashAlt, FaPen, FaPlus } from "react-icons/fa";
+import { FaTrashAlt, FaPen, FaPlus, FaPencilAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const TablaNodo = () => {
@@ -91,8 +90,19 @@ const TablaNodo = () => {
       );
       if (response.ok) {
         toast({
-          title: "Nodo eliminado.",
-          description: "El nodo ha sido eliminado correctamente.",
+          render: () => (
+            <Box 
+              color="white" 
+              bg="red.600" 
+              borderRadius="md" 
+              p={5} 
+              mb={4}
+              boxShadow="md"
+              fontSize="lg" 
+            >
+              El nodo ha sido eliminado correctamente.
+            </Box>
+          ),
           status: "success",
           duration: 3000,
           isClosable: true,
@@ -100,8 +110,19 @@ const TablaNodo = () => {
         setNodos(nodos.filter((nodo) => nodo.alias !== nodeToDelete));
       } else {
         toast({
-          title: "Error.",
-          description: "No se pudo eliminar el nodo.",
+          render: () => (
+            <Box 
+              color="white" 
+              bg="red.600" 
+              borderRadius="md" 
+              p={5} 
+              mb={4}
+              boxShadow="md"
+              fontSize="lg" 
+            >
+              Error: No se pudo eliminar el nodo.
+            </Box>
+          ),
           status: "error",
           duration: 3000,
           isClosable: true,
@@ -109,8 +130,19 @@ const TablaNodo = () => {
       }
     } catch (error) {
       toast({
-        title: "Error.",
-        description: "No se pudo conectar con la API.",
+        render: () => (
+          <Box 
+            color="white" 
+            bg="red.600" 
+            borderRadius="md" 
+            p={5} 
+            mb={4}
+            boxShadow="md"
+            fontSize="lg" 
+          >
+            Error: No se pudo conectar con la API.
+          </Box>
+        ),
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -129,28 +161,27 @@ const TablaNodo = () => {
   );
 
   return (
-    <>
+    <Box p={4} bg={colorMode === 'light' ? 'white' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'}>
       <Heading
         as="h1"
         textAlign="center"
         color={isLight ? "black" : "white"}
-        my="2%"
+        m={7}
       >
         Gestión de Nodos
       </Heading>
-      <Box
-        maxW="90%" // Tamaño máximo de la caja
-        mx="auto" // Centra horizontalmente
-        p={10}
-        borderWidth="1px"
-        color={isLight ? "black" : "white"}
-        borderColor={isLight ? "black" : "gray.500"}
-        borderRadius="lg"
-        bg={isLight ? "white" : "gray.800"}
-      >
-        <Box textAlign="right" mb={4}>
-          <Tooltip label="Agregar Nodo" aria-label="Tooltip para agregar nodo">
+      <Box width="100%" bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} p={2} borderRadius="md">
+        <Box
+          maxW="100%" // Tamaño máximo de la caja
+          mx="auto" // Centra horizontalmente
+          p={10}
+          color={isLight ? "black" : "white"}
+          borderRadius="lg"
+          bg={isLight ? "gray.100" : "gray.700"}
+        >
+          <Box textAlign="right" mb={4}>
             <IconButton
+              FaPencilAlt title = "Agregar Nodo"
               icon={<FaPlus />}
               aria-label="Agregar Nodo"
               background={buttonDefaultColor}
@@ -162,128 +193,138 @@ const TablaNodo = () => {
               }}
               onClick={handleNew}
             />
-          </Tooltip>
-        </Box>
-        <TableContainer overflowX="auto">
-          <Table variant="simple">
-            <Thead>
-              <Tr>
-                <Th textAlign="center">Nodo</Th>
-                <Th textAlign="center">Alias</Th>
-                <Th textAlign="center">Latitud</Th>
-                <Th textAlign="center">Longitud</Th>
-                <Th textAlign="center">Acciones</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {nodos.map((nodo) => (
-                <Tr key={nodo.id_nodo}>
-                  <Td textAlign="center">{nodo.id_nodo}</Td>
-                  <Td textAlign="center">{nodo.alias}</Td>
-                  <Td textAlign="center">{nodo.latitud}</Td>
-                  <Td textAlign="center">{nodo.longitud}</Td>
-                  <Td textAlign="center">
-                    <IconButton
-                      aria-label="Editar"
-                      icon={<FaPen />}
-                      onClick={() => handleEdit(nodo.id_nodo)}
-                      mr={2}
-                      background={buttonDefaultColor}
-                      borderRadius="6px"
-                      boxShadow={buttonShadow}
-                      _hover={{
-                        background: buttonHoverColor,
-                        color: "lightgray",
-                      }}
-                    />
-                    <IconButton
-                      icon={<FaTrashAlt />}
-                      onClick={() => handleDelete(nodo.alias)}
-                      aria-label="Eliminar"
-                      background={buttonDefaultColor}
-                      borderRadius="6px"
-                      boxShadow={buttonShadow}
-                      _hover={{
-                        background: buttonHoverColor,
-                        color: "lightgray",
-                      }}
-                    />
-                  </Td>
+          </Box>
+          <TableContainer overflowX="auto">
+            <Table variant="simple" colorScheme={colorMode === 'light' ? "blackAlpha" : "whiteAlpha"}>
+              <Thead>
+                <Tr>
+                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Nodo</Th>
+                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Alias</Th>
+                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Latitud</Th>
+                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Longitud</Th>
+                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Acciones</Th>
                 </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </TableContainer>
+              </Thead>
+              <Tbody>
+                {nodos.map((nodo) => (
+                  <Tr 
+                    key={nodo.id_nodo}
+                    bg={colorMode === 'light' ? 'white' : 'gray.700'} 
+                    color={colorMode === 'light' ? 'black' : 'white'}
+                    _hover={{ backgroundColor: colorMode === 'light' ? "gray.100" : "gray.700" }}
+                  >
+                    <Td textAlign="center">{nodo.id_nodo}</Td>
+                    <Td textAlign="center">{nodo.alias}</Td>
+                    <Td textAlign="center">{nodo.latitud}</Td>
+                    <Td textAlign="center">{nodo.longitud}</Td>
+                    <Td textAlign="center">
+                      <IconButton
+                        FaPencilAlt title = "Editar Nodo"
+                        aria-label="Editar"
+                        icon={<FaPen />}
+                        onClick={() => handleEdit(nodo.id_nodo)}
+                        mr={2}
+                        background={buttonDefaultColor}
+                        borderRadius="6px"
+                        boxShadow={buttonShadow}
+                        _hover={{
+                          background: buttonHoverColor,
+                          color: "lightgray",
+                        }}
+                      />
+                      <IconButton
+                        FaPencilAlt title = "Eliminar Nodo"
+                        icon={<FaTrashAlt />}
+                        onClick={() => handleDelete(nodo.alias)}
+                        aria-label="Eliminar"
+                        background={buttonDefaultColor}
+                        borderRadius="6px"
+                        boxShadow={buttonShadow}
+                        _hover={{
+                          background: buttonHoverColor,
+                          color: "lightgray",
+                        }}
+                      />
+                    </Td>
+                  </Tr>
+                ))}
+              </Tbody>
+            </Table>
+          </TableContainer>
 
-        {/* Modal de confirmación para eliminar */}
-        <AlertDialog
-          isOpen={isDeleteModalOpen}
-          leastDestructiveRef={cancelRef}
-          onClose={() => setDeleteModalOpen(false)}
-        >
-          <AlertDialogOverlay>
-            <AlertDialogContent>
-              <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                Confirmar eliminación
-              </AlertDialogHeader>
-              <AlertDialogBody>
-                ¿Estás seguro de que deseas eliminar el nodo con alias "
-                {nodeToDelete}"?
-              </AlertDialogBody>
-              <AlertDialogFooter>
-                <Button
-                  ref={cancelRef}
-                  onClick={() => setDeleteModalOpen(false)}
-                  ml={3}
-                  bg="grey.500"
-                  border="none"
-                  p="6"
-                  boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
-                  _hover={{
-                    bg: "grey.600",
-                    boxShadow:
-                      "10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)",
-                    transform: "scale(1.05)",
-                  }}
-                  _active={{
-                    bg: "grey.700",
-                    transform: "translateY(2px)",
-                    boxShadow:
-                      "10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)",
-                  }}
+          {/* Modal de confirmación para eliminar */}
+          <AlertDialog
+            isOpen={isDeleteModalOpen}
+            leastDestructiveRef={cancelRef}
+            onClose={() => setDeleteModalOpen(false)}
+          >
+            <AlertDialogOverlay>
+              <AlertDialogContent>
+                <AlertDialogHeader 
+                  bg={colorMode === 'light' ? 'gray.200' : 'gray.800'}
+                  color={colorMode === 'light' ? 'black' : 'white'}
                 >
-                  Cancelar
-                </Button>
-                <Button
-                  colorScheme="red"
-                  onClick={confirmDelete}
-                  ml={3}
-                  bg={colorMode === "light" ? "rgb(0, 31, 63)" : "orange.500"}
-                  color={colorMode === "light" ? "gray.200" : "white"}
-                  border="none"
-                  p="6"
-                  boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
-                  _hover={{
-                    bg: colorMode === "light" ? "rgb(0, 41, 83)" : "orange.600",
-                    boxShadow:
-                      "10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)",
-                    transform: "scale(1.05)",
-                  }}
-                  _active={{
-                    bg: colorMode === "light" ? "rgb(0, 21, 43)" : "orange.700",
-                    transform: "translateY(2px)",
-                    boxShadow:
-                      "10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)",
-                  }}
-                >
-                  Eliminar
-                </Button>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialogOverlay>
-        </AlertDialog>
+                  Confirmar eliminación
+                </AlertDialogHeader>
+                <AlertDialogBody>
+                  ¿Estás seguro de que deseas eliminar el nodo con alias "
+                  {nodeToDelete}"?
+                </AlertDialogBody>
+                <AlertDialogFooter>
+                  <Button
+                    colorScheme="red"
+                    onClick={confirmDelete}
+                    ml={3}
+                    bg={colorMode === "light" ? "rgb(0, 31, 63)" : "orange.500"}
+                    color={colorMode === "light" ? "gray.200" : "white"}
+                    border="none"
+                    p="6"
+                    boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
+                    _hover={{
+                      bg: colorMode === "light" ? "rgb(0, 41, 83)" : "orange.600",
+                      boxShadow:
+                        "10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)",
+                      transform: "scale(1.05)",
+                    }}
+                    _active={{
+                      bg: colorMode === "light" ? "rgb(0, 21, 43)" : "orange.700",
+                      transform: "translateY(2px)",
+                      boxShadow:
+                        "10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)",
+                    }}
+                  >
+                    Eliminar
+                  </Button>
+                  <Button
+                    ref={cancelRef}
+                    onClick={() => setDeleteModalOpen(false)}
+                    ml={3}
+                    bg="grey.500"
+                    border="none"
+                    p="6"
+                    boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
+                    _hover={{
+                      bg: "grey.600",
+                      boxShadow:
+                        "10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)",
+                      transform: "scale(1.05)",
+                    }}
+                    _active={{
+                      bg: "grey.700",
+                      transform: "translateY(2px)",
+                      boxShadow:
+                        "10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)",
+                    }}
+                  >
+                    Cancelar
+                  </Button>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialogOverlay>
+          </AlertDialog>
+        </Box>
       </Box>
-    </>
+    </Box>
   );
 };
 

@@ -1,4 +1,4 @@
-import { Box, Grid, GridItem, useColorMode, Heading, Button, Select} from '@chakra-ui/react';
+import { Box, Grid, GridItem, useColorMode, Heading, Button, Select, useColorModeValue} from '@chakra-ui/react';
 import { useState } from 'react';
 import SelectorNodo from './SelectorNodo';
 import ResumenVariable from '../pages/ResumenVariable'; 
@@ -17,6 +17,10 @@ export default function Inicio() {
   const [dateRange, setDateRange] = useState(24);
   const { colorMode } = useColorMode(); // Modo de color actual
   const { userRole } = useAuth(); // Obtenemos el rol del usuario desde el contexto
+
+  const buttonDefaultColor = useColorModeValue('gray.300', 'gray.600');
+  const buttonHoverColor = useColorModeValue('rgb(0, 31, 63)', 'rgb(255, 130, 37)');
+  const buttonShadow = useColorModeValue("5px 5px 3px #5a5a5a, -5px -5px 3px #ffffff", "2px 2px 3px rgba(0, 0, 0, 0.3)");
 
   const handleRangeChange = (event) => {
     const hours = parseInt(event.target.value, 10);
@@ -270,10 +274,20 @@ export default function Inicio() {
           </Grid>
         </Box>
       </Box>
-      {/* Botón para descargar la vista como PDF */}
-      <Button colorScheme="blue" m={4} onClick={downloadPDF}>
-        Descargar PDF
-      </Button>
+        {/* Botón para descargar la vista como PDF */}
+        <Button 
+          background={buttonDefaultColor}
+          borderRadius="6px"
+          boxShadow={buttonShadow}
+          _hover={{ 
+              background: buttonHoverColor, 
+              color: "lightgray"
+          }} 
+          m={4} 
+          onClick={downloadPDF}
+        >
+          Descargar PDF
+        </Button>
     </Box>
   );
 }

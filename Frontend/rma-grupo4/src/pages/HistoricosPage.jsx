@@ -311,65 +311,71 @@ function HistoricosPage() {
           {renderChart()}
         </Box>
       </Box>
-      <Box overflowX="auto" mt={10} borderRadius="md" boxShadow="lg" p={7} bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
-        <Table  variant="simple" colorScheme="whiteAlpha">
-          <Thead>
-            <Tr>
-              <Th textAlign={'center'} color={colorMode === 'light' ? 'black' : 'white'}>Nodo</Th>
-              <Th>
-                <Center color={colorMode === 'light' ? 'black' : 'white'}>
-                  <FaClock size="1.5em" style={{ marginRight: "5px" }} />
-                  Fecha
-                </Center>
-              </Th>
-              <Th>
-                <Center color={colorMode === 'light' ? 'black' : 'white'}>
-                  {
-                    selectedVariable === 'Temperatura'
-                    ? <FaTemperatureHigh style={{ marginRight: "5px" }} />
-                    : selectedVariable === 'Viento'
-                    ? <FaWind size="1.5em" style={{ marginRight: "5px" }} />
-                    : selectedVariable === 'Humedad'
-                    ? <FaTint size="1.5em" style={{ marginRight: "5px" }} />
-                    : selectedVariable === 'Presión'
-                    ? <GiSpeedometer size="1.5em" style={{ marginRight: "5px" }} />
-                    : selectedVariable === 'Precipitacion'
-                    ? <GiWaterDrop size="1.5em" style={{ marginRight: "5px" }} />
-                    : ''
-                  }
-                  {selectedVariable}
-                </Center>
-              </Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {historicalData.map((item, index) => (
-              <Tr key={index} bg={colorMode === 'light' ? 'white' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
-                <Td textAlign={'center'}>{item.id}</Td>
-                <Td textAlign={'center'}>{item.year}-{item.month}-{item.day} {item.hour}:00</Td>
-                <Td textAlign={'center'}>
-                {
-                  typeof item[selectedVariable] === 'number' && !isNaN(item[selectedVariable])
-                    ? `${item[selectedVariable].toFixed(2)} ${
-                        selectedVariable === 'Temperatura'
-                          ? '°C'
-                          : selectedVariable === 'Viento'
-                          ? 'km/h'
-                          : selectedVariable === 'Humedad'
-                          ? '%'
-                          : selectedVariable === 'Presión'
-                          ? 'hPa'
-                          : selectedVariable === 'Precipitacion'
-                          ? 'mm'
-                          : ''
-                      }`
-                    : '-'
-                }
-                </Td>
+      <Box bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
+        <Box overflowX="auto" mt={2} borderRadius="md" boxShadow="lg" p={7} bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'}>
+          <Table  variant="simple" colorScheme={colorMode === 'light' ? "blackAlpha" : "whiteAlpha"}>
+            <Thead>
+              <Tr>
+                <Th textAlign={'center'} color={colorMode === 'light' ? 'black' : 'white'}>Nodo</Th>
+                <Th>
+                  <Center color={colorMode === 'light' ? 'black' : 'white'}>
+                    <FaClock size="1.5em" style={{ marginRight: "5px" }} />
+                    Fecha
+                  </Center>
+                </Th>
+                <Th>
+                  <Center color={colorMode === 'light' ? 'black' : 'white'}>
+                    {
+                      selectedVariable === 'Temperatura'
+                      ? <FaTemperatureHigh style={{ marginRight: "5px" }} />
+                      : selectedVariable === 'Viento'
+                      ? <FaWind size="1.5em" style={{ marginRight: "5px" }} />
+                      : selectedVariable === 'Humedad'
+                      ? <FaTint size="1.5em" style={{ marginRight: "5px" }} />
+                      : selectedVariable === 'Presión'
+                      ? <GiSpeedometer size="1.5em" style={{ marginRight: "5px" }} />
+                      : selectedVariable === 'Precipitacion'
+                      ? <GiWaterDrop size="1.5em" style={{ marginRight: "5px" }} />
+                      : ''
+                    }
+                    {selectedVariable}
+                  </Center>
+                </Th>
               </Tr>
-            ))}
-          </Tbody>
-        </Table>
+            </Thead>
+            <Tbody>
+              {historicalData.map((item, index) => (
+                <Tr key={index} 
+                  bg={colorMode === 'light' ? 'white' : 'gray.700'} 
+                  color={colorMode === 'light' ? 'black' : 'white'}
+                  _hover={{ backgroundColor: colorMode === 'light' ? "gray.100" : "gray.700" }}
+                >
+                  <Td textAlign={'center'}>{item.id}</Td>
+                  <Td textAlign={'center'}>{item.year}-{item.month}-{item.day} {item.hour}:00</Td>
+                  <Td textAlign={'center'}>
+                  {
+                    typeof item[selectedVariable] === 'number' && !isNaN(item[selectedVariable])
+                      ? `${item[selectedVariable].toFixed(2)} ${
+                          selectedVariable === 'Temperatura'
+                            ? '°C'
+                            : selectedVariable === 'Viento'
+                            ? 'km/h'
+                            : selectedVariable === 'Humedad'
+                            ? '%'
+                            : selectedVariable === 'Presión'
+                            ? 'hPa'
+                            : selectedVariable === 'Precipitacion'
+                            ? 'mm'
+                            : ''
+                        }`
+                      : '-'
+                  }
+                  </Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Box>
       </Box>
     </Box>
   );
