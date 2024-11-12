@@ -47,6 +47,10 @@ class PressureData(BaseDataSchema):
     pass
 
 
+class WaterLevelData(BaseDataSchema):
+    pass
+
+
 # Esquemas para la respuesta final del endpoint con un resumen
 class DataResponse(BaseModel):
     data: List[BaseDataSchema]  
@@ -57,7 +61,8 @@ class DataResponse(BaseModel):
 
 class TemperatureResponse(DataResponse):
     data: List[TemperatureData]
-
+class WaterLevelResponse(DataResponse):
+    data: List[WaterLevelData]
 class HumidityResponse(DataResponse):
     data: List[HumidityData]
 
@@ -95,3 +100,4 @@ class NodeHistoricalData(BaseModel):
     pressure: List[HistoricalDataPoint] = []
     precipitation: List[HistoricalDataPoint] = []
     wind: List[HistoricalDataPoint] = []
+

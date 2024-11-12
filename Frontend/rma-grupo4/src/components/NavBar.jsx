@@ -229,7 +229,9 @@ function NavBar() {
                 onClose={() => setModalOpen(false)}
                 onConfirm={handleEliminarUsuario}
             />
-            <HelpModal isOpen={isHelpOpen} onClose={() => setHelpOpen(false)} />
+            <HelpModal isOpen={isHelpOpen} onClose={() => setHelpOpen(false)} userRole={userRole} />        
+
+
         </Box>
     );
 }

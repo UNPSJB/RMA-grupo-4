@@ -14,11 +14,13 @@ from src.mensajes.schemas import (
     PressureResponse,
     PressureData,
     PrecipitationResponse,
+    WaterLevelData,
     PrecipitationData,
     WindResponse,
     WindData,
     NodeSummary,
     NodeSummaryResponse,
+    WaterLevelResponse,
     NodeHistoricalData,
     HistoricalDataPoint,
 )
@@ -116,6 +118,76 @@ def get_temperature_data(
 
     return TemperatureResponse(data=response_data, summary=summary)
 
+
+@router.get("/clima/nivel-agua/", response_model=WaterLevelResponse)
+def get_water_level_data(
+    node_id: Optional[int] = Query(None, description="Identificador del nodo"),
+    start_time: Optional[datetime] = Query(None, description="Inicio del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
+    end_time: Optional[datetime] = Query(None, description="Fin del rango de tiempo (YYYY-MM-DDTHH:MM:SS)"),
+    limit: Optional[int] = Query(10, description="Número máximo de registros a devolver"),
+    sort: Optional[str] = Query("desc", description="Orden de los resultados (asc o desc)"),
+    db: Session = Depends(get_db),
+    rol: str = Depends(verificar_rol("admin", "profesional", "cooperativa"))
+):
+    """
+    Endpoint para obtener los datos de nivel de agua actual e histórico.
+    """
+    # Valida que el parámetro `sort` sea 'asc' o 'desc'
+    if sort not in ["asc", "desc"]:
+        raise HTTPException(status_code=400, detail="El parámetro 'sort' debe ser 'asc' o 'desc'.")
+
+    # Ajuste de zona horaria a UTC y eliminación de milisegundos
+    if start_time:
+        start_time = start_time.replace(tzinfo=timezone.utc, microsecond=0) - timedelta(hours=3)
+    if end_time:
+        end_time = end_time.replace(tzinfo=timezone.utc, microsecond=0) - timedelta(hours=3)
+
+
+    # Configuración de la consulta base
+    base_query = db.query(Mensaje).filter(
+        Mensaje.type == "Nivel de agua",  # Ajuste para nivel de agua
+        Mensaje.tipo_mensaje == "correcto"
+    )
+
+    if node_id is not None:
+        base_query = base_query.filter(Mensaje.id_nodo == node_id)
+
+    if start_time:
+        base_query = base_query.filter(Mensaje.time >= start_time)
+    if end_time:
+        base_query = base_query.filter(Mensaje.time <= end_time)
+
+    # Consulta para calcular el resumen sin límite
+    summary_query = base_query.all()
+    if not summary_query:
+        raise HTTPException(status_code=404, detail="No se encontraron registros para los filtros proporcionados.")
+
+    water_levels = [float(record.data) for record in summary_query]
+    summary = {
+        "total_records": len(summary_query),
+        "max_value": max(water_levels),
+        "min_value": min(water_levels),
+        "average_value": sum(water_levels) / len(water_levels)
+    }
+
+    # Consulta para los datos, aplicando el límite si es necesario
+    if sort == "asc":
+        data_query = base_query.order_by(Mensaje.time.asc()).limit(limit)
+    else:
+        data_query = base_query.order_by(Mensaje.time.desc()).limit(limit)
+
+    results = data_query.all()
+
+    response_data = [
+        WaterLevelData(
+            id_nodo=record.id_nodo,
+            type=record.type,
+            data=record.data,  
+            timestamp=record.time
+        ) for record in results
+    ]
+
+    return WaterLevelResponse(data=response_data, summary=summary)
 # Endpoint para obtener los datos de humedad
 @router.get("/clima/humedad/", response_model=HumidityResponse)
 def get_humidity_data(

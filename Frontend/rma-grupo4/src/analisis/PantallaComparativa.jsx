@@ -4,6 +4,7 @@ import TemperaturaHumedadLineas from './TemperaturaHumedadLineas';
 import TemperaturaPrecipitacionBarra from './TemperaturaPrecipitacionBarra';
 import HumedadPrecipitacionArea from './HumedadPrecipitacionArea';
 import VientoRosaPrecipitacionBarra from './VientoRosa';
+import NivelesDeAgua from './NivelesDeAgua';
 import PresionLineas from './PresionLineas';
 import axios from 'axios';
 import TablaSummary from './TablaSummary';
@@ -165,14 +166,24 @@ const PantallaComparativa = () => {
                         <GridItem bg={colorMode === 'dark' ? 'gray.800' : 'gray.300'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
                             <TablaSummary nodeId1={selectedNode1} nodeId2={selectedNode2} />
                         </GridItem>
-                        <GridItem bg={colorMode === 'dark' ? 'gray.800' : 'gray.300'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
+                        <GridItem 
+                            bg={colorMode === 'dark' ? 'gray.800' : 'gray.300'} 
+                            p={{ base: 2, md: 4 }} 
+                            borderRadius="md" 
+                            boxShadow="lg"
+                            >
                             <GridItem mb="4">
                                 <VientoRosaPrecipitacionBarra nodeId1={selectedNode1} nodeId2={selectedNode2} />
                             </GridItem>
                             <GridItem>
-                                <Mapa />
+                                <NivelesDeAgua 
+                                    title="Nivel de Agua" 
+                                    url="http://localhost:8000/api/v1/clima/nivel-agua" 
+                                   nodeId1={selectedNode1}
+                                   nodeId2={selectedNode2}
+                                />
                             </GridItem>
-                        </GridItem>
+                            </GridItem>
                     </Grid>
                 </Box>
             </Box>

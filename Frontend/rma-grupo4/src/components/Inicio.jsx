@@ -9,11 +9,14 @@ import GraficoArea from '../pages/GraficoArea';
 import GraficoRosa from '../pages/GraficoRosa';
 import GraficoMedidor from '../pages/GraficoMedidor';
 import html2pdf from 'html2pdf.js';
+import GraficoNivelAgua from '../pages/GraficoNivelAgua';
+import { useAuth } from './AuthContext'; // Importa el hook de autenticación
 
 export default function Inicio() {
   const [selectedNode, setSelectedNode] = useState(0);
   const [dateRange, setDateRange] = useState(24);
   const { colorMode } = useColorMode(); // Modo de color actual
+  const { userRole } = useAuth(); // Obtenemos el rol del usuario desde el contexto
 
   const handleRangeChange = (event) => {
     const hours = parseInt(event.target.value, 10);
@@ -145,28 +148,111 @@ export default function Inicio() {
         </Box>
 
         <Box p={{ base: 2, md: 4 }}>
-          <Grid
-            templateColumns={{ base: '1fr', md: '2fr 1fr' }}
-            gap={4}
-            maxWidth="100%"
-          >
-            <GridItem bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
-              <GraficoLinea title="Temperatura" url="http://localhost:8000/api/v1/clima/temperatura" nodeId={selectedNode}/>
-            </GridItem>
+          {userRole?.trim() === 'cooperativa' ? (
+            // Aca si es cooperativa ordena de otra manera los graficos
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              gap={6}
+              bg={colorMode === 'light' ? 'gray.200' : 'gray.900'}
+              p={{ base: 4, md: 6 }}
+              borderRadius="md"
+              boxShadow="lg"
+            >
+              {/* Gráfico de Nivel de Agua */}
+              <Box 
+                bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} 
+                p={{ base: 2, md: 4 }} 
+                borderRadius="md" 
+                width="80%"
+              >
+                <GraficoNivelAgua 
+                  title="Nivel de Agua" 
+                  url="http://localhost:8000/api/v1/clima/nivel-agua" 
+                  nodeId={selectedNode} 
+                />
+              </Box>
+              
+              {/* Gráfico de Temperatura */}
+              <Box 
+                bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} 
+                p={{ base: 2, md: 4 }} 
+                borderRadius="md" 
+                width="80%"
+              >
+                <GraficoLinea 
+                  title="Temperatura" 
+                  url="http://localhost:8000/api/v1/clima/temperatura" 
+                  nodeId={selectedNode} 
+                />
+              </Box>
 
-            <GridItem>
-              <Grid templateRows="0.5fr 0.5fr" gap={4}>
-                <GridItem bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
-                  <GraficoMedidor title="Presión" url="http://localhost:8000/api/v1/clima/presion" nodeId={selectedNode}/>
-                </GridItem>
-                <GridItem bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
-                  <GraficoRosa title="V. de Viento" url="http://localhost:8000/api/v1/clima/viento" nodeId={selectedNode}/>
-                </GridItem>
-              </Grid>
-            </GridItem>
-          </Grid>
-        </Box>
+              {/* Gráfico de Viento */}
+              <Box 
+                bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} 
+                p={{ base: 2, md: 4 }} 
+                borderRadius="md" 
+                width="80%"
+              >
+                <GraficoRosa 
+                  title="V. de Viento" 
+                  url="http://localhost:8000/api/v1/clima/viento" 
+                  nodeId={selectedNode}
+                />
+              </Box>
+            </Box>
+          ) : (
+            <Grid
+              templateColumns={{ base: '1fr', md: '2fr 1fr' }}
+              gap={4}
+              maxWidth="100%"
+            >
+              <GridItem 
+                bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} 
+                p={{ base: 2, md: 4 }} 
+                borderRadius="md" 
+                boxShadow="lg"
+              >
+                <GraficoLinea title="Temperatura" url="http://localhost:8000/api/v1/clima/temperatura" nodeId={selectedNode}/>
+              </GridItem>
 
+              <GridItem>
+                <Grid templateRows="0.5fr 0.5fr" gap={4}>
+                  <GridItem 
+                    bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} 
+                    p={{ base: 2, md: 4 }} 
+                    borderRadius="md" 
+                    boxShadow="lg"
+                  >
+                    {(userRole?.trim() === 'profesional' || userRole?.trim() === 'admin') ? (
+                      <GraficoMedidor 
+                        title="Presión" 
+                        url="http://localhost:8000/api/v1/clima/presion" 
+                        nodeId={selectedNode} 
+                      />
+                    ) : (
+                      <GraficoNivelAgua 
+                        title="Nivel de Agua" 
+                        url="http://localhost:8000/api/v1/clima/nivel-agua" 
+                        nodeId={selectedNode} 
+                      />
+                    )}
+                  </GridItem>
+                  
+                  <GridItem 
+                    bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} 
+                    p={{ base: 2, md: 4 }} 
+                    borderRadius="md" 
+                    boxShadow="lg"
+                  >
+                    <GraficoRosa title="V. de Viento" url="http://localhost:8000/api/v1/clima/viento" nodeId={selectedNode}/>
+                  </GridItem>
+                </Grid>
+              </GridItem>
+            </Grid>
+            )}
+          </Box>
         <Box p={{ base: 2, md: 4 }}>
           <Grid
             templateColumns={{ base: '1fr', md: '1fr 1fr' }} 
