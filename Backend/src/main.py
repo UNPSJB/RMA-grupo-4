@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.database import engine
 from src.models import BaseModel
+from src.notificaciones.router import router as notificaciones_router
 from src.example.router import router as example_router
 from src.variables.router import router as variables_router
 from src.nodos.router import router as nodos_router
@@ -48,3 +49,4 @@ app.include_router(example_router)
 app.include_router(nodos_router)
 app.include_router(variables_router)
 app.include_router(mensajes_router, prefix="/api/v1")
+app.include_router(notificaciones_router)
