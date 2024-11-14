@@ -19,44 +19,43 @@ def mensaje_recibido(client, userdata, msg):
 
         # Crear una sesión de base de datos
         db = SessionLocal()
-        variable = db.query(Variable).filter(Variable.numero == mensaje_json['type']).first()
-
-        if variable:
-            nombre_variable = variable.nombre
-        else:
-            nombre_variable = "Desconocido"  # O algún valor por defecto en caso de que no se encuentre
-        
         try:
+            # Obtener la variable desde la base de datos
+            variable = db.query(Variable).filter(Variable.numero == mensaje_json['type']).first()
+            nombre_variable = variable.nombre if variable else "Desconocido"
+            
+            # Verificar si el mensaje es duplicado
             if validar_duplicado(db, mensaje_json):
-                nuevo_mensaje = Mensaje(
-                    id_nodo=mensaje_json['id'],
-                    type= nombre_variable,
-                    data=mensaje_json['data'],
-                    time=time_received,
-                    tipo_mensaje='duplicado'
-                )
-                analizar_alerta(mensaje_json)
-
-            # Validar el mensaje y el tiempo
-            if validar_mensaje(mensaje_json) and validar_fecha_hora_actual(time_received):
-                nuevo_mensaje = Mensaje(
-                    id_nodo=mensaje_json['id'],
-                    type=nombre_variable,
-                    data=mensaje_json['data'],
-                    time=time_received,
-                    tipo_mensaje='correcto'
-                )
-                analizar_alerta(mensaje_json)
+                tipo_mensaje = 'duplicado'
+            elif validar_mensaje(mensaje_json) and validar_fecha_hora_actual(time_received):
+                tipo_mensaje = 'correcto'
             else:
-                nuevo_mensaje = Mensaje(
-                    id_nodo=mensaje_json['id'],
-                    type=nombre_variable,
-                    data=mensaje_json['data'],
-                    time=time_received,
-                    tipo_mensaje='incorrecto'
-                )                         
+                tipo_mensaje = 'incorrecto'
+
+            # Crear y guardar el mensaje en la base de datos
+            nuevo_mensaje = Mensaje(
+                id_nodo=mensaje_json['id'],
+                type=nombre_variable,
+                data=mensaje_json['data'],
+                time=time_received,
+                tipo_mensaje=tipo_mensaje
+            )
             db.add(nuevo_mensaje)
             db.commit()
+            
+            def mensaje_to_dict(mensaje):
+                return {
+                    'id': mensaje.id_nodo,
+                    'type': mensaje.type,
+                    'data': mensaje.data,
+                    'time': mensaje.time.timestamp(),
+                    'tipo_mensaje': mensaje.tipo_mensaje
+                }
+
+            if nuevo_mensaje.type in ['Nivel de agua', 'Bateria']:
+                mensaje_json = mensaje_to_dict(nuevo_mensaje)  
+                analizar_alerta(mensaje_json)
+
         finally:
             db.close()
 
