@@ -280,7 +280,7 @@ def get_pressure_data(
         end_time = end_time.replace(tzinfo=timezone.utc, microsecond=0) - timedelta(hours=3)
 
     query = db.query(Mensaje).filter(
-        Mensaje.type == "Presión",
+        Mensaje.type == "Presion",
         Mensaje.tipo_mensaje == "correcto"
     )
 
@@ -348,7 +348,7 @@ def get_precipitation_data(
         end_time = end_time.replace(tzinfo=timezone.utc, microsecond=0) - timedelta(hours=3)
 
     query = db.query(Mensaje).filter(
-        Mensaje.type == "Precipitación",
+        Mensaje.type == "Precipitacion",
         Mensaje.tipo_mensaje == "correcto"
     )
 
@@ -492,8 +492,8 @@ def get_node_summary(db: Session = Depends(get_db), rol: str = Depends(verificar
     type_to_field = {
         "Temperatura": "last_temperature",
         "Humedad": "last_humidity",
-        "Presión": "last_pressure",
-        "Precipitación": "last_precipitation",
+        "Presion": "last_pressure",
+        "Precipitacion": "last_precipitation",
         "Viento": "last_wind"
     }
 
@@ -525,6 +525,93 @@ def get_node_summary(db: Session = Depends(get_db), rol: str = Depends(verificar
 
     return NodeSummaryResponse(summary=summary_response)
 
+@router.get("/clima/nodos/resumen/{id_nodo}", response_model=NodeSummaryResponse)
+def get_summary(
+    id_nodo: str,  # Recibes el id como cadena
+    db: Session = Depends(get_db),
+):
+    """
+    Endpoint para obtener el resumen del último valor registrado de cada variable de un nodo específico.
+    Solo incluye mensajes cuyo tipo de mensaje es 'correcto'.
+    """
+    # Convertir id_nodo a entero
+    try:
+        id_nodo_int = int(id_nodo)  # Convertir a entero
+    except ValueError:
+        raise HTTPException(status_code=400, detail="El id_nodo debe ser un número entero válido")
+
+    print(f"Recibiendo id_nodo: {id_nodo_int}")
+
+    # Subconsulta para obtener el último mensaje por tipo y nodo
+    subquery = (
+        db.query(
+            Mensaje.type,
+            func.max(Mensaje.time).label("latest_time")
+        )
+        .filter(Mensaje.tipo_mensaje == "correcto", Mensaje.id_nodo == id_nodo_int)
+        .group_by(Mensaje.type)
+        .subquery()
+    )
+
+    # Realiza el join con la subconsulta para obtener los datos más recientes por tipo
+    results = (
+        db.query(
+            Mensaje.id_nodo,
+            Mensaje.type,
+            Mensaje.data,
+            Mensaje.time
+        )
+        .join(subquery, Mensaje.type == subquery.c.type)
+        .filter(
+            Mensaje.id_nodo == id_nodo_int,
+            Mensaje.time == subquery.c.latest_time
+        )
+        .all()
+    )
+
+    # Si no se encuentran resultados, retornar un error 404
+    if not results:
+        raise HTTPException(status_code=404, detail="Nodo no encontrado o sin datos correctos.")
+
+    # Estructura para almacenar los datos del nodo
+    node_data = {
+        "id_nodo": id_nodo_int,
+        "last_temperature": None,
+        "last_humidity": None,
+        "last_pressure": None,
+        "last_precipitation": None,
+        "last_wind": None,
+        "last_update": None
+    }
+
+    # Mapeo de los tipos de mensajes a los campos correspondientes
+    type_to_field = {
+        "Temperatura": "last_temperature",
+        "Humedad": "last_humidity",
+        "Presion": "last_pressure",
+        "Precipitacion": "last_precipitation",
+        "Viento": "last_wind"
+    }
+
+    # Recorre los resultados y asigna los valores a los campos adecuados
+    for record in results:
+        if record.type in type_to_field:
+            try:
+                node_data[type_to_field[record.type]] = float(record.data)
+            except ValueError:
+                node_data[type_to_field[record.type]] = None
+
+        # Actualiza la fecha de la última medición
+        if node_data["last_update"] is None or record.time > node_data["last_update"]:
+            node_data["last_update"] = record.time
+
+    # Responde con los datos del nodo en formato de resumen
+    summary_response = NodeSummary(**node_data)
+    return NodeSummaryResponse(summary=[summary_response])
+
+
+
+
 @router.get("/clima/nodos/historico", response_model=List[NodeHistoricalData])
 def get_node_historical_data(
     db: Session = Depends(get_db),
@@ -537,8 +624,8 @@ def get_node_historical_data(
     type_to_field = {
         "Temperatura": "temperature",
         "Humedad": "humidity",
-        "Presión": "pressure",
-        "Precipitación": "precipitation",
+        "Presion": "pressure",
+        "Precipitacion": "precipitation",
         "Viento": "wind"
     }
 

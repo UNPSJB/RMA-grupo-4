@@ -1,214 +1,267 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import App from './App';
-import Home from './components/Home';
-import Login from './components/Login';
-import Registrar from './components/Registrar';
-import Inicio from './components/Inicio';
-import PrivateRoute from './components/PrivateRoute';
-import HistoricosPage from './pages/HistoricosPage'; 
-import ModificarDatos from './components/ModificarDatos';
-import ModificarPassword from './components/ModificarPassword';
-import HelpModal from './components/HelpModal';
-import PantallaComparativa from './analisis/PantallaComparativa';
-import GeneraQR from './utils/GeneraQR';
-import TablaDatosHistoricos from './pages/TablaDatosHistoricos'; 
-import TablaAuditoria from './pages/TablaAuditoria';
-import TablaNodo from './components/TablaNodos';
-import FormNodo from './components/FormNodo';
-import Admin from './components/Admin';
-import Usuarios from './components/Usuarios';
-import Roles from './components/Roles';
-import ListaNodos from './components/ListaNodos';
-import AlertasAdmin from './components/AlertasAdmin';
-import Error403 from './components/Error403';
-import CrearVariable from './components/Variables';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import App from "./App";
+import Home from "./components/Home";
+import Login from "./components/Login";
+import Registrar from "./components/Registrar";
+import Inicio from "./components/Inicio";
+import PrivateRoute from "./components/PrivateRoute";
+import HistoricosPage from "./pages/HistoricosPage";
+import ModificarDatos from "./components/ModificarDatos";
+import ModificarPassword from "./components/ModificarPassword";
+import HelpModal from "./components/HelpModal";
+import PantallaComparativa from "./analisis/PantallaComparativa";
+import GeneraQR from "./utils/GeneraQR";
+import TablaDatosHistoricos from "./pages/TablaDatosHistoricos";
+import TablaAuditoria from "./pages/TablaAuditoria";
+import TablaNodo from "./components/TablaNodos";
+import FormNodo from "./components/FormNodo";
+import Admin from "./components/Admin";
+import Usuarios from "./components/Usuarios";
+import Roles from "./components/Roles";
+import ListaNodos from "./components/ListaNodos";
+import AlertasAdmin from "./components/AlertasAdmin";
+import Error403 from "./components/Error403";
+import CrearVariable from "./components/Variables";
 
 function AppRoutes() {
   return (
     <Router>
       <Routes>
-        {/* Rutas públicas */}
-        <Route path="/" element={<App><Home /></App>} />
-        <Route path="/*" element={<Error403 />} />
-        <Route path="/login" element={<App><Login /></App>} />
-        <Route path="/registrar" element={<App><Registrar /></App>} />
-        <Route path="/error403" element={<Error403 />} />
-        
-        
-        {/* Ruta protegida */}
-        <Route 
-          path="/analisis_actual" 
+        {/* Rutas pÃºblicas */}
+        <Route
+          path="/"
           element={
             <App>
-              <PrivateRoute allowedRoles={['admin','cooperativa','profesional']}>
+              <Home />
+            </App>
+          }
+        />
+        <Route path="/*" element={<Error403 />} />
+        <Route
+          path="/login"
+          element={
+            <App>
+              <Login />
+            </App>
+          }
+        />
+        <Route
+          path="/registrar"
+          element={
+            <App>
+              <Registrar />
+            </App>
+          }
+        />
+        <Route path="/error403" element={<Error403 />} />
+
+        {/* Ruta protegida */}
+        <Route
+          path="/analisis_actual"
+          element={
+            <App>
+              <PrivateRoute
+                allowedRoles={["admin", "cooperativa", "profesional"]}
+              >
                 <Inicio />
               </PrivateRoute>
             </App>
-          } 
+          }
         />
         {/* Rutas adicionales protegidas */}
-        <Route 
-          path="/graficos_historicos" 
+        <Route
+          path="/graficos_historicos"
           element={
             <App>
-              <PrivateRoute allowedRoles={['admin', 'invitado', 'universidad']}>
+              <PrivateRoute allowedRoles={["admin", "invitado", "universidad"]}>
                 <HistoricosPage />
               </PrivateRoute>
             </App>
-          } 
+          }
         />
-        <Route 
-          path="/analisis_avanzado" 
+        <Route
+          path="/analisis_avanzado"
           element={
             <App>
-              <PrivateRoute allowedRoles={['admin', 'profesional', 'cooperativa']}>
+              <PrivateRoute
+                allowedRoles={["admin", "profesional", "cooperativa"]}
+              >
                 <PantallaComparativa />
               </PrivateRoute>
             </App>
-          } 
+          }
         />
-        <Route 
-          path="/tabla_historicos" 
+        <Route
+          path="/tabla_historicos"
           element={
             <App>
-              <PrivateRoute allowedRoles={['admin', 'invitado', 'universidad']}>
+              <PrivateRoute allowedRoles={["admin", "invitado", "universidad"]}>
                 <TablaDatosHistoricos />
               </PrivateRoute>
             </App>
-          } 
+          }
         />
-         <Route 
-          path="/tabla_auditoria" 
+        <Route
+          path="/tabla_auditoria"
           element={
             <App>
-              <PrivateRoute allowedRoles={['admin']}>
+              <PrivateRoute allowedRoles={["admin"]}>
                 <TablaAuditoria />
               </PrivateRoute>
             </App>
-          } 
+          }
         />
-        <Route 
-          path="/modificar_datos" 
+        <Route
+          path="/modificar_datos"
           element={
             <App>
-              <PrivateRoute allowedRoles={['admin','cooperativa','profesional','invitado', 'universidad']}>
+              <PrivateRoute
+                allowedRoles={[
+                  "admin",
+                  "cooperativa",
+                  "profesional",
+                  "invitado",
+                  "universidad",
+                ]}
+              >
                 <ModificarDatos />
               </PrivateRoute>
             </App>
-          } 
+          }
         />
-        <Route 
-          path="/usuarios" 
+        <Route
+          path="/usuarios"
           element={
             <App>
-              <PrivateRoute allowedRoles={['admin']}>
+              <PrivateRoute allowedRoles={["admin"]}>
                 <Usuarios />
               </PrivateRoute>
             </App>
-          } 
+          }
         />
-        <Route 
-          path="/roles" 
+        <Route
+          path="/roles"
           element={
             <App>
-              <PrivateRoute allowedRoles={['admin']}>
+              <PrivateRoute allowedRoles={["admin"]}>
                 <Roles />
               </PrivateRoute>
             </App>
-          } 
+          }
         />
-        <Route 
-          path="/nodos" 
+        <Route
+          path="/nodos"
           element={
             <App>
-              <PrivateRoute allowedRoles={['admin']}>
-                <ListaNodos/>
+              <PrivateRoute allowedRoles={["admin"]}>
+                <ListaNodos />
               </PrivateRoute>
             </App>
-          } 
+          }
         />
-        <Route 
-          path="/modificar_password" 
+        <Route
+          path="/modificar_password"
           element={
             <App>
-              <PrivateRoute allowedRoles={['admin','cooperativa','profesional','invitado', 'universidad']}>
+              <PrivateRoute
+                allowedRoles={[
+                  "admin",
+                  "cooperativa",
+                  "profesional",
+                  "invitado",
+                  "universidad",
+                ]}
+              >
                 <ModificarPassword />
               </PrivateRoute>
             </App>
-          } 
+          }
         />
-        <Route 
-          path="/help" 
+        <Route
+          path="/help"
           element={
             <App>
-              <PrivateRoute allowedRoles={['admin','cooperativa','profesional','invitado', 'universidad']}>
+              <PrivateRoute
+                allowedRoles={[
+                  "admin",
+                  "cooperativa",
+                  "profesional",
+                  "invitado",
+                  "universidad",
+                ]}
+              >
                 <HelpModal />
               </PrivateRoute>
             </App>
-          } 
+          }
         />
-        <Route 
-          path="/suscripcion_alertas" 
+        <Route
+          path="/suscripcion_alertas"
           element={
             <App>
-              <PrivateRoute allowedRoles={['admin','cooperativa','profesional']}>
+              <PrivateRoute
+                allowedRoles={["admin", "cooperativa", "profesional"]}
+              >
                 <GeneraQR />
               </PrivateRoute>
             </App>
-          } 
+          }
         />
-        <Route 
-          path="/gestion_nodos" 
+        <Route
+          path="/gestion_nodos"
           element={
             <App>
-              <PrivateRoute allowedRoles={['admin','cooperativa','profesional']}>
-                <TablaNodo/>
+              <PrivateRoute
+                allowedRoles={["admin", "cooperativa", "profesional"]}
+              >
+                <TablaNodo />
               </PrivateRoute>
             </App>
-          } 
+          }
         />
-        <Route 
-          path="/form_nodo" 
+        <Route
+          path="/formulario_nodo"
           element={
             <App>
-              <PrivateRoute allowedRoles={['admin','cooperativa','profesional']}>
-                <FormNodo/>
+              <PrivateRoute
+                allowedRoles={["admin", "cooperativa", "profesional"]}
+              >
+                <FormNodo />
               </PrivateRoute>
             </App>
-          } 
+          }
         />
-        <Route 
-          path="/panel_admin" 
+        <Route
+          path="/panel_admin"
           element={
             <App>
-              <PrivateRoute allowedRoles={['admin']}>
+              <PrivateRoute allowedRoles={["admin"]}>
                 <Admin />
               </PrivateRoute>
             </App>
-          } 
+          }
         />
-        <Route 
-          path="/alertaAdmin" 
+        <Route
+          path="/alertaAdmin"
           element={
             <App>
-              <PrivateRoute allowedRoles={['admin']}>
-                <AlertasAdmin/>
+              <PrivateRoute allowedRoles={["admin"]}>
+                <AlertasAdmin />
               </PrivateRoute>
             </App>
-          } 
+          }
         />
-         <Route 
-          path="/gestionVariables" 
+        <Route
+          path="/gestionVariables"
           element={
             <App>
-              <PrivateRoute allowedRoles={['admin']}>
+              <PrivateRoute allowedRoles={["admin"]}>
                 <CrearVariable />
               </PrivateRoute>
             </App>
-          } 
+          }
         />
-        
-      </Routes>  
+      </Routes>
     </Router>
   );
 }
