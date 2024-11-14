@@ -13,35 +13,39 @@ export function AuthProvider({ children }) {
     });
     
     const [user, setUser] = useState(() => {
-        return localStorage.getItem('user');
+        const storedUser = localStorage.getItem('user');
+        return storedUser ? storedUser : null;
     });
 
     const [userRole, setUserRole] = useState(() => {
-        return localStorage.getItem('userRole');
+        const storedRole = localStorage.getItem('userRole');
+        return storedRole ? storedRole : null;
     });
 
     const [token, setToken] = useState(() => {
-        // Recupera el token desde localStorage
-        return localStorage.getItem('token');
+        const storedToken = localStorage.getItem('token');
+        return storedToken ? storedToken : null;
     });
 
     useEffect(() => {
-        localStorage.setItem('isAuthenticated', isAuthenticated);
-        if (user) {
+        if (isAuthenticated !== null) {
+            localStorage.setItem('isAuthenticated', isAuthenticated);
+        }
+        if (user !== null) {
             localStorage.setItem('user', user);
         } else {
             localStorage.removeItem('user');
         }
-        if (userRole) {
+        if (userRole !== null) {
             localStorage.setItem('userRole', userRole);
         } else {
             localStorage.removeItem('userRole');
         }
-        if (token) {
-             localStorage.setItem('token', token);
+        if (token !== null) {
+            localStorage.setItem('token', token);
         } else {
-             localStorage.removeItem('token');
-         }
+            localStorage.removeItem('token');
+        }
     }, [isAuthenticated, user, userRole, token]);
 
     const login = (username, role, authToken) => {
@@ -55,11 +59,15 @@ export function AuthProvider({ children }) {
         setIsAuthenticated(false);
         setUser(null);
         setUserRole(null);
-        setToken(null); // Limpia el token
+        setToken(null);
+    
         localStorage.removeItem('user');
         localStorage.removeItem('userRole');
-        localStorage.removeItem('token'); // Elimina el token de localStorage
-        localStorage.removeItem(`token_${user}`); // NO TOCAR
+        localStorage.removeItem('token');
+    
+        if (user) {
+            localStorage.removeItem(`token_${user}`);
+        }
     };
 
     return (

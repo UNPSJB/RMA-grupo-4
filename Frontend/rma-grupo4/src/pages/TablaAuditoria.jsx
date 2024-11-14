@@ -49,14 +49,14 @@ const TablaAuditoria = () => {
         return "Temperatura";
       case "Humedad":
         return "Humedad";
-      case "Presión":
-        return "Presión";
-      case "Precipitación":
-        return "Precipitación";
+      case "Presion":
+        return "Presion";
+      case "Precipitacion":
+        return "Precipitacion";
       case "Viento":
         return "Viento";
-      case "Nivel":
-        return "Nivel";
+      case "Nivel de agua":
+        return "Nivel de agua";
       default:
         return "Desconocido"; 
     }

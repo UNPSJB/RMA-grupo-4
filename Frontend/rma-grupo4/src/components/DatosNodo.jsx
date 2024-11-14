@@ -7,22 +7,16 @@ const DatosNodo = ({ idNodo }) => {
   const [nodeData, setNodeData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  console.log("ACAAA", idNodo);
 
   useEffect(() => {
-    if (idNodo == !null) return; // Si no hay id_nodo, no hacer la solicitud.
-    console.log("ACAAA", idNodo);
 
     const fetchNodeData = async () => {
-      console.log("ACAAA", idNodo);
       setLoading(true);
       setError(null);
       try {
         const response = await axios.get(
           `http://localhost:8000/api/v1/clima/nodos/resumen/${idNodo}`
         );
-        // Verifica la estructura de la respuesta
-        console.log("Respuesta de la API:", response.data);
 
         if (response.data.summary && response.data.summary.length > 0) {
           setNodeData(response.data.summary[0]); // Suponiendo que la respuesta tiene este formato
