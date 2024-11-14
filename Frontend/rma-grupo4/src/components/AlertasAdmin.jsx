@@ -9,13 +9,13 @@ export default function AlertasAdmin() {
 
   const cards = [
     { id: 1, title: 'Suscripción a Alertas', route: '/suscripcion_alertas', icon: FaBell },
-    //{ id: 2, title: 'Personalización de Alertas', route: '/personalizacion-alertas', icon: FaCogs },
+    { id: 2, title: 'Personalización de Alertas', route: '/personalizacion-alertas', icon: FaCogs },
   ];
 
   return (
     <Box p={5}>
       <SimpleGrid
-        columns={{ base: 1, md: 2 }}
+        columns={{ base: 1, md: 2, lg: 4}}
         spacing={5}
         justifyContent="center"
         maxW="1000px"

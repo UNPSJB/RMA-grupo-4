@@ -9,6 +9,8 @@ const CrearVariable = () => {
   const [formData, setFormData] = useState({
     nombre: '',
     numero: '',
+    minimo: '',
+    maximo: '',
     unidad: '',
   });
   const [variables, setVariables] = useState([]);
@@ -109,25 +111,71 @@ const CrearVariable = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
-  const handleKeyDown = (e) => {
-    const allowedCharacters = /[0-9.-]/;
-    if (!allowedCharacters.test(e.key) && e.key !== "Backspace" && e.key !== "Enter" && e.key !== "Tab") {
-      e.preventDefault();
-    }
-  };
-
-  const handleAliasKeyDown = (e) => {
-    const specialCharacters = /[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~¡]/;
-    if (specialCharacters.test(e.key) && e.key !== "Backspace" && e.key !== "Enter" && e.key !== "Tab") {
-      e.preventDefault();
-    }
-  };
   
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const numero = parseInt(selectedTipo, 10); 
+    const { nombre, minimo, maximo, unidad } = formData;
+  
+    if (!/^[a-zA-Z\s]+$/.test(nombre)) {
+      toast({
+        render: () => (
+          <Box color="white" bg="red.600" borderRadius="md" p={5} mb={4} boxShadow="md" fontSize="lg">
+            Nombre inválido: Solo se permiten letras y espacios.
+          </Box>
+        ),
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+  
+    if (isNaN(numero) || numero <= 0) {
+      toast({
+        render: () => (
+          <Box color="white" bg="red.600" borderRadius="md" p={5} mb={4} boxShadow="md" fontSize="lg">
+            Número inválido: Seleccione un tipo de mensaje válido.
+          </Box>
+        ),
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+  
+    const minimoNum = parseFloat(minimo);
+    const maximoNum = parseFloat(maximo);
+    if (isNaN(minimoNum) || isNaN(maximoNum) || minimoNum >= maximoNum) {
+      toast({
+        render: () => (
+          <Box color="white" bg="red.600" borderRadius="md" p={5} mb={4} boxShadow="md" fontSize="lg">
+            Rango inválido: Ingrese valores numéricos donde el mínimo sea menor al máximo.
+          </Box>
+        ),
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+  
+    if (!/^[a-zA-Z0-9°%]+$/.test(unidad)) {
+      toast({
+        render: () => (
+          <Box color="white" bg="red.600" borderRadius="md" p={5} mb={4} boxShadow="md" fontSize="lg">
+            Unidad inválida: Use solo letras, números o caracteres como ° y %.
+          </Box>
+        ),
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
     if (isNaN(numero)) {
       toast({
         render: () => (
@@ -235,7 +283,7 @@ const CrearVariable = () => {
         isClosable: true,
       });
     }
-    setFormData({ nombre: '', numero: '', unidad: '' });
+    setFormData({ nombre: '', numero: '', minimo: '', maximo: '', unidad: '' });
     setFormModalOpen(false); 
   };
 
@@ -244,6 +292,8 @@ const CrearVariable = () => {
     setFormData({
       nombre: variable.nombre,
       numero: variable.numero,
+      minimo: variable.minimo,
+      maximo: variable.maximo,
       unidad: variable.unidad,
     });
     setFormModalOpen(true); 
@@ -324,7 +374,7 @@ const CrearVariable = () => {
 
   const handleCancelEdit = () => {
     setEditingVariableId(null);
-    setFormData({ nombre: '', numero: '', unidad: '' });
+    setFormData({ nombre: '', numero: '', minimo: '', maximo: '', unidad: '' });
     setFormModalOpen(false);
   };
   
@@ -360,6 +410,8 @@ const CrearVariable = () => {
                   <Tr>
                     <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Nombre</Th>
                     <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Número</Th>
+                    <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Rango Minimo</Th>
+                    <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Rango Maximo</Th>
                     <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Unidad</Th>
                     <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Acciones</Th>
                   </Tr>
@@ -377,6 +429,8 @@ const CrearVariable = () => {
                     >
                       <Td textAlign="center">{variable.nombre}</Td>
                       <Td textAlign="center">{variable.numero}</Td>
+                      <Td textAlign="center">{variable.minimo}</Td>
+                      <Td textAlign="center">{variable.maximo}</Td>
                       <Td textAlign="center">{variable.unidad}</Td>
                       <Td textAlign="center">
                         <IconButton 
@@ -443,6 +497,14 @@ const CrearVariable = () => {
                     </option>
                   ))}
                 </Select>
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel>Minimo</FormLabel>
+                <Input name="minimo" value={formData.minimo} onChange={handleChange} placeholder="Ingrese el rango minimo de la variable" />
+              </FormControl>
+              <FormControl isRequired>
+                <FormLabel>Maximo</FormLabel>
+                <Input name="maximo" value={formData.maximo} onChange={handleChange} placeholder="Ingrese el rango maximo de la variable" />
               </FormControl>
               <FormControl isRequired>
                 <FormLabel>Unidad</FormLabel>

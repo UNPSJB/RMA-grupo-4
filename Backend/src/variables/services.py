@@ -17,6 +17,8 @@ def crear_variable(db: Session, variable_data: CrearVariable):
     db_variable = Variable(
         numero=variable_data.numero,
         nombre=variable_data.nombre,
+        minimo=variable_data.minimo,
+        maximo=variable_data.maximo,
         unidad=variable_data.unidad 
     )
     db.add(db_variable)
@@ -38,6 +40,12 @@ def modificar_variable(db: Session, db_variable: Variable, datos: ModificarVaria
         db_variable.numero = datos.numero
     if datos.nombre is not None:
         db_variable.nombre = datos.nombre
+    if datos.minimo is not None:
+        db_variable.minimo = datos.minimo
+    if datos.maximo is not None:
+        db_variable.maximo = datos.maximo
+    if datos.unidad is not None:
+        db_variable.unidad = datos.unidad
     
     db.commit()
     db.refresh(db_variable)

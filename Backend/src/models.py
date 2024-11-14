@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, update
+from sqlalchemy import Column, Integer, String, Float, DateTime, update
 from sqlalchemy.orm import Session, declarative_base
 from datetime import datetime
 
@@ -76,6 +76,8 @@ class Variable(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     numero = Column(Integer)
     nombre = Column(String)
+    minimo = Column(Float)
+    maximo = Column(Float)
     unidad = Column(String)
 
 class Mensaje(Base):
