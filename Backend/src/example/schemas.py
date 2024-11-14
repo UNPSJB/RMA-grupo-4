@@ -57,6 +57,26 @@ class Config:
     orm_mode= True
 
 
+class CrearPreferencia(BaseModel):
+    id: int
+    id_usuario: int
+    id_variable: int
+    alerta: str
+
+class ModificarPreferencia(BaseModel):
+    id: Optional[int] = None
+    id_usuario: Optional[int] = None
+    id_variable: Optional[int] = None
+    alerta: Optional[str] = None
+
+class RespuestaPreferencia(BaseModel):
+    id:int
+    id_usuario:int
+    id_variable:int
+    alerta: str
+    
+
+
 #Propósito: Define las estructuras de los datos que se usan para la entrada y salida de datos en las API.
 
 #Función: Los esquemas son clases de Pydantic que definen cómo los datos deben ser validados y transformados en la entrada y salida de las API. 

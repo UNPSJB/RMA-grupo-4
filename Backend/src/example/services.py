@@ -1,6 +1,6 @@
 from typing import List
 from sqlalchemy.orm import Session
-from src.example.models import Usuario, Rol
+from src.example.models import Usuario, Rol, Usuario_preferencias
 from src.example import exceptions
 import bcrypt
 import os
@@ -20,6 +20,28 @@ ENV = os.getenv("ENV")
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
+def crear_preferencia(db: Session, preferencia: CrearPreferencia):
+    db_preferencia = Usuario_preferencias(
+        id_variable = preferencia.id_variable,
+        id_usuario = preferencia.id_usuario,
+        alerta = preferencia.alerta
+    )
+def get_preferencia(db: Session, preferencia: int):
+    return db.query(Usuario_preferencias).filter(Usuario_preferencias.id == preferencia).first()
+
+def modificar_preferencia(db: Session, db_preferencia: Usuario_preferencias, datos: ModificarPreferencia):
+    # Actualizamos los campos del usuario según los datos proporcionados
+    if datos.id_usuario is not None:
+        db_preferencia.id_usuario = datos.id_usuario
+    if datos.id_variable is not None:
+        db_preferencia.id_variable = datos.id_variable
+    if datos.alerta is not None:
+        db_preferencia.alerta = datos.alerta
+    
+    db.commit()  # Guardamos los cambios en la base de datos
+    db.refresh(db_preferencia)  # Actualizamos la instancia del usuario
+    return db_preferencia  # Devolvemos el usuario modificado
 
 def crear_usuario(db: Session, usuario: CrearUsuario):
     hashed_password = bcrypt.hashpw(usuario.password.encode('utf-8'), bcrypt.gensalt())

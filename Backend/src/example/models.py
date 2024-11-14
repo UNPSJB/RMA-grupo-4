@@ -22,3 +22,14 @@ class Usuario(BaseModel):
     rol_id = Column(Integer, ForeignKey("roles.id"), nullable=False)  # FK al rol
     rol = relationship("Rol", backref="usuarios")
 
+
+
+class Usuario_preferencias(BaseModel):
+    __tablename__ = "preferencias"
+
+    id = Column(Integer, primary_key=True, index=True)
+    id_usuario = Column(Integer, ForeignKey("usuarios.id"))
+    id_variable = Column(Integer, ForeignKey("variables.id"))
+    alerta = Column(String, index=True)
+
+

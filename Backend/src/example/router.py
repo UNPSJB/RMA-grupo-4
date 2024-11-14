@@ -9,6 +9,42 @@ from fastapi.security import OAuth2PasswordBearer
 
 router = APIRouter()
 
+@router.post("/preferencia", response_model= RespuestaPreferencia)
+def preferenica(preferencia: CrearPreferencia, db: Session = Depends(get_db)):
+    return crear_preferencia(db=db, preferencia=preferencia)
+
+@router.put("/modificar_preferencia/{id}", response_model=RespuestaPreferencia)
+def modificar_preferencia(id: int, datos: ModificarPreferencia, db: Session = Depends(get_db)):
+    db_preferencia = get_preferencia(db, id)
+    if db_preferencia is None:
+        raise HTTPException(status_code=404, detail="preferencia no encontrada")
+    
+    # Llamamos a la función de servicio para modificar el usuario
+    preferencia_modificada = modificar_preferencia(db, db_preferencia, datos)
+    
+    return preferencia_modificada
+
+@router.delete("/eliminar_preferencia/{id}", response_model=RespuestaPreferencia)
+def eliminar_preferencia(id: int, db: Session = Depends(get_db)):
+    db_preferencia = get_preferencia(db, id)
+    if db_preferencia is None:
+        raise HTTPException(status_code=404, detail="Preferencia no encontrada")
+    
+    # Eliminar el usuario de la base de datos
+    db.delete(db_preferencia)
+    db.commit()
+    
+    return db_preferencia  # Devuelve el usuario eliminado (opcional)
+
+@router.get("/preferencias/{id}", response_model=RespuestaPreferencia)
+def obtener_preferencia(id: int, db: Session = Depends(get_db)):
+    db_preferencia = get_preferencia(db, id)
+    if db_preferencia is None:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return db_preferencia
+
+
+
 @router.post("/registrar", response_model= RespuestaUsuario)
 def registrar(usuario: CrearUsuario, db: Session = Depends(get_db)):
     db_usuario = get_usuario(db, usuario=usuario.usuario)
@@ -91,3 +127,5 @@ def asignar_rol(usuario_id: int, rol_asignacion: RolAsignacion, db: Session = De
 def lista_usuarios(db: Session = Depends(get_db)):
     """Endpoint para listar todos los usuarios y sus roles."""
     return listar_usuarios(db)
+
+

@@ -8,6 +8,7 @@ import NavigationButtons from './NavigationButtons';
 import HelpModal from './HelpModal';
 import axios from 'axios';
 import ButtonTheme from './ButtonTheme';
+import Notificaciones from './Notificaciones';
 
 function NavBar() {
     const navigate = useNavigate();
@@ -221,6 +222,8 @@ function NavBar() {
                     )}
 
                     <ButtonTheme />
+                    <Notificaciones>
+                    </Notificaciones>
                 </Flex>
             </Flex>
 
