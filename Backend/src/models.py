@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, update
-from sqlalchemy.orm import Session, declarative_base
+from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, update, ForeignKey
+from sqlalchemy.orm import Session, relationship, declarative_base
 from datetime import datetime
 
 Base = declarative_base()
@@ -75,10 +75,27 @@ class Variable(Base):
     
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     numero = Column(Integer)
-    nombre = Column(String)
-    minimo = Column(Float)
-    maximo = Column(Float)
+    nombre = Column(String, nullable=False)
+    minimo = Column(Float, nullable=False)
+    maximo = Column(Float, nullable=False)
     unidad = Column(String)
+    activo = Column(Boolean) #Indicara si desea recibir notificaciones de esta variable
+
+    # Relación para los rangos (usando una relación de uno a muchos)
+    rangos = relationship("Rango", back_populates="variable")
+
+class Rango(Base):
+    __tablename__ = 'rangos'
+
+    id = Column(Integer, primary_key=True)
+    variable_id = Column(Integer, ForeignKey('variables.id'))
+    color = Column(String, nullable=False)
+    min_val = Column(Float, nullable=False)
+    max_val = Column(Float, nullable=False)
+    activo = Column(Boolean) #Indicara si desea recibir notificaciones de este rango o estado
+    
+    # Relación inversa con Variable
+    variable = relationship("Variable", back_populates="rangos")
 
 class Mensaje(Base):
     __tablename__ = 'mensajes'

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, StrictFloat, field_validator, root_validator
+from pydantic import BaseModel, StrictFloat, field_validator, root_validator, Field
 from typing import Optional
 
 class CrearVariable(BaseModel):
@@ -26,3 +26,12 @@ class RespuestaVariable(BaseModel):
     maximo: float
     unidad: str
     
+class RangoSchema(BaseModel):
+    variable_id: int
+    color: str
+    min_val: float
+    max_val: float
+    activo: bool = Field(default=False)
+
+class RespuestaBase(BaseModel):
+    message: str

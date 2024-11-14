@@ -3,8 +3,8 @@ import {
   Box, FormControl, Heading, FormLabel, Input, useToast, VStack, HStack, useColorMode, Table, Thead, Tbody, Tr, Th, Td, Button, IconButton,
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalFooter, useColorModeValue, Select, TableContainer
 } from '@chakra-ui/react';
-import { FaTrashAlt, FaPen, FaPlus } from "react-icons/fa";
-
+import { FaTrashAlt, FaPen, FaPlus, FaCogs } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 const CrearVariable = () => {
   const [formData, setFormData] = useState({
     nombre: '',
@@ -25,6 +25,7 @@ const CrearVariable = () => {
   const buttonHoverColor = useColorModeValue('rgb(0, 31, 63)', 'rgb(255, 130, 37)');
   const buttonShadow = useColorModeValue("5px 5px 3px #5a5a5a, -5px -5px 3px #ffffff", "2px 2px 3px rgba(0, 0, 0, 0.3)");
   const [isFormModalOpen, setFormModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const tiposMensaje = [
     { nombre: "TEMP_T", valor: 1 },
@@ -162,7 +163,7 @@ const CrearVariable = () => {
       return;
     }
   
-    if (!/^[a-zA-Z0-9°%]+$/.test(unidad)) {
+    if (!/^[a-zA-Z0-9°%/]+$/.test(unidad)) {
       toast({
         render: () => (
           <Box color="white" bg="red.600" borderRadius="md" p={5} mb={4} boxShadow="md" fontSize="lg">
@@ -378,6 +379,10 @@ const CrearVariable = () => {
     setFormModalOpen(false);
   };
   
+  const handleRangosNotificaciones = () => {
+    navigate(`/gestionRangosVariables`);
+};
+
   return (
     <VStack display="flex" justifyContent="center" alignItems="center" minHeight="20vh" spacing={4} p={4} bg={colorMode === 'light' ? 'white' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'}>
       <Heading as="h1" m={7} textAlign="center">Gestión Variables</Heading>
@@ -385,7 +390,7 @@ const CrearVariable = () => {
         {/* Tabla */}
         <Box width="100%" bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} p={2} borderRadius="md">
           <Box width="100%" p={10} bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} borderRadius="md" boxShadow="lg" overflowX="auto">
-            <Box textAlign="right" mb={4}>
+            <Box textAlign="right" mb={4} mr={16}>
               <IconButton 
                 FaPencilAlt title = "Agregar Variable"
                 icon={<FaPlus />} 
@@ -402,8 +407,23 @@ const CrearVariable = () => {
                     background: buttonHoverColor, 
                     color: "lightgray"
                 }}
+                mr={2}
+              />
+              <IconButton
+                title="Configurar rangos"
+                icon={<FaCogs />}
+                aria-label="Agregar Nodo"
+                background={buttonDefaultColor}
+                borderRadius="6px"
+                boxShadow={buttonShadow}
+                _hover={{
+                    background: buttonHoverColor,
+                    color: "lightgray",
+                }}
+                onClick={handleRangosNotificaciones}
               />
             </Box>
+
             <TableContainer overflowX="auto">
               <Table variant="simple" colorScheme={colorMode === 'light' ? "blackAlpha" : "whiteAlpha"}>
                 <Thead>
