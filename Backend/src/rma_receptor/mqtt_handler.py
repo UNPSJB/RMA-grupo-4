@@ -72,7 +72,7 @@ def mensaje_recibido(client, userdata, msg):
 
 def analizar_notificacion(db: Session, variable, mensaje):
 
-    valor_variable = mensaje['data']
+    valor_variable = float(mensaje['data'])
     nombre_variable = mensaje['type']
 
     #Consultar los rangos activos para la variable
@@ -102,7 +102,7 @@ def analizar_notificacion(db: Session, variable, mensaje):
     # Filtrar usuarios interesados en esta alerta según sus preferencias
     usuarios_interesados = db.query(Usuario).join(Usuario_preferencias).filter(
         Usuario_preferencias.id_variable == variable,
-        Usuario_preferencias.color == color_alerta
+        Usuario_preferencias.alerta == color_alerta
     ).all()
 
     # Crear un Estado_notificacion para cada usuario interesado

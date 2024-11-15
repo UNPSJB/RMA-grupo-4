@@ -37,6 +37,7 @@ function Login() {
                 // Decodificar el token
                 const decodedToken = jwtDecode(response.data.token);
                 const rol = decodedToken.rol;
+                const userId = decodedToken.userId;
 
                 toast({
                     render: () => (
@@ -58,7 +59,7 @@ function Login() {
                 login(usuario);
                 navigate('/analisis_actual');
 
-                login(usuario, rol, response.data.token); // Pasar el rol al contexto
+                login(usuario, rol, response.data.token, userId); // Pasar el rol al contexto
     
                 // Redirigir basado en el rol
                 if (rol === 'admin') {

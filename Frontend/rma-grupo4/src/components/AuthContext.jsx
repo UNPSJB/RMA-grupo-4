@@ -27,6 +27,11 @@ export function AuthProvider({ children }) {
         return storedToken ? storedToken : null;
     });
 
+    const [userId, setUserId] = useState(() => {
+        const storedUserId = localStorage.getItem('userId');
+        return storedUserId ? storedUserId : null;
+    });
+
     useEffect(() => {
         if (isAuthenticated !== null) {
             localStorage.setItem('isAuthenticated', isAuthenticated);
@@ -48,9 +53,10 @@ export function AuthProvider({ children }) {
         }
     }, [isAuthenticated, user, userRole, token]);
 
-    const login = (username, role, authToken) => {
+    const login = (username, role, authToken, userId) => {
         setIsAuthenticated(true);
         setUser(username);
+        setUserId(userId);
         setUserRole(role);
         setToken(authToken); // Guarda el token
     };
@@ -59,10 +65,12 @@ export function AuthProvider({ children }) {
         setIsAuthenticated(false);
         setUser(null);
         setUserRole(null);
+        setUserId(null);
         setToken(null);
     
         localStorage.removeItem('user');
         localStorage.removeItem('userRole');
+        localStorage.removeItem('userId');
         localStorage.removeItem('token');
     
         if (user) {
@@ -71,7 +79,7 @@ export function AuthProvider({ children }) {
     };
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, user, userRole, token, login, logout }}>
+        <AuthContext.Provider value={{ isAuthenticated, user, userId, userRole, token, login, logout }}>
             {children}
         </AuthContext.Provider>
     );

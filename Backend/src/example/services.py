@@ -65,10 +65,17 @@ def crear_token(usuario: str, rol_id: int, db: Session):
     if not rol:
         raise HTTPException(status_code=400, detail="Rol no encontrado")
 
+    db_usuario = db.query(Usuario).filter(Usuario.usuario == usuario).first()
+    if not db_usuario:
+        raise HTTPException(status_code=400, detail="Usuario no encontrado")
+    
+    user_id = db_usuario.id  
+    
     expiration = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     payload = {
         "sub": usuario,
         "rol": rol.nombre,  # Nombre del rol desde la tabla roles
+        "userId": user_id, 
         "exp": expiration,
     }
     token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
