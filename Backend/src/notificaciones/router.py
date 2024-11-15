@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from src.database import get_db
+from src.example.models import *
 from src.notificaciones import models, exceptions
 from src.notificaciones.services import *
 from src.notificaciones.schemas import *
@@ -88,16 +89,22 @@ def obtener_estado_notificaciones(db: Session = Depends(get_db)):
     notificaciones = get_all_estados_notificacion(db)
     return notificaciones
 
-@router.get("/obtenerNotificacion/{id}", response_model=RespuestaNotificacion)
-def obtener_notificacion_por_id(id: int, db: Session = Depends(get_db)):
-    # Buscar el nodo por ID
-    notificacion = db.query(Notificacion).filter(Notificacion.id == id).first()
+@router.get("/obtenerNotificacion/{id_usuario}", response_model=list[RespuestaNotificacion])
+def obtener_notificaciones_por_usuario(id_usuario: int, db: Session = Depends(get_db)):
+    # Consulta para buscar notificaciones relacionadas al usuario
+    notificaciones = (
+            db.query(Notificacion)
+            .join(Estado_notificacion, Estado_notificacion.id_notificacion == Notificacion.id)
+            .filter(Estado_notificacion.id_usuario == id_usuario)
+            .all()
+        )
+
     
-    # Si no se encuentra el nodo, lanzar una excepción
-    if not notificacion:
-        raise HTTPException(status_code=404, detail="Nodo no encontrado")
+    # Si no se encuentran notificaciones, lanzar una excepción
+    if not notificaciones:
+        raise HTTPException(status_code=404, detail="No se encontraron notificaciones para este usuario")
     
-    return notificacion
+    return notificaciones
 
 @router.get("/obtenerEstadoNotificacion/{id}", response_model=RespuestaEstadoNotificacion)
 def obtener_estado_notificacion_por_id(id: int, db: Session = Depends(get_db)):

@@ -29,20 +29,19 @@ const Notificaciones = () => {
       setLoading(false);
       return;
     }
-    console.log("USUARIO ID", userId);
+    console.log('userId:', userId);
     try {
       setError(null);
-      const [notificacionesRes, estadosRes] = await Promise.all([
-        axios.get('http://localhost:8000/obtenerNotificaciones', {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        axios.get('http://localhost:8000/obtenerEstadoNotificaciones', {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-      ]);
-
-      setNotificaciones(notificacionesRes.data);
-      setEstadosNotificacion(estadosRes.data);
+      const res = await fetch(`http://localhost:8000/obtenerNotificacion/${userId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+  
+      if (!res.ok) {
+        throw new Error('Error en la respuesta del servidor');
+      }
+  
+      const data = await res.json(); // Convertir la respuesta en JSON
+      setNotificaciones(data); // Solo llegan notificaciones según preferencias
     } catch (error) {
       console.error("Error al cargar notificaciones:", error);
       setError(error);
@@ -55,31 +54,31 @@ const Notificaciones = () => {
     } finally {
       setLoading(false);
     }
-  }, [token, toast]);
+  }, [token, toast, userId]);
+  
+  
 
   useEffect(() => {
     cargarNotificaciones();
-    
-    // Solo configuramos el intervalo si tenemos token 
     if (token) {
       const interval = setInterval(cargarNotificaciones, 60000);
       return () => clearInterval(interval);
     }
-  }, [cargarNotificaciones]);
+  }, [token, cargarNotificaciones]);
 
-  const getEstadoNotificacion = useCallback((idNotificacion) => {
-    const estado = estadosNotificacion.find(
-      estado => estado.id_notificacion === idNotificacion
-    );
-    return estado;
-  }, [estadosNotificacion]);
+  const getEstadoNotificacion = useCallback(
+    (idNotificacion) =>
+      estadosNotificacion.find(
+        estado => estado.id_notificacion === idNotificacion
+      ),
+    [estadosNotificacion]
+  );
 
   const marcarComoLeida = async (idNotificacion) => {
     if (!token) return;
 
     try {
       const estado = getEstadoNotificacion(idNotificacion);
-      
       if (!estado) {
         await axios.post(
           'http://localhost:8000/crear_estado_notificacion',
@@ -104,7 +103,7 @@ const Notificaciones = () => {
           }
         );
       }
-      
+
       await cargarNotificaciones();
     } catch (error) {
       console.error("Error al marcar como leída:", error);
@@ -121,21 +120,6 @@ const Notificaciones = () => {
     const estado = getEstadoNotificacion(notif.id);
     return !estado || estado.estado !== true;
   }).length;
-
-  // Si no hay usuario o token, mostramos el icono sin funcionalidad
-  if (!token) {
-    return (
-      <Box position="relative">
-        <IconButton
-          icon={<FaBell />}
-          aria-label="Notificaciones"
-          variant="ghost"
-          size="lg"
-          isDisabled
-        />
-      </Box>
-    );
-  }
 
   return (
     <Box position="relative">
@@ -181,8 +165,8 @@ const Notificaciones = () => {
               <VStack spacing={0} align="stretch">
                 {notificaciones.map(notif => {
                   const estado = getEstadoNotificacion(notif.id);
-                  const leido = estado?.estado === 'leido';
-                  
+                  const leido = estado?.estado === true;
+
                   return (
                     <Box
                       key={notif.id}
@@ -217,5 +201,6 @@ const Notificaciones = () => {
     </Box>
   );
 };
+
 
 export default Notificaciones;
