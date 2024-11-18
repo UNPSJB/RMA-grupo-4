@@ -1,17 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import {
-  Box,
-  IconButton,
-  VStack,
-  Text,
-  Badge,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverBody,
-  Circle,
-  useToast
-} from '@chakra-ui/react';
+import {Box,IconButton,VStack,Text,Badge,Popover,PopoverTrigger,PopoverContent,PopoverBody,Circle,useToast} from '@chakra-ui/react';
 import { FaBell } from 'react-icons/fa';
 import axios from 'axios';
 import { useAuth } from '../components/AuthContext';
@@ -43,21 +31,12 @@ const Notificaciones = () => {
       const data = await res.json(); // Convertir la respuesta en JSON
       setNotificaciones(data); // Solo llegan notificaciones según preferencias
     } catch (error) {
-      console.error("Error al cargar notificaciones:", error);
       setError(error);
-      toast({
-        title: "Error",
-        description: "No se pudieron cargar las notificaciones",
-        status: "error",
-        duration: 3000,
-      });
     } finally {
       setLoading(false);
     }
-  }, [token, toast, userId]);
-  
-  
-
+  }, [token, userId]);
+ 
   useEffect(() => {
     cargarNotificaciones();
     if (token) {
@@ -120,6 +99,14 @@ const Notificaciones = () => {
     const estado = getEstadoNotificacion(notif.id);
     return !estado || estado.estado !== true;
   }).length;
+
+  if (!token) {
+    return (
+      <Box position="relative">
+
+      </Box>
+    );
+  }
 
   return (
     <Box position="relative">
@@ -201,6 +188,4 @@ const Notificaciones = () => {
     </Box>
   );
 };
-
-
 export default Notificaciones;

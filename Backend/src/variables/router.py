@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from src.database import get_db
-from src.models import Variable, Rango
+from src.models import Variable, Rango, Unidad, TipoMensaje
 from src.variables import exceptions
 from src.variables.services import *
 from src.variables.schemas import *
@@ -127,3 +127,13 @@ def guardar_rangos(rangos: List[RangoSchema], db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail="Error de base de datos")
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/obtener_unidades")
+def obtener_unidades(db: Session = Depends(get_db)):
+    unidades = db.query(Unidad).all()
+    return unidades
+
+@router.get("/obtener_tipos_mensaje")
+def obtener_ipos_mensaje(db: Session = Depends(get_db)):
+    tiposMensaje = db.query(TipoMensaje).all()
+    return tiposMensaje

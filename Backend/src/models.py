@@ -69,6 +69,19 @@ class BaseModel(Base):
         # Define un formato de representacion como cadena para el modelo base.
         params = ", ".join(f"{k}={v}" for k, v in keyvalgen(self))
         return f"{self.__class__.__name__}({params})"
+
+class Unidad(Base):
+    __tablename__ = 'unidades'
+    
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True) 
+    unidad = Column(String, index=True)
+
+class TipoMensaje(Base):
+    __tablename__ = 'tipos_mensaje'
+    
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True) 
+    nombre = Column(String, index=True)
+    valor = Column(Integer)
     
 class Variable(Base):
     __tablename__ = 'variables'

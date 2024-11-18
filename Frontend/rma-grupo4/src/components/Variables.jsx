@@ -5,6 +5,8 @@ import {
 } from '@chakra-ui/react';
 import { FaTrashAlt, FaPen, FaPlus, FaCogs } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';
+
 const CrearVariable = () => {
   const [formData, setFormData] = useState({
     nombre: '',
@@ -14,7 +16,10 @@ const CrearVariable = () => {
     unidad: '',
   });
   const [variables, setVariables] = useState([]);
-  const [selectedTipo, setSelectedTipo] = useState("");
+  const [unidades, setUnidades] = useState([]);
+  const [selectedUnidad, setUnidad] = useState('');
+  const [tiposMensajes, setTiposMensaje] = useState([]);
+  const [selectedTipoMensaje, setTipoMensaje] = useState('');
   const [editingVariableId, setEditingVariableId] = useState(null);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [variableToDelete, setVariableToDelete] = useState(null);
@@ -27,33 +32,56 @@ const CrearVariable = () => {
   const [isFormModalOpen, setFormModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  const tiposMensaje = [
-    { nombre: "TEMP_T", valor: 1 },
-    { nombre: "TEMP2_T", valor: 2 },
-    { nombre: "HUMIDITY_T", valor: 3 },
-    { nombre: "PRESSURE_T", valor: 4 },
-    { nombre: "LIGHT_T", valor: 5 },
-    { nombre: "SOIL_T", valor: 6 },
-    { nombre: "SOIL2_T", valor: 7 },
-    { nombre: "SOILR_T", valor: 8 },
-    { nombre: "SOILR2_T", valor: 9 },
-    { nombre: "OXYGEN_T", valor: 10 },
-    { nombre: "CO2_T", valor: 11 },
-    { nombre: "WINDSPD_T", valor: 12 },
-    { nombre: "WINDHDG_T", valor: 13 },
-    { nombre: "RAINFALL_T", valor: 14 },
-    { nombre: "MOTION_T", valor: 15 },
-    { nombre: "VOLTAGE_T", valor: 16 },
-    { nombre: "VOLTAGE2_T", valor: 17 },
-    { nombre: "CURRENT_T", valor: 18 },
-    { nombre: "CURRENT2_T", valor: 19 },
-    { nombre: "IT_T", valor: 20 },
-    { nombre: "LATITUDE_T", valor: 21 },
-    { nombre: "LONGITUDE_T", valor: 22 },
-    { nombre: "ALTITUDE_T", valor: 23 },
-    { nombre: "HDOP_T", valor: 24 },
-    { nombre: "LEVEL_T", valor: 25 },
-  ];
+  const fetchUnidades = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/obtener_unidades');
+      const response2 = await fetch('http://localhost:8000/obtener_tipos_mensaje');
+      const data = await response.json();
+      const data2 = await response2.json();
+      if (response.ok && response2.ok) {
+        setUnidades(data);
+        setTiposMensaje(data2);
+      } else {
+        toast({
+          render: () => (
+            <Box 
+              color="white" 
+              bg="red.600" 
+              borderRadius="md" 
+              p={5} 
+              mb={4}
+              boxShadow="md"
+              fontSize="lg" 
+            >
+              Error al cargar.
+            </Box>
+          ),
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        });
+      }
+    } catch (error) {
+      toast({
+        render: () => (
+          <Box 
+            color="white" 
+            bg="red.600" 
+            borderRadius="md" 
+            p={5} 
+            mb={4}
+            boxShadow="md"
+            fontSize="lg" 
+          >
+            Error de conexión.: No se pudo conectar con la API.
+          </Box>
+        ),
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
 
   // Fetch variables
   const fetchVariables = async () => {
@@ -106,18 +134,28 @@ const CrearVariable = () => {
 
   useEffect(() => {
     fetchVariables();
+    fetchUnidades();
   }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-  
+
+  const handleUnidadChange = (e) => {
+    setUnidad(e.target.value);
+  };
+
+  const handleTipoMensajeChange = (e) => {
+    setTipoMensaje(e.target.value);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    const numero = parseInt(selectedTipo, 10); 
-    const { nombre, minimo, maximo, unidad } = formData;
+    const numero = parseInt(selectedTipoMensaje, 10); 
+    const unidad = selectedUnidad;
+    const { nombre, minimo, maximo } = formData;
   
     if (!/^[a-zA-Z\s]+$/.test(nombre)) {
       toast({
@@ -163,20 +201,6 @@ const CrearVariable = () => {
       return;
     }
   
-    if (!/^[a-zA-Z0-9°%/]+$/.test(unidad)) {
-      toast({
-        render: () => (
-          <Box color="white" bg="red.600" borderRadius="md" p={5} mb={4} boxShadow="md" fontSize="lg">
-            Unidad inválida: Use solo letras, números o caracteres como ° y %.
-          </Box>
-        ),
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
-    }
-
     if (isNaN(numero)) {
       toast({
         render: () => (
@@ -226,6 +250,7 @@ const CrearVariable = () => {
     const formDataToSend = {
       ...formData,
       numero: numero, 
+      unidad: unidad,
     };
 
     try {
@@ -308,15 +333,13 @@ const CrearVariable = () => {
   const confirmDelete = async () => {
     setDeleteModalOpen(false);
     try {
-      const response = await fetch(`http://localhost:8000/eliminar_variable/${variableToDelete}`, {
-        method: 'DELETE',
-      });
-      if (response.ok) {
+      const response = await axios.delete(`http://localhost:8000/eliminar_variable_por_nombre/${variableToDelete}`);
+      if (response.status >= 200 && response.status < 300) {
         toast({
           render: () => (
             <Box 
               color="white" 
-              bg="red.600" 
+              bg="green.600" 
               borderRadius="md" 
               p={5} 
               mb={4}
@@ -330,7 +353,11 @@ const CrearVariable = () => {
           duration: 3000,
           isClosable: true,
         });
-        setVariables(variables.filter((variable) => variable.nombre !== variableToDelete));
+
+        // Actualizar el estado eliminando la variable
+        setVariables((prevVariables) =>
+          prevVariables.filter((variable) => variable.nombre !== variableToDelete)
+        );
       } else {
         toast({
           render: () => (
@@ -505,13 +532,13 @@ const CrearVariable = () => {
                 <Input name="nombre" value={formData.nombre} onChange={handleChange} placeholder="Ingrese el nombre de la variable" />
               </FormControl>
               <FormControl isRequired>
-              <FormLabel color={isLight ? 'black' : 'white'}>Número</FormLabel>
+                <FormLabel color={isLight ? 'black' : 'white'}>Número</FormLabel>
                 <Select
                   placeholder="Selecciona un tipo de mensaje"
-                  value={selectedTipo}
-                  onChange={(e) => setSelectedTipo(e.target.value)} 
+                  value={selectedTipoMensaje}
+                  onChange={handleTipoMensajeChange} 
                 >
-                  {tiposMensaje.map((tipo) => (
+                  {tiposMensajes.map((tipo) => (
                     <option key={tipo.valor} value={tipo.valor}>
                       {tipo.valor} - {tipo.nombre}
                     </option>
@@ -527,8 +554,18 @@ const CrearVariable = () => {
                 <Input name="maximo" value={formData.maximo} onChange={handleChange} placeholder="Ingrese el rango maximo de la variable" />
               </FormControl>
               <FormControl isRequired>
-                <FormLabel>Unidad</FormLabel>
-                <Input name="unidad" value={formData.unidad} onChange={handleChange} placeholder="Ingrese la unidad" />
+                <FormLabel color={isLight ? 'black' : 'white'}>Unidad</FormLabel>
+                <Select
+                  placeholder="Selecciona una unidad"
+                  value={selectedUnidad}
+                  onChange={handleUnidadChange}
+                >
+                  {unidades.map((unidad) => (
+                    <option key={unidad.id} value={unidad.unidad}>
+                      {unidad.unidad}
+                    </option>
+                  ))}
+                </Select>
               </FormControl>
             </form>
           </ModalBody>
