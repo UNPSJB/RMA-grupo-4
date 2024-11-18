@@ -56,7 +56,7 @@ def modificar_estado_notificacion_endpoint(
         raise HTTPException(status_code=404, detail="Estado de notificación no encontrado")
 
     estado.estado = datos.estado
-    estado.leido_el = datos.leido_el or datetime.utcnow().isoformat() 
+    estado.leido_el = datos.leido_el or datetime.utcnow() 
 
     db.commit()
     db.refresh(estado)

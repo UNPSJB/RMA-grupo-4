@@ -8,7 +8,7 @@ import NavigationButtons from './NavigationButtons';
 import HelpModal from './HelpModal';
 import axios from 'axios';
 import ButtonTheme from './ButtonTheme';
-import Notificaciones from './Notificaciones';
+import Notificaciones from '../notificaciones/Notificaciones';
 
 function NavBar() {
     const navigate = useNavigate();

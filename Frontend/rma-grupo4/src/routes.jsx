@@ -23,7 +23,7 @@ import AlertasAdmin from "./components/AlertasAdmin";
 import Error403 from "./components/Error403";
 import CrearVariable from "./components/Variables";
 import RangosVariables from './components/RangosVariables';
-import Notificaciones from './components/NotificacionesTabla';
+import Notificaciones from './notificaciones/NotificacionesTabla';
 
 function AppRoutes() {
   return (
