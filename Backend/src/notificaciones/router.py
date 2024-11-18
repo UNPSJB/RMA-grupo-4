@@ -5,6 +5,7 @@ from src.example.models import *
 from src.notificaciones import models, exceptions
 from src.notificaciones.services import *
 from src.notificaciones.schemas import *
+from src.example.services import *
 
 router = APIRouter()
 
@@ -39,22 +40,27 @@ def crear_estado_notificacion(estado_data: CrearEstadoNotificacion, db: Session 
         id_notificacion=estado_data.id_notificacion,
         id_usuario=estado_data.id_usuario,
         estado=estado_data.estado,
-        leido_el=estado_data.leido_el
+        leido_el=estado_data.leido_el or datetime.utcnow().isoformat()
     )
     db.add(db_estado)
     db.commit()
     db.refresh(db_estado)
     return db_estado
 
-# Endpoint para modificar el estado de una notificación
 @router.put("/modificar_estado_notificacion/{id_notificacion}/{id_usuario}", response_model=ModificarEstadoNotificacion)
-def modificar_estado_notificacion_endpoint(id_notificacion: int, id_usuario: int, datos: ModificarEstadoNotificacion, db: Session = Depends(get_db)):
+def modificar_estado_notificacion_endpoint(
+    id_notificacion: int, id_usuario: int, datos: ModificarEstadoNotificacion, db: Session = Depends(get_db)
+):
     estado = get_estado_notificacion_por_usuario(db, id_notificacion=id_notificacion, id_usuario=id_usuario)
     if estado is None:
         raise HTTPException(status_code=404, detail="Estado de notificación no encontrado")
 
-    estado_modificado = modificar_estado_notificacion(db, estado, datos)
-    return estado_modificado
+    estado.estado = datos.estado
+    estado.leido_el = datos.leido_el or datetime.utcnow().isoformat() 
+
+    db.commit()
+    db.refresh(estado)
+    return estado
 
 
 @router.delete("/eliminar_notificacion/{id}", response_model=RespuestaNotificacion)
@@ -78,11 +84,33 @@ def eliminar_estado_notificacion_endpoint(id_notificacion: int, id_usuario: int,
     db.commit()
     return db_estado
 
+@router.get("/obtenerNotificacion/{id_usuario}", response_model=list[RespuestaNotificacion])
+def obtener_notificaciones_por_usuario(id_usuario: int, db: Session = Depends(get_db)):
+    notificaciones = (
+        db.query(Notificacion, Estado_notificacion)
+        .join(Estado_notificacion, Estado_notificacion.id_notificacion == Notificacion.id)
+        .filter(Estado_notificacion.id_usuario == id_usuario)
+        .all()
+    )
+    
+    resultado = []
+    for notificacion, estado in notificaciones:
+        resultado.append({
+            "id": notificacion.id,
+            "titulo": notificacion.titulo,
+            "mensaje": notificacion.mensaje,
+            "creada": notificacion.creada,
+            "id_nodo": notificacion.id_nodo,
+            "estado_notificacion": {
+                "id": estado.id,
+                "id_notificacion": estado.id_notificacion,
+                "id_usuario": estado.id_usuario,
+                "estado": estado.estado,
+                "leido_el": estado.leido_el
+            }
+        })
 
-@router.get("/obtenerNotificaciones", response_model=List[RespuestaNotificacion])
-def obtener_notificaciones(db: Session = Depends(get_db)):
-    notificaciones = get_all_notificaciones(db)
-    return notificaciones
+    return resultado
 
 @router.get("/obtenerEstadoNotificaciones", response_model=List[RespuestaEstadoNotificacion])
 def obtener_estado_notificaciones(db: Session = Depends(get_db)):
@@ -91,20 +119,26 @@ def obtener_estado_notificaciones(db: Session = Depends(get_db)):
 
 @router.get("/obtenerNotificacion/{id_usuario}", response_model=list[RespuestaNotificacion])
 def obtener_notificaciones_por_usuario(id_usuario: int, db: Session = Depends(get_db)):
-    # Consulta para buscar notificaciones relacionadas al usuario
     notificaciones = (
-            db.query(Notificacion)
-            .join(Estado_notificacion, Estado_notificacion.id_notificacion == Notificacion.id)
-            .filter(Estado_notificacion.id_usuario == id_usuario)
-            .all()
-        )
+        db.query(Notificacion, Estado_notificacion.estado, Estado_notificacion.leido_el)
+        .join(Estado_notificacion, Estado_notificacion.id_notificacion == Notificacion.id)
+        .filter(Estado_notificacion.id_usuario == id_usuario)
+        .all()
+    )
 
-    
-    # Si no se encuentran notificaciones, lanzar una excepción
     if not notificaciones:
         raise HTTPException(status_code=404, detail="No se encontraron notificaciones para este usuario")
-    
-    return notificaciones
+
+    return [
+        {
+            "id": notif[0].id,
+            "titulo": notif[0].titulo,
+            "mensaje": notif[0].mensaje,
+            "estado": notif[1],
+            "leido_el": notif[2]
+        }
+        for notif in notificaciones
+    ]
 
 @router.get("/obtenerEstadoNotificacion/{id}", response_model=RespuestaEstadoNotificacion)
 def obtener_estado_notificacion_por_id(id: int, db: Session = Depends(get_db)):

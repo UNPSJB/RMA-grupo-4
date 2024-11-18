@@ -59,8 +59,8 @@ def mensaje_recibido(client, userdata, msg):
                 analizar_notificacion(db, variable.id, mensaje_json)
             
             if nuevo_mensaje.type in ['Nivel de agua', 'Bateria']:
-                mensaje_json = mensaje_to_dict(nuevo_mensaje)  
-                analizar_alerta(mensaje_json)
+                mensaje_telegram = mensaje_to_dict(nuevo_mensaje)  
+                analizar_alerta(mensaje_telegram)
 
         finally:
             db.close()
@@ -71,9 +71,11 @@ def mensaje_recibido(client, userdata, msg):
         print(f"Error al procesar el mensaje: {e}")
 
 def analizar_notificacion(db: Session, variable, mensaje):
-
-    valor_variable = float(mensaje['data'])
-    nombre_variable = mensaje['type']
+    
+    var = db.query(Variable).filter(Variable.numero == mensaje['type']).first()
+    nombre_variable = var.nombre if var else "Desconocido"
+    unidad_variable = var.unidad if var else "Desconocido"
+    valor_variable = round(float(mensaje['data']), 2)
 
     #Consultar los rangos activos para la variable
     rangos_activos = db.query(Rango).filter(
@@ -91,7 +93,7 @@ def analizar_notificacion(db: Session, variable, mensaje):
 
     nueva_notificacion = Notificacion(
         titulo=f"Alerta de {color_alerta.upper()} para la variable {nombre_variable}",
-        mensaje=f"Valor de {valor_variable} fuera de rango en {color_alerta}.",
+        mensaje=f"Valor de {valor_variable}{unidad_variable} - Estado: {color_alerta}.",
         creada=datetime.now(),
         id_nodo=mensaje['id']
     )

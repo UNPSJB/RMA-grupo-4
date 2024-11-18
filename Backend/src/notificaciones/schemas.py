@@ -20,12 +20,20 @@ class ModificarNotificacion(BaseModel):
     
     model_config = ConfigDict(arbitrary_types_allowed=True)  # Permitir tipos arbitrarios
 
+class RespuestaEstadoNotificacion(BaseModel):
+    id: int
+    id_notificacion: int
+    id_usuario: int
+    estado: bool
+    leido_el: Optional[datetime] = None
+
 class RespuestaNotificacion(BaseModel): 
     id: int
     titulo: str
     mensaje: str
     creada: datetime
     id_nodo: int
+    estado_notificacion: RespuestaEstadoNotificacion
 
 
 class CrearEstadoNotificacion(BaseModel):
