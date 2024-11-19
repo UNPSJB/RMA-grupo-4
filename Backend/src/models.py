@@ -113,7 +113,7 @@ class Mensaje(Base):
     __tablename__ = 'mensajes'
     
     id = Column(Integer, primary_key=True, index=True, autoincrement=True) #creamos un id para cada mensaje
-    id_nodo = Column(Integer,index=True) 
+    id_nodo = Column(Integer, ForeignKey("nodos.id_nodo"), index=True) 
     type = Column(String)
     data = Column(String)
     time = Column(DateTime)

@@ -113,6 +113,25 @@ const CrearNodo = () => {
   // Maneja el envío del formulario (crear/modificar)
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const { latitud, longitud } = formData;
+    const validarCordenadas = 
+    latitud >= -55.0 &&
+    latitud <= -22.0 &&
+    longitud >= -73.0 &&
+    longitud <= -53.0;
+
+    if (!validarCordenadas) {
+      toast({
+        title: "Coordenadas inválidas.",
+        description: "Las coordenadas seleccionadas están fuera de Argentina.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
     try {
       const method = editingNodeId ? "PUT" : "POST";
       const endpoint = editingNodeId
