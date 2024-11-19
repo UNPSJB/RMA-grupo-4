@@ -52,6 +52,12 @@ def obtener_nodos(db: Session = Depends(get_db)):
     nodos = get_all_nodos(db)
     return nodos
 
+
+@router.get("/obtenerNodosActivos", response_model=List[RespuestaNodo])
+def obtener_nodos(db: Session = Depends(get_db)):
+    nodos = get_all_nodos_activos(db)
+    return nodos
+
 @router.get("/obtenerNodo/{id}", response_model=RespuestaNodo)
 def obtener_nodo_por_id(id: int, db: Session = Depends(get_db)):
     # Buscar el nodo por ID
@@ -61,4 +67,16 @@ def obtener_nodo_por_id(id: int, db: Session = Depends(get_db)):
     if not nodo:
         raise HTTPException(status_code=404, detail="Nodo no encontrado")
     
+    return nodo
+
+
+@router.put("/actualizar_estado_nodo/{id_nodo}", response_model=RespuestaNodo)
+def actualizar_estado_nodo(id_nodo: int, datos: ActualizarEstadoNodo, db: Session = Depends(get_db)):
+    nodo = db.query(Nodo).filter(Nodo.id_nodo == id_nodo).first()
+    if not nodo:
+        raise HTTPException(status_code=404, detail="Nodo no encontrado")
+    
+    nodo.estado = datos.estado
+    db.commit()
+    db.refresh(nodo)
     return nodo

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, SimpleGrid, Text, VStack, Icon, Button, useColorMode } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { FaTrash, FaEdit, FaPlus, FaList, FaArrowLeft } from 'react-icons/fa';
+import {FaPlus, FaList} from 'react-icons/fa';
 
 export default function Nodos() {
   const navigate = useNavigate();
@@ -9,7 +9,7 @@ export default function Nodos() {
 
   const cards = [
     { id: 1, title: 'Gestión Nodos', route: '/gestion_nodos', icon: FaPlus },
-    //{ id: 2, title: 'Modificar Nodo', route: '/modificar-nodo', icon: FaEdit },
+    { id: 2, title: 'Estados del Nodo', route: '/estado_nodo', icon: FaList },
     //{ id: 3, title: 'Eliminar Nodo', route: '/eliminar-nodo', icon: FaTrash },
     //{ id: 4, title: 'Lista de Nodos', route: '/lista-nodos', icon: FaList },
   ];

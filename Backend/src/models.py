@@ -1,6 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime, Boolean, update, ForeignKey
 from sqlalchemy.orm import Session, relationship, declarative_base
-from datetime import datetime
 
 Base = declarative_base()
 
@@ -114,7 +113,7 @@ class Mensaje(Base):
     __tablename__ = 'mensajes'
     
     id = Column(Integer, primary_key=True, index=True, autoincrement=True) #creamos un id para cada mensaje
-    id_nodo = Column(Integer, index=True)
+    id_nodo = Column(Integer, ForeignKey("nodo.id_nodo"), index=True) 
     type = Column(String)
     data = Column(String)
     time = Column(DateTime)

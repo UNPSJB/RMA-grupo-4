@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from "react";
 import {
   Box,
-  Button,
   useColorMode,
   useToast,
   useColorModeValue,
   Flex,
   IconButton,
-  AlertDialog,
-  AlertDialogOverlay,
-  AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogBody,
-  AlertDialogFooter,
   Heading,
 } from "@chakra-ui/react";
 import { FaPlus, FaPen, FaTrashAlt, FaEye } from "react-icons/fa";
@@ -23,12 +16,9 @@ import DatosNodo from "../components/DatosNodo";
 
 const Mapa = () => {
   const [nodos, setNodos] = useState([]);
-  const [nodeToDelete, setNodeToDelete] = useState(null);
   const [nodeToEdit, setNodeToEdit] = useState(null);
-  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [showDatosNodo, setShowDatosNodo] = useState(false); // Estado para controlar la visibilidad de DatosNodo
   const [selectedNodeId, setSelectedNodeId] = useState(null); // Estado para almacenar el id del nodo seleccionado
-  const cancelRef = React.useRef();
   const toast = useToast();
   const { colorMode } = useColorMode();
   const isLight = colorMode === "light";
@@ -37,7 +27,7 @@ const Mapa = () => {
   // Cargar nodos desde la API
   const fetchNodos = async () => {
     try {
-      const response = await fetch("http://localhost:8000/obtenerNodos");
+      const response = await fetch("http://localhost:8000/obtenerNodosActivos");
       const data = await response.json();
       if (response.ok) {
         setNodos(data);
@@ -83,84 +73,6 @@ const Mapa = () => {
     console.log("Nodo seleccionado ID:", id_nodo); // Log para verificar el ID
     setSelectedNodeId(id_nodo); // Almacena el id del nodo seleccionado
     setShowDatosNodo(true); // Mostrar DatosNodo
-  };
-
-  // Eliminar un nodo
-  const handleDelete = (alias) => {
-    setNodeToDelete(alias);
-    setDeleteModalOpen(true);
-  };
-
-  // Confirmar eliminación de nodo
-  const confirmDelete = async () => {
-    setDeleteModalOpen(false);
-    try {
-      const response = await fetch(
-        `http://localhost:8000/eliminar_nodo/${nodeToDelete}`,
-        {
-          method: "DELETE",
-        }
-      );
-      if (response.ok) {
-        toast({
-          render: () => (
-            <Box
-              color="white"
-              bg="red.600"
-              borderRadius="md"
-              p={5}
-              mb={4}
-              boxShadow="md"
-              fontSize="lg"
-            >
-              El nodo ha sido eliminado correctamente.
-            </Box>
-          ),
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-        setNodos(nodos.filter((nodo) => nodo.alias !== nodeToDelete));
-      } else {
-        toast({
-          render: () => (
-            <Box
-              color="white"
-              bg="red.600"
-              borderRadius="md"
-              p={5}
-              mb={4}
-              boxShadow="md"
-              fontSize="lg"
-            >
-              Error: No se pudo eliminar el nodo.
-            </Box>
-          ),
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      }
-    } catch (error) {
-      toast({
-        render: () => (
-          <Box
-            color="white"
-            bg="red.600"
-            borderRadius="md"
-            p={5}
-            mb={4}
-            boxShadow="md"
-            fontSize="lg"
-          >
-            Error: No se pudo conectar con la API.
-          </Box>
-        ),
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    }
   };
 
   const buttonDefaultColor = useColorModeValue("gray.300", "gray.600");
@@ -288,19 +200,6 @@ const Mapa = () => {
                           color: "lightgray",
                         }}
                       />
-                      <IconButton
-                        title="Eliminar Nodo"
-                        aria-label="Eliminar"
-                        icon={<FaTrashAlt />}
-                        onClick={() => handleDelete(nodo.alias)}
-                        background={buttonDefaultColor}
-                        borderRadius="6px"
-                        boxShadow={buttonShadow}
-                        _hover={{
-                          background: buttonHoverColor,
-                          color: "lightgray",
-                        }}
-                      />
                     </Flex>
                   </Box>
                 </Box>
@@ -309,76 +208,6 @@ const Mapa = () => {
           ))}
         </MapContainer>
       </Box>
-
-      <AlertDialog
-        isOpen={isDeleteModalOpen}
-        leastDestructiveRef={cancelRef}
-        onClose={() => setDeleteModalOpen(false)}
-      >
-        <AlertDialogOverlay>
-          <AlertDialogContent>
-            <AlertDialogHeader
-              bg={colorMode === "light" ? "gray.200" : "gray.800"}
-              color={colorMode === "light" ? "black" : "white"}
-            >
-              Confirmar eliminación
-            </AlertDialogHeader>
-            <AlertDialogBody>
-              ¿Estás seguro de que deseas eliminar el nodo con alias "
-              {nodeToDelete}"?
-            </AlertDialogBody>
-            <AlertDialogFooter>
-              <Button
-                colorScheme="red"
-                onClick={confirmDelete}
-                ml={3}
-                bg={colorMode === "light" ? "rgb(0, 31, 63)" : "orange.500"}
-                color={colorMode === "light" ? "gray.200" : "white"}
-                border="none"
-                p="6"
-                boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
-                _hover={{
-                  bg: colorMode === "light" ? "rgb(0, 41, 83)" : "orange.600",
-                  boxShadow:
-                    "10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)",
-                  transform: "scale(1.05)",
-                }}
-                _active={{
-                  bg: colorMode === "light" ? "rgb(0, 21, 43)" : "orange.700",
-                  transform: "translateY(2px)",
-                  boxShadow:
-                    "10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)",
-                }}
-              >
-                Eliminar
-              </Button>
-              <Button
-                ref={cancelRef}
-                onClick={() => setDeleteModalOpen(false)}
-                ml={3}
-                bg="grey.500"
-                border="none"
-                p="6"
-                boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
-                _hover={{
-                  bg: "grey.600",
-                  boxShadow:
-                    "10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)",
-                  transform: "scale(1.05)",
-                }}
-                _active={{
-                  bg: "grey.700",
-                  transform: "translateY(2px)",
-                  boxShadow:
-                    "10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)",
-                }}
-              >
-                Cancelar
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialogOverlay>
-      </AlertDialog>
     </>
   );
 };

@@ -52,4 +52,8 @@ def get_all_nodos(db: Session):
     return db.query(Nodo).all()
 
 
+def get_all_nodos_activos(db: Session):
+    return db.query(Nodo).filter(Nodo.estado == "ACTIVO").all()
+
+
     

@@ -24,6 +24,7 @@ import Error403 from "./components/Error403";
 import CrearVariable from "./components/Variables";
 import RangosVariables from './components/RangosVariables';
 import Notificaciones from './notificaciones/NotificacionesTabla';
+import EstadoNodos from "./components/EstadosNodo";
 
 function AppRoutes() {
   return (
@@ -229,6 +230,18 @@ function AppRoutes() {
                 allowedRoles={["admin", "cooperativa", "profesional"]}
               >
                 <FormNodo />
+              </PrivateRoute>
+            </App>
+          }
+        />
+        <Route
+          path="/estado_nodo"
+          element={
+            <App>
+              <PrivateRoute
+                allowedRoles={["admin"]}
+              >
+                <EstadoNodos />
               </PrivateRoute>
             </App>
           }

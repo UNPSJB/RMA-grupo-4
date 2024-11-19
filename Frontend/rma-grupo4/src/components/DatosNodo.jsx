@@ -50,7 +50,7 @@ const DatosNodo = ({ idNodo }) => {
           setError("No se encontraron datos para este nodo.");
         }
       } catch (err) {
-        setError(`Error al obtener los datos del nodo: ${err.message}`);
+        setError(`El nodo no tiene datos`);
       } finally {
         setLoading(false);
       }
