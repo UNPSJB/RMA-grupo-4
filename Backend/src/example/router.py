@@ -9,40 +9,42 @@ from fastapi.security import OAuth2PasswordBearer
 
 router = APIRouter()
 
-@router.post("/preferencia", response_model= RespuestaPreferencia)
-def preferenica(preferencia: CrearPreferencia, db: Session = Depends(get_db)):
-    return crear_preferencia(db=db, preferencia=preferencia)
+#Todas las preferencias de un usuario en especifico segun el id
+@router.get("/preferencias/{id_usuario}", response_model=List[RespuestaPreferencia])
+def obtener_preferencias_usuario(id_usuario: int, db: Session = Depends(get_db)):
+    preferencias = db.query(Usuario_preferencias).filter(Usuario_preferencias.id_usuario == id_usuario).all()
+    return preferencias
+
+#Una preferencia en especifico de un usuario
+@router.get("/preferencia/{id_usuario}/{id}", response_model=RespuestaPreferencia)
+def obtener_preferencia_usuario(id_usuario: int, id: int, db: Session = Depends(get_db)):
+    preferencia = db.query(Usuario_preferencias).filter(
+        Usuario_preferencias.id == id, 
+        Usuario_preferencias.id_usuario == id_usuario
+    ).first()
+    
+    if preferencia is None:
+        raise HTTPException(status_code=404, detail="Preferencia no encontrada o no pertenece al usuario")
+    
+    return preferencia
+
 
 @router.put("/modificar_preferencia/{id}", response_model=RespuestaPreferencia)
 def modificar_preferencia(id: int, datos: ModificarPreferencia, db: Session = Depends(get_db)):
     db_preferencia = get_preferencia(db, id)
-    if db_preferencia is None:
-        raise HTTPException(status_code=404, detail="preferencia no encontrada")
     
-    # Llamamos a la función de servicio para modificar el usuario
-    preferencia_modificada = modificar_preferencia(db, db_preferencia, datos)
+    # Validar que la preferencia pertenece al usuario que hace la solicitud
+    if db_preferencia is None or db_preferencia.id_usuario != datos.id_usuario:
+        raise HTTPException(status_code=404, detail="Preferencia no encontrada o no pertenece al usuario")
     
-    return preferencia_modificada
+    # Actualizar los campos permitidos
+    for key, value in datos.dict(exclude_unset=True).items():
+        setattr(db_preferencia, key, value)
 
-@router.delete("/eliminar_preferencia/{id}", response_model=RespuestaPreferencia)
-def eliminar_preferencia(id: int, db: Session = Depends(get_db)):
-    db_preferencia = get_preferencia(db, id)
-    if db_preferencia is None:
-        raise HTTPException(status_code=404, detail="Preferencia no encontrada")
-    
-    # Eliminar el usuario de la base de datos
-    db.delete(db_preferencia)
     db.commit()
+    db.refresh(db_preferencia)
     
-    return db_preferencia  # Devuelve el usuario eliminado (opcional)
-
-@router.get("/preferencias/{id}", response_model=RespuestaPreferencia)
-def obtener_preferencia(id: int, db: Session = Depends(get_db)):
-    db_preferencia = get_preferencia(db, id)
-    if db_preferencia is None:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return db_preferencia
-
 
 
 @router.post("/registrar", response_model= RespuestaUsuario)

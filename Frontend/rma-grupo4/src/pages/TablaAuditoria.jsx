@@ -215,7 +215,7 @@ const TablaAuditoria = () => {
                     >
                       <Td textAlign={'center'}>{msg.id_nodo}</Td>
                       <Td textAlign={'center'}>
-                        {msg.data.replace(/\./g, ',').substring(0, 8)}
+                        {parseFloat(msg.data).toFixed(2).replace(/\./g, ',').substring(0, 8)}
                         {msg.data.length > 20 ? '...' : ''}
                       </Td>
                       <Td textAlign={'center'}>{cambiarVariable(msg.type)}</Td>
@@ -224,6 +224,7 @@ const TablaAuditoria = () => {
                       <Td textAlign={'center'}>{horaFormateada}</Td>
                     </Tr>
                   );
+                  
                 })
               )}
             </Tbody>

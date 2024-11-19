@@ -110,14 +110,19 @@ const DescargasHistoricas = () => {
       const month = (`0${date.getMonth() + 1}`).slice(-2);
       const day = (`0${date.getDate()}`).slice(-2);
       const hour = (`0${date.getHours()}`).slice(-2);
-
+  
       return `${row.id_nodo},${year}-${month}-${day},${hour},${Number(row.temperature || 0).toFixed(2)},${Number(row.humidity || 0).toFixed(2)},${Number(row.pressure || 0).toFixed(2)},${Number(row.wind || 0).toFixed(2)},${Number(row.precipitation || 0).toFixed(2)}`;
     });
-
-    const header = 'NODO,Fecha,Hora,Temperatura,Humedad,Presion,Viento,Precipitacion\n';
-    const blob = new Blob([header + csvContent.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  
+    const header = 'NODO,Fecha,Hora,Temperatura(°C),Humedad(%),Presion(hPa),Viento(km/h),Precipitacion(mm)\n';
+  
+    const bom = '\uFEFF';
+  
+    const blob = new Blob([bom + header + csvContent.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  
     saveAs(blob, 'historical_data.csv');
   };
+  
   const formatNumber = (number) => {
     if (number === null || isNaN(number)) {
       return '--';

@@ -1,5 +1,5 @@
 from typing import Optional, List
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Table
+from sqlalchemy import Column, Integer, String,Boolean, DateTime, ForeignKey, Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from enum import auto, StrEnum
 from datetime import datetime, UTC
@@ -31,5 +31,6 @@ class Usuario_preferencias(BaseModel):
     id_usuario = Column(Integer, ForeignKey("usuarios.id"))
     id_variable = Column(Integer, ForeignKey("variables.id"))
     alerta = Column(String, index=True)
+    estado = Column(Boolean, default=True)
 
 

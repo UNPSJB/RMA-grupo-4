@@ -25,6 +25,7 @@ import CrearVariable from "./components/Variables";
 import RangosVariables from './components/RangosVariables';
 import Notificaciones from './notificaciones/NotificacionesTabla';
 import EstadoNodos from "./components/EstadosNodo";
+import PreferenciasTabla from "./notificaciones/PreferenciasTabla";
 
 function AppRoutes() {
   return (
@@ -292,6 +293,16 @@ function AppRoutes() {
             <App>
               <PrivateRoute allowedRoles={["admin", "cooperativa", "profesional"]}>
                 <Notificaciones />
+              </PrivateRoute>
+            </App>
+          } 
+        />
+          <Route 
+          path="/preferenciaNotificaciones" 
+          element={
+            <App>
+              <PrivateRoute allowedRoles={["admin", "cooperativa", "profesional"]}>
+                <PreferenciasTabla />
               </PrivateRoute>
             </App>
           } 

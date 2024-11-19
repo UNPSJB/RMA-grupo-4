@@ -58,22 +58,23 @@ class Config:
 
 
 class CrearPreferencia(BaseModel):
-    id: int
     id_usuario: int
     id_variable: int
-    alerta: str
-
+    alerta: str  
+    estado: Optional[bool] = True  
 class ModificarPreferencia(BaseModel):
     id: Optional[int] = None
     id_usuario: Optional[int] = None
     id_variable: Optional[int] = None
     alerta: Optional[str] = None
+    estado: Optional[bool] = None  
 
 class RespuestaPreferencia(BaseModel):
-    id:int
-    id_usuario:int
-    id_variable:int
+    id: int
+    id_usuario: int
+    id_variable: int
     alerta: str
+    estado: bool 
     
 
 

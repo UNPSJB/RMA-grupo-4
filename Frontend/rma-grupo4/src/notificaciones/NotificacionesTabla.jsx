@@ -2,7 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Table, Thead, Tbody, Tr, Th, Td, Heading, Text, Badge, useToast, IconButton,useColorMode,Button, useColorModeValue, Flex, Select } from '@chakra-ui/react';
 import { CheckIcon } from '@chakra-ui/icons';
 import { useAuth } from '../components/AuthContext';
+import {FaCogs } from "react-icons/fa";
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 const NotificacionesTabla = () => {
   const { token, userId } = useAuth();
@@ -14,6 +16,7 @@ const NotificacionesTabla = () => {
   const toast = useToast();
   const { colorMode } = useColorMode();
   const [tipoFiltro, setTipoFiltro] = useState("todos");
+  const navigate = useNavigate();
 
   const buttonDefaultColor = useColorModeValue('gray.300', 'gray.600');
   const buttonHoverColor = useColorModeValue('rgb(0, 31, 63)', 'rgb(255, 130, 37)');
@@ -123,6 +126,10 @@ const NotificacionesTabla = () => {
 
   const nextPage = () => setCurrentPage((prev) => prev + 1);
   const prevPage = () => setCurrentPage((prev) => prev - 1);
+
+  const handlePreferenciaNotificaciones = () => {
+    navigate(`/preferenciaNotificaciones`);
+};
   
   return (
     <Box bg={colorMode === 'light' ? 'gray.100' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'} borderRadius="md" boxShadow="md" width="100%" p={4}>
@@ -146,6 +153,21 @@ const NotificacionesTabla = () => {
       </Flex>
       <Box bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
         <Box overflowX="auto" bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'} borderRadius="md" boxShadow="lg" p={7} >
+          <Box textAlign="right" mb={4} mr={16}>
+            <IconButton
+                title="Configurar Preferencias"
+                icon={<FaCogs />}
+                aria-label="Configurar preferencia"
+                background={buttonDefaultColor}
+                borderRadius="6px"
+                boxShadow={buttonShadow}
+                _hover={{
+                      background: buttonHoverColor,
+                      color: "lightgray",
+                    }}
+                    onClick={handlePreferenciaNotificaciones}
+            />
+          </Box>
           {loading ? (
             <Text textAlign="center">Cargando notificaciones...</Text>
           ) : error ? (
@@ -157,6 +179,7 @@ const NotificacionesTabla = () => {
               No hay notificaciones
             </Text>
           ) : (
+
             <Table variant="simple" colorScheme={colorMode === 'light' ? "blackAlpha" : "whiteAlpha"}>
               <Thead>
                 <Tr>
