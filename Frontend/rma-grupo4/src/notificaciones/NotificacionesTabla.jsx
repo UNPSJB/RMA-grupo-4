@@ -124,8 +124,17 @@ const NotificacionesTabla = () => {
   const notificacionesPaginadas = notificacionesFiltradas.slice(startIndex, endIndex);
   const totalPaginas = Math.ceil(notificaciones.length / pageSize);
 
-  const nextPage = () => setCurrentPage((prev) => prev + 1);
-  const prevPage = () => setCurrentPage((prev) => prev - 1);
+  const nextPage = () => {
+    if (currentPage < totalPaginas && totalPaginas > 0) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+  
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
 
   const handlePreferenciaNotificaciones = () => {
     navigate(`/preferenciaNotificaciones`);

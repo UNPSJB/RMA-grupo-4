@@ -71,49 +71,50 @@ def mensaje_recibido(client, userdata, msg):
         print(f"Error al procesar el mensaje: {e}")
 
 def analizar_notificacion(db: Session, variable, mensaje):
-    
     var = db.query(Variable).filter(Variable.numero == mensaje['type']).first()
     nombre_variable = var.nombre if var else "Desconocido"
     unidad_variable = var.unidad if var else "Desconocido"
     valor_variable = round(float(mensaje['data']), 2)
 
-    #Consultar los rangos activos para la variable
     rangos_activos = db.query(Rango).filter(
-        Rango.variable_id ==  variable,
-        Rango.activo == True  # Solo consideramos los rangos marcados como activos
+        Rango.variable_id == variable,
+        Rango.activo == True 
     ).all()
 
     color_alerta = None
 
-    # Determinar el color de alerta comparando el valor con los rangos activos
+    # Determina el color de alerta comparando el valor con los rangos activos
     for rango in rangos_activos:
         if rango.min_val <= valor_variable <= rango.max_val:
             color_alerta = rango.color
             break
 
-    nueva_notificacion = Notificacion(
-        titulo=f"Alerta de {color_alerta.upper()} para la variable {nombre_variable}",
-        mensaje=f"Valor de {valor_variable}{unidad_variable} - Estado: {color_alerta}.",
-        creada=datetime.now(),
-        id_nodo=mensaje['id']
-    )
-    db.add(nueva_notificacion)
-    db.commit()
-    db.refresh(nueva_notificacion)
-
-    # Filtrar usuarios interesados en esta alerta según sus preferencias
+    # Filtra usuarios interesados en esta alerta según sus preferencias activas
     usuarios_interesados = db.query(Usuario).join(Usuario_preferencias).filter(
         Usuario_preferencias.id_variable == variable,
-        Usuario_preferencias.alerta == color_alerta
+        Usuario_preferencias.alerta == color_alerta,
+        Usuario_preferencias.estado == True
     ).all()
 
-    # Crear un Estado_notificacion para cada usuario interesado
-    for usuario in usuarios_interesados:
-        estado_notificacion = Estado_notificacion(
-            id_notificacion=nueva_notificacion.id,
-            id_usuario=usuario.id,
-            estado=False  # False indica que no ha sido leída aún
+    # Crea notificación solo si hay usuarios interesados
+    if usuarios_interesados:
+        nueva_notificacion = Notificacion(
+            titulo=f"Alerta de {color_alerta.upper()} para la variable {nombre_variable}",
+            mensaje=f"Valor de {valor_variable}{unidad_variable} - Estado: {color_alerta}.",
+            creada=datetime.now(),
+            id_nodo=mensaje['id']
         )
-        db.add(estado_notificacion)
+        db.add(nueva_notificacion)
+        db.commit()
+        db.refresh(nueva_notificacion)
 
-    db.commit()
+        # Crea un Estado_notificacion para cada usuario interesado
+        for usuario in usuarios_interesados:
+            estado_notificacion = Estado_notificacion(
+                id_notificacion=nueva_notificacion.id,
+                id_usuario=usuario.id,
+                estado=False
+            )
+            db.add(estado_notificacion)
+
+        db.commit()
