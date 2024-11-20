@@ -9,6 +9,36 @@ from fastapi.security import OAuth2PasswordBearer
 
 router = APIRouter()
 
+@router.post("/crear_preferencia")
+def crear_preferencia(preferencia: CrearPreferencia, db: Session = Depends(get_db)):
+    # Obtén las preferencias actuales de `id_variable` para `id_usuario`
+    preferencias_actuales = db.query(Usuario_preferencias).filter(
+        Usuario_preferencias.id_usuario == preferencia.id_usuario,
+        Usuario_preferencias.id_variable == preferencia.id_variable
+    ).all()
+    
+    # Verifica la cantidad máxima de estados
+    if len(preferencias_actuales) >= 4:
+        raise HTTPException(status_code=400, detail="Cada variable puede tener un máximo de 4 estados distintos.")
+
+    # Verifica que el estado/alerta no se repita
+    for pref in preferencias_actuales:
+        if pref.alerta == preferencia.alerta:
+            raise HTTPException(status_code=400, detail="Ya existe una preferencia con este estado para la variable.")
+    
+    # Crear la nueva preferencia
+    nueva_preferencia = Usuario_preferencias(
+        id_usuario=preferencia.id_usuario,
+        id_variable=preferencia.id_variable,
+        alerta=preferencia.alerta,
+        estado=preferencia.estado
+    )
+    db.add(nueva_preferencia)
+    db.commit()
+    db.refresh(nueva_preferencia)
+    
+    return nueva_preferencia
+
 #Todas las preferencias de un usuario en especifico segun el id
 @router.get("/preferencias/{id_usuario}", response_model=List[RespuestaPreferencia])
 def obtener_preferencias_usuario(id_usuario: int, db: Session = Depends(get_db)):

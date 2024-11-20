@@ -2,22 +2,46 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Box, Table, Thead, Tbody, Tr, Th, Td, Heading, Text, Badge, 
   useToast, IconButton, useColorMode, Button, useColorModeValue, 
-  Flex, Select 
+  Flex, Select,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton,
+  FormControl,
+  FormLabel,
 } from '@chakra-ui/react';
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
 import { useAuth } from '../components/AuthContext';
 import axios from 'axios';
+import { FaPlus } from "react-icons/fa";
 
 const PreferenciasTabla = () => {
-  const { token, userId } = useAuth();
+  const { token, userId, userRole } = useAuth();
   const [preferencias, setPreferencias] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
+  const pageSize = 4;
   const toast = useToast();
   const { colorMode } = useColorMode();
   const [tipoFiltro, setTipoFiltro] = useState("todas");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [variables, setVariables] = useState([]);
+  const [loadingVariables, setLoadingVariables] = useState(false);
+  const [formData, setFormData] = useState({
+    variableId: '',
+    color: ''
+  });
+
+  const colores = [
+    { value: 'verde', label: 'Verde' },
+    { value: 'amarillo', label: 'Amarillo' },
+    { value: 'naranja', label: 'Naranja' },
+    { value: 'rojo', label: 'Rojo' },
+  ];
 
   const buttonDefaultColor = useColorModeValue('gray.300', 'gray.600');
   const buttonHoverColor = useColorModeValue('rgb(0, 31, 63)', 'rgb(255, 130, 37)');
@@ -44,14 +68,109 @@ const PreferenciasTabla = () => {
     }
   }, [token, userId]);
 
+  const cargarVariables = async () => {
+    try {
+      setLoadingVariables(true);
+  
+      // Obtener variables desde el backend
+      const response = await fetch('http://localhost:8000/obtener_variables', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Error al obtener variables');
+      }
+  
+      const data = await response.json();
+
+
+      // Filtrar las variables según el rol
+      let variablesFiltradas = data;
+      if (userRole === 'cooperativa') {
+        variablesFiltradas = data.filter((variable) => variable.nombre !== 'Bateria');
+      } else if (userRole === 'profesional') {
+        variablesFiltradas = data.filter((variable) => variable.nombre !== 'Nivel de agua');
+      }
+  
+      setVariables(variablesFiltradas);
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: 'Error al cargar variables',
+        status: 'error',
+        duration: 3000,
+      });
+    } finally {
+      setLoadingVariables(false);
+    }
+  };
+
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+    cargarVariables();
+    setFormData({ variableId: '', color: '' });
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setFormData({ variableId: '', color: '' });
+  };
+
+  const handleSubmit = async () => {
+    if (!formData.variableId || !formData.color) {
+      toast({
+        title: 'Error',
+        description: 'Por favor complete todos los campos',
+        status: 'error',
+        duration: 3000,
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8000/crear_preferencia', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          id_usuario: userId,
+          id_variable: formData.variableId,
+          alerta: formData.color,
+          estado: 1,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error('Error al guardar la preferencia');
+      }
+
+      toast({
+        title: 'Preferencia guardada',
+        status: 'success',
+        duration: 3000,
+      });
+
+      handleModalClose();
+      cargarPreferencias();
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: 'Error al guardar la preferencia',
+        status: 'error',
+        duration: 3000,
+      });
+    }
+  };
+
   const toggleEstadoPreferencia = async (idPreferencia, estadoActual) => {
     if (!token) return;
     try {
       await axios.put(
         `http://localhost:8000/modificar_preferencia/${idPreferencia}`,
-        { estado: !estadoActual },
+        { estado: !estadoActual, id_usuario: userId }, 
         { headers: { Authorization: `Bearer ${token}` } }
-      );
+    );
 
       setPreferencias((prevPreferencias) =>
         prevPreferencias.map((pref) =>
@@ -60,7 +179,7 @@ const PreferenciasTabla = () => {
       );
 
       toast({
-        title: `Preferencia ${!estadoActual ? 'activada' : 'desactivada'} con éxito`,
+        title: `Preferencia ${!estadoActual ? 'activada' : 'desactivada'} con Exito`,
         status: 'success',
         duration: 3000,
       });
@@ -76,6 +195,7 @@ const PreferenciasTabla = () => {
 
   useEffect(() => {
     cargarPreferencias();
+    cargarVariables();
   }, [cargarPreferencias]);
 
   const preferenciasFiltradas = preferencias.filter((pref) => {
@@ -89,8 +209,17 @@ const PreferenciasTabla = () => {
   const preferenciasPaginadas = preferenciasFiltradas.slice(startIndex, endIndex);
   const totalPaginas = Math.ceil(preferencias.length / pageSize);
 
-  const nextPage = () => setCurrentPage((prev) => prev + 1);
-  const prevPage = () => setCurrentPage((prev) => prev - 1);
+  const nextPage = () => {
+    if (currentPage < totalPaginas && totalPaginas > 0) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
+  
+  const prevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
 
   return (
     <Box bg={colorMode === 'light' ? 'gray.100' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'} borderRadius="md" boxShadow="md" width="100%" p={4}>
@@ -114,6 +243,22 @@ const PreferenciasTabla = () => {
       </Flex>
       <Box bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
         <Box overflowX="auto" bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'} borderRadius="md" boxShadow="lg" p={7}>
+          <Box textAlign="right" mb={4} mr={16}>
+            <IconButton 
+              title="Agregar Preferencia"
+              icon={<FaPlus />} 
+              aria-label="Agregar Preferencia"
+              onClick={handleModalOpen}
+              background={buttonDefaultColor}
+              borderRadius="6px"
+              boxShadow={buttonShadow}
+              _hover={{ 
+                background: buttonHoverColor, 
+                color: "lightgray"
+              }}
+              mr={2}
+            />
+          </Box>
           {loading ? (
             <Text textAlign="center">Cargando preferencias...</Text>
           ) : error ? (
@@ -128,7 +273,8 @@ const PreferenciasTabla = () => {
             <Table variant="simple" colorScheme={colorMode === 'light' ? "blackAlpha" : "whiteAlpha"}>
               <Thead>
                 <Tr>
-                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Preferencia</Th>
+                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Variable</Th>
+                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Alerta</Th>
                   <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Estado</Th>
                   <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Acciones</Th>
                 </Tr>
@@ -141,7 +287,10 @@ const PreferenciasTabla = () => {
                     color={colorMode === 'light' ? 'black' : 'white'}
                     _hover={{ backgroundColor: colorMode === 'light' ? "gray.100" : "gray.700" }}
                   >
-                    <Td textAlign="center">{pref.nombre}</Td>
+                    <Td textAlign="center">
+                      {variables.find((variable) => variable.id === pref.id_variable)?.nombre || "Nombre no encontrado"}
+                    </Td>
+                    <Td textAlign="center">{pref.alerta}</Td>
                     <Td textAlign="center">
                       <Badge colorScheme={pref.estado ? 'green' : 'red'}>
                         {pref.estado ? 'Activa' : 'Inactiva'}
@@ -177,7 +326,7 @@ const PreferenciasTabla = () => {
             >
               Anterior
             </Button>
-            <Text mx={4}>Página {currentPage} de {totalPaginas}</Text>
+            <Text mx={4}>Pagina {currentPage} de {totalPaginas}</Text>
             <Button 
               onClick={nextPage}
               disabled={currentPage === totalPaginas || totalPaginas === 0}
@@ -194,6 +343,62 @@ const PreferenciasTabla = () => {
           </Box>
         </Box>
       </Box>
+
+      {/* Modal para agregar preferencia */}
+      <Modal isOpen={isModalOpen} onClose={handleModalClose}>
+        <ModalOverlay />
+        <ModalContent
+          bg={colorMode === 'light' ? 'white' : 'gray.800'}
+          color={colorMode === 'light' ? 'black' : 'white'}
+        >
+          <ModalHeader>Crear Preferencia</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <FormControl>
+              <FormLabel>Variable</FormLabel>
+              <Select
+                placeholder="Seleccione una variable"
+                value={formData.variableId}
+                onChange={(e) => setFormData({ ...formData, variableId: e.target.value })}
+                isDisabled={loadingVariables}
+              >
+                {variables.map((variable) => (
+                  <option key={variable.id} value={variable.id}>
+                    {variable.nombre}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+
+            <FormControl mt={4}>
+              <FormLabel>Color</FormLabel>
+              <Select
+                placeholder="Seleccione un color"
+                value={formData.color}
+                onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+              >
+                {colores.map((color) => (
+                  <option key={color.value} value={color.value}>
+                    {color.label}
+                  </option>
+                ))}
+              </Select>
+            </FormControl>
+          </ModalBody>
+
+          <ModalFooter>
+            <Button 
+              colorScheme="blue" 
+              mr={3} 
+              onClick={handleSubmit}
+              isLoading={loadingVariables}
+            >
+              Guardar
+            </Button>
+            <Button onClick={handleModalClose}>Cancelar</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Box>
   );
 };
