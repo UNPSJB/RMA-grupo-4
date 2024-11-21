@@ -179,20 +179,21 @@ const NotificacionesTabla = () => {
       </Flex>
       <Box bg={colorMode === 'light' ? 'gray.300' : 'gray.800'} p={{ base: 2, md: 4 }} borderRadius="md" boxShadow="lg">
         <Box overflowX="auto" bg={colorMode === 'light' ? 'gray.100' : 'gray.700'} color={colorMode === 'light' ? 'black' : 'white'} borderRadius="md" boxShadow="lg" p={7} >
-          <Box textAlign="right" mb={4} mr={16}>
-            <IconButton
-                title="Configurar Preferencias"
-                icon={<FaCogs />}
-                aria-label="Configurar preferencia"
-                background={buttonDefaultColor}
-                borderRadius="6px"
-                boxShadow={buttonShadow}
-                _hover={{
-                      background: buttonHoverColor,
-                      color: "lightgray",
-                    }}
-                    onClick={handlePreferenciaNotificaciones}
-            />
+          <Box textAlign="right" mb={4} >
+            <Button
+              leftIcon={<FaCogs />}
+              aria-label="Configurar preferencia"
+              background={buttonDefaultColor}
+              borderRadius="6px"
+              boxShadow={buttonShadow}
+              _hover={{
+                background: buttonHoverColor,
+                color: "lightgray",
+              }}
+              onClick={handlePreferenciaNotificaciones}
+            >
+              Configurar Preferencias
+            </Button>
           </Box>
           {loading ? (
             <Text textAlign="center">Cargando notificaciones...</Text>
@@ -265,6 +266,7 @@ const NotificacionesTabla = () => {
                       <Td textAlign="center">
                           {!notif.estado_notificacion.estado && (
                             <IconButton
+                              title="Marcar como leido"
                               icon={<CheckIcon />}
                               background={buttonDefaultColor}
                               borderRadius="6px"

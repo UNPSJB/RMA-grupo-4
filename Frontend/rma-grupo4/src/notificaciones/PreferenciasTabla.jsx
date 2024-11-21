@@ -12,6 +12,7 @@ import {
   ModalCloseButton,
   FormControl,
   FormLabel,
+  HStack
 } from '@chakra-ui/react';
 import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
 import { useAuth } from '../components/AuthContext';
@@ -35,6 +36,12 @@ const PreferenciasTabla = () => {
     variableId: '',
     color: ''
   });
+  const isLight = colorMode === 'light';
+
+  const [isFormModalOpen, setFormModalOpen] = useState(false);
+
+  const [editingVariableId, setEditingVariableId] = useState(null);
+
 
   const colores = [
     { value: 'verde', label: 'Verde' },
@@ -99,6 +106,19 @@ const PreferenciasTabla = () => {
         title: 'Error al cargar variables',
         status: 'error',
         duration: 3000,
+        render: () => (
+          <Box 
+              color="white" 
+              bg="red.600" 
+              borderRadius="md" 
+              p={5} 
+              mb={4}
+              boxShadow="md"
+              fontSize="lg"
+          >
+            Error al cargar variables
+          </Box>
+      ),
       });
     } finally {
       setLoadingVariables(false);
@@ -123,6 +143,19 @@ const PreferenciasTabla = () => {
         description: 'Por favor complete todos los campos',
         status: 'error',
         duration: 3000,
+        render: () => (
+          <Box 
+              color="white" 
+              bg="red.600" 
+              borderRadius="md" 
+              p={5} 
+              mb={4}
+              boxShadow="md"
+              fontSize="lg"
+          >
+             Por favor complete todos los campos
+          </Box>
+      ),
       });
       return;
     }
@@ -149,7 +182,21 @@ const PreferenciasTabla = () => {
         title: 'Preferencia guardada',
         status: 'success',
         duration: 3000,
+        render: () => (
+          <Box 
+            color="white" 
+            bg="green.600" 
+            borderRadius="md" 
+            p={5} 
+            mb={4}
+            boxShadow="md"
+            fontSize="lg" 
+          >
+            Preferencia guardada
+          </Box>
+      ),
       });
+      
 
       handleModalClose();
       cargarPreferencias();
@@ -159,7 +206,21 @@ const PreferenciasTabla = () => {
         title: 'Error al guardar la preferencia',
         status: 'error',
         duration: 3000,
+        render: () => (
+          <Box 
+              color="white" 
+              bg="red.600" 
+              borderRadius="md" 
+              p={5} 
+              mb={4}
+              boxShadow="md"
+              fontSize="lg"
+          >
+            Error al guardar la preferencia
+          </Box>
+      ),
       });
+      
     }
   };
 
@@ -182,6 +243,19 @@ const PreferenciasTabla = () => {
         title: `Preferencia ${!estadoActual ? 'activada' : 'desactivada'} con Exito`,
         status: 'success',
         duration: 3000,
+        render: () => (
+          <Box 
+            color="white" 
+            bg="green.600" 
+            borderRadius="md" 
+            p={5} 
+            mb={4}
+            boxShadow="md"
+            fontSize="lg" 
+          >
+            Preferencia {estadoActual ? 'desactivada' : 'activada'}
+          </Box>
+      ),
       });
     } catch (error) {
       console.error('Error al cambiar estado:', error);
@@ -189,6 +263,19 @@ const PreferenciasTabla = () => {
         title: 'Error al cambiar el estado de la preferencia',
         status: 'error',
         duration: 3000,
+        render: () => (
+          <Box 
+              color="white" 
+              bg="red.600" 
+              borderRadius="md" 
+              p={5} 
+              mb={4}
+              boxShadow="md"
+              fontSize="lg"
+          >
+             Error al cambiar el estado de la preferencia
+          </Box>
+      ),
       });
     }
   };
@@ -219,6 +306,28 @@ const PreferenciasTabla = () => {
     if (currentPage > 1) {
       setCurrentPage((prev) => prev - 1);
     }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingVariableId(null);
+    setFormData({ variable: '', alerta: '', estado: ''});
+    setFormModalOpen(false);
+  };
+  
+  const getColorAndIcon = (alerta) => {
+    if (/verde/i.test(alerta)) {
+        return {  icon: '🟢' };
+    }
+    if (/amarillo/i.test(alerta)) {
+        return {  icon: '🟡' };
+    }
+    if (/naranja/i.test(alerta)) {
+        return {  icon: '🟠' };
+    }
+    if (/rojo/i.test(alerta)) {
+        return {  icon: '🔴' };
+    }
+    return {  icon: '⚪' }; 
   };
 
   return (
@@ -273,6 +382,7 @@ const PreferenciasTabla = () => {
             <Table variant="simple" colorScheme={colorMode === 'light' ? "blackAlpha" : "whiteAlpha"}>
               <Thead>
                 <Tr>
+                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Ícono</Th>
                   <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Variable</Th>
                   <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Alerta</Th>
                   <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Estado</Th>
@@ -280,13 +390,18 @@ const PreferenciasTabla = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {preferenciasPaginadas.map((pref) => (
+                {preferenciasPaginadas.map((pref) => {
+                  const { icon } = getColorAndIcon(pref.alerta);
+                  return (
                   <Tr 
                     key={pref.id}
                     bg={colorMode === 'light' ? 'white' : 'gray.700'} 
                     color={colorMode === 'light' ? 'black' : 'white'}
                     _hover={{ backgroundColor: colorMode === 'light' ? "gray.100" : "gray.700" }}
                   >
+                       <Td textAlign="center">
+                        <span style={{ fontSize: '1.5rem' }}>{icon}</span>
+                      </Td>
                     <Td textAlign="center">
                       {variables.find((variable) => variable.id === pref.id_variable)?.nombre || "Nombre no encontrado"}
                     </Td>
@@ -299,6 +414,7 @@ const PreferenciasTabla = () => {
                     <Td textAlign="center">
                       <IconButton
                         icon={pref.estado ? <CloseIcon /> : <CheckIcon />}
+                        title={pref.estado ? "Desactivar preferencia" : "Activar preferencia"}
                         onClick={() => toggleEstadoPreferencia(pref.id, pref.estado)}
                         aria-label={pref.estado ? "Desactivar preferencia" : "Activar preferencia"}
                         background={buttonDefaultColor}
@@ -308,7 +424,8 @@ const PreferenciasTabla = () => {
                       />
                     </Td>
                   </Tr>
-                ))}
+                  );
+                })}
               </Tbody>
             </Table>
           )}
@@ -343,19 +460,21 @@ const PreferenciasTabla = () => {
           </Box>
         </Box>
       </Box>
-
       {/* Modal para agregar preferencia */}
       <Modal isOpen={isModalOpen} onClose={handleModalClose}>
         <ModalOverlay />
         <ModalContent
-          bg={colorMode === 'light' ? 'white' : 'gray.800'}
-          color={colorMode === 'light' ? 'black' : 'white'}
         >
-          <ModalHeader>Crear Preferencia</ModalHeader>
+          <ModalHeader
+            bg={colorMode === 'light' ? 'gray.200' : 'gray.800'}
+            color={colorMode === 'light' ? 'black' : 'white'}
+          >
+            Crear Preferencia
+          </ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <FormControl>
-              <FormLabel>Variable</FormLabel>
+            <FormControl isRequired>
+              <FormLabel color={isLight ? 'black' : 'white'}>Variable</FormLabel>
               <Select
                 placeholder="Seleccione una variable"
                 value={formData.variableId}
@@ -370,7 +489,7 @@ const PreferenciasTabla = () => {
               </Select>
             </FormControl>
 
-            <FormControl mt={4}>
+            <FormControl mt={4} isRequired>
               <FormLabel>Color</FormLabel>
               <Select
                 placeholder="Seleccione un color"
@@ -387,18 +506,56 @@ const PreferenciasTabla = () => {
           </ModalBody>
 
           <ModalFooter>
-            <Button 
-              colorScheme="blue" 
-              mr={3} 
-              onClick={handleSubmit}
-              isLoading={loadingVariables}
-            >
-              Guardar
-            </Button>
-            <Button onClick={handleModalClose}>Cancelar</Button>
+            <HStack spacing={4}>
+              <Button
+                onClick={handleSubmit}
+                bg={colorMode === 'light' ? 'rgb(0, 31, 63)' : 'orange.500'}
+                color={colorMode === 'light' ? 'gray.200' : 'white'}
+                border="none"
+                p="6"
+                boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
+                _hover={{
+                  bg: colorMode === 'light' ? 'rgb(0, 41, 83)' : 'orange.600',
+                  boxShadow:
+                    '10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)',
+                  transform: 'scale(1.05)',
+                }}
+                _active={{
+                  bg: colorMode === 'light' ? 'rgb(0, 21, 43)' : 'orange.700',
+                  transform: 'translateY(2px)',
+                  boxShadow:
+                    '10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)',
+                }}
+              >
+                Guardar
+              </Button>
+              <Button
+                onClick={handleModalClose}
+                ml={3}
+                bg="grey.500"
+                border="none"
+                p="6"
+                boxShadow="10px 10px 30px rgba(0, 0, 0, 0.4), -10px -10px 30px rgba(255, 255, 255, 0.1), 4px 4px 10px rgba(0,0,0,0.3), -4px -4px 10px rgba(255,255,255,0.1)"
+                _hover={{
+                  bg: 'grey.600',
+                  boxShadow:
+                    '10px 10px 35px rgba(0, 0, 0, 0.5), -10px -10px 35px rgba(255, 255, 255, 0.1), 6px 6px 12px rgba(0,0,0,0.3), -6px -6px 12px rgba(255,255,255,0.1)',
+                  transform: 'scale(1.05)',
+                }}
+                _active={{
+                  bg: 'grey.700',
+                  transform: 'translateY(2px)',
+                  boxShadow:
+                    '10px 10px 30px rgba(0, 0, 0, 0.5), -10px -10px 30px rgba(255, 255, 255, 0.1), inset 6px 6px 12px rgba(0,0,0,0.2), inset -6px -6px 12px rgba(255,255,255,0.1)',
+                }}
+              >
+                Cancelar
+              </Button>
+            </HStack>
           </ModalFooter>
         </ModalContent>
       </Modal>
+
     </Box>
   );
 };

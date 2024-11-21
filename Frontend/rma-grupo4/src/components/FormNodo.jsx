@@ -54,6 +54,19 @@ const CrearNodo = () => {
           status: "error",
           duration: 3000,
           isClosable: true,
+          render: () => (
+            <Box 
+                color="white" 
+                bg="red.600" 
+                borderRadius="md" 
+                p={5} 
+                mb={4}
+                boxShadow="md"
+                fontSize="lg"
+            >
+             Error al cargar el nodo
+            </Box>
+        ),
         });
       }
     } catch (error) {
@@ -128,6 +141,19 @@ const CrearNodo = () => {
         status: "error",
         duration: 3000,
         isClosable: true,
+        render: () => (
+          <Box 
+              color="white" 
+              bg="red.600" 
+              borderRadius="md" 
+              p={5} 
+              mb={4}
+              boxShadow="md"
+              fontSize="lg"
+          >
+            Coordenadas inválidas.
+          </Box>
+      ),
       });
       return;
     }
@@ -154,6 +180,19 @@ const CrearNodo = () => {
           description: editingNodeId
             ? "El nodo se ha modificado correctamente."
             : "El nodo se ha creado correctamente.",
+            render: () => (
+              <Box 
+                color="white" 
+                bg="green.600" 
+                borderRadius="md" 
+                p={5} 
+                mb={4}
+                boxShadow="md"
+                fontSize="lg" 
+              >
+                Nodo {editingNodeId ? 'modificado' : 'creado'}
+              </Box>
+          ),
           status: "success",
           duration: 3000,
           isClosable: true,
@@ -177,6 +216,19 @@ const CrearNodo = () => {
         status: "error",
         duration: 3000,
         isClosable: true,
+        render: () => (
+          <Box 
+              color="white" 
+              bg="red.600" 
+              borderRadius="md" 
+              p={5} 
+              mb={4}
+              boxShadow="md"
+              fontSize="lg"
+          >
+            No se pudo conectar con la API.
+          </Box>
+      ),
       });
     }
 
