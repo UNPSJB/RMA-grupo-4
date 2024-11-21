@@ -30,7 +30,6 @@ const Notificaciones = () => {
   const buttonHoverColor = useColorModeValue('rgb(0, 31, 63)', 'rgb(255, 130, 37)');
   const buttonShadow = useColorModeValue("5px 5px 3px #5a5a5a, -5px -5px 3px #ffffff", "2px 2px 3px rgba(0, 0, 0, 0.3)");
   const popoverBg = useColorModeValue('white', 'gray.800');
-  const hoverBg = useColorModeValue('gray.100', 'gray.700');
 
   const cargarNotificaciones = useCallback(async () => {
     if (!token) {

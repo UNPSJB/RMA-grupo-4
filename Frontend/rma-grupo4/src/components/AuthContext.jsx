@@ -51,14 +51,19 @@ export function AuthProvider({ children }) {
         } else {
             localStorage.removeItem('token');
         }
-    }, [isAuthenticated, user, userRole, token]);
+        if (userId !== null) {
+            localStorage.setItem('userId', userId); 
+        } else {
+            localStorage.removeItem('userId');
+        }
+    }, [isAuthenticated, user, userRole, token, userId]); 
 
-    const login = (username, role, authToken, userId) => {
+    const login = (username, role, authToken, userIdValue) => {
         setIsAuthenticated(true);
         setUser(username);
-        setUserId(userId);
+        setUserId(userIdValue);
         setUserRole(role);
-        setToken(authToken); // Guarda el token
+        setToken(authToken); 
     };
 
     const logout = () => {
@@ -67,15 +72,12 @@ export function AuthProvider({ children }) {
         setUserRole(null);
         setUserId(null);
         setToken(null);
-    
+
+        localStorage.removeItem('isAuthenticated');
         localStorage.removeItem('user');
         localStorage.removeItem('userRole');
         localStorage.removeItem('userId');
         localStorage.removeItem('token');
-    
-        if (user) {
-            localStorage.removeItem(`token_${user}`);
-        }
     };
 
     return (

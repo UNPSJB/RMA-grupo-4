@@ -108,6 +108,7 @@ const NotificacionesTabla = () => {
         duration: 3000,
       });
     }
+    cargarNotificaciones();
   };
 
   useEffect(() => {
@@ -138,8 +139,24 @@ const NotificacionesTabla = () => {
 
   const handlePreferenciaNotificaciones = () => {
     navigate(`/preferenciaNotificaciones`);
-};
+  };
   
+  const getColorAndIcon = (titulo, mensaje) => {
+    if (/verde/i.test(titulo) || /verde/i.test(mensaje)) {
+        return {  icon: '🟢' };
+    }
+    if (/amarillo/i.test(titulo) || /amarillo/i.test(mensaje)) {
+        return {  icon: '🟡' };
+    }
+    if (/naranja/i.test(titulo) || /naranja/i.test(mensaje)) {
+        return {  icon: '🟠' };
+    }
+    if (/rojo/i.test(titulo) || /rojo/i.test(mensaje)) {
+        return {  icon: '🔴' };
+    }
+    return {  icon: '⚪' }; 
+  };
+
   return (
     <Box bg={colorMode === 'light' ? 'gray.100' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'} borderRadius="md" boxShadow="md" width="100%" p={4}>
       <Heading as="h1" mb={7} textAlign="center">Mis Notificaciones</Heading>
@@ -192,6 +209,7 @@ const NotificacionesTabla = () => {
             <Table variant="simple" colorScheme={colorMode === 'light' ? "blackAlpha" : "whiteAlpha"}>
               <Thead>
                 <Tr>
+                  <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Ícono</Th>
                   <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Título</Th>
                   <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Mensaje</Th>
                   <Th textAlign="center" color={colorMode === 'light' ? 'black' : 'white'}>Fecha Notificado</Th>
@@ -201,26 +219,30 @@ const NotificacionesTabla = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                  {notificacionesPaginadas.map((notif) => (
+                {notificacionesPaginadas.map((notif) => {
+                  const { icon } = getColorAndIcon(notif.titulo, notif.mensaje);
+                  return (
                     <Tr 
                       key={notif.id}
                       bg={colorMode === 'light' ? 'white' : 'gray.700'} 
                       color={colorMode === 'light' ? 'black' : 'white'}
                       _hover={{ backgroundColor: colorMode === 'light' ? "gray.100" : "gray.700" }} 
                     >
+                      <Td textAlign="center">
+                        <span style={{ fontSize: '1.5rem' }}>{icon}</span>
+                      </Td>
                       <Td textAlign="center">{notif.titulo}</Td>
                       <Td textAlign="center">{notif.mensaje}</Td>
                       <Td textAlign="center">
                         {notif.creada ? 
-                          new Intl.DateTimeFormat('es-AR', {
-                            year: 'numeric', 
-                            month: '2-digit', 
-                            day: '2-digit', 
-                            hour: '2-digit', 
-                            minute: '2-digit',
-                            hourCycle: 'h23'
-                          }).format(new Date(notif.creada))                           
-                          : 'Sin fecha'}
+                            new Intl.DateTimeFormat('es-AR', {
+                              year: 'numeric', 
+                              month: '2-digit', 
+                              day: '2-digit', 
+                              hour: '2-digit', 
+                              minute: '2-digit',
+                              hourCycle: 'h23'
+                            }).format(new Date(notif.creada)) : 'Sin fecha'}
                       </Td>
                       <Td textAlign="center">
                         {notif.estado_notificacion.estado ? 
@@ -231,35 +253,35 @@ const NotificacionesTabla = () => {
                             hour: '2-digit', 
                             minute: '2-digit',
                             hourCycle: 'h23'
-                          }).format(new Date(notif.estado_notificacion.leido_el))                           
-                          : 'Sin fecha'}
+                          }).format(new Date(notif.estado_notificacion.leido_el)) : 'Sin fecha'}
                       </Td>
                       <Td textAlign="center">
-                        <Badge 
-                          colorScheme={notif.estado_notificacion.estado ? 'green' : 'red'}
-                        >
-                          {notif.estado_notificacion.estado ? 'Leído' : 'No leído'}
-                        </Badge>
+                          <Badge 
+                            colorScheme={notif.estado_notificacion.estado ? 'green' : 'red'}
+                          >
+                            {notif.estado_notificacion.estado ? 'Leído' : 'No leído'}
+                          </Badge>
                       </Td>
                       <Td textAlign="center">
-                        {!notif.estado_notificacion.estado && (
-                          <IconButton
-                            icon={<CheckIcon />}
-                            background={buttonDefaultColor}
-                            borderRadius="6px"
-                            boxShadow={buttonShadow}
-                            _hover={{
+                          {!notif.estado_notificacion.estado && (
+                            <IconButton
+                              icon={<CheckIcon />}
+                              background={buttonDefaultColor}
+                              borderRadius="6px"
+                              boxShadow={buttonShadow}
+                              _hover={{
                                 background: buttonHoverColor,
                                 color: "lightgray",
-                            }}
-                            aria-label="Marcar como leída"
-                            onClick={() => marcarComoLeida(notif.id)}
-                          />
-                        )}
+                              }}
+                              aria-label="Marcar como leída"
+                              onClick={() => marcarComoLeida(notif.id)}
+                            />
+                          )}
                       </Td>
                     </Tr>
-                  ))}
-                </Tbody>
+                  );
+                })}
+              </Tbody>
             </Table>
           )}
           <Box display="flex" justifyContent="center" mt={4}>
