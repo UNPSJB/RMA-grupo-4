@@ -55,18 +55,18 @@ const CrearNodo = () => {
           duration: 3000,
           isClosable: true,
           render: () => (
-            <Box 
-                color="white" 
-                bg="red.600" 
-                borderRadius="md" 
-                p={5} 
-                mb={4}
-                boxShadow="md"
-                fontSize="lg"
+            <Box
+              color="white"
+              bg="red.600"
+              borderRadius="md"
+              p={5}
+              mb={4}
+              boxShadow="md"
+              fontSize="lg"
             >
-             Error al cargar el nodo
+              Error al cargar el nodo
             </Box>
-        ),
+          ),
         });
       }
     } catch (error) {
@@ -125,14 +125,14 @@ const CrearNodo = () => {
 
   // Maneja el envío del formulario (crear/modificar)
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Evitar el comportamiento predeterminado del formulario
 
     const { latitud, longitud } = formData;
-    const validarCordenadas = 
-    latitud >= -55.0 &&
-    latitud <= -22.0 &&
-    longitud >= -73.0 &&
-    longitud <= -53.0;
+    const validarCordenadas =
+      latitud >= -55.0 &&
+      latitud <= -22.0 &&
+      longitud >= -73.0 &&
+      longitud <= -53.0;
 
     if (!validarCordenadas) {
       toast({
@@ -142,27 +142,29 @@ const CrearNodo = () => {
         duration: 3000,
         isClosable: true,
         render: () => (
-          <Box 
-              color="white" 
-              bg="red.600" 
-              borderRadius="md" 
-              p={5} 
-              mb={4}
-              boxShadow="md"
-              fontSize="lg"
+          <Box
+            color="white"
+            bg="red.600"
+            borderRadius="md"
+            p={5}
+            mb={4}
+            boxShadow="md"
+            fontSize="lg"
           >
             Coordenadas inválidas.
           </Box>
-      ),
+        ),
       });
       return;
     }
 
     try {
-      const method = editingNodeId ? "PUT" : "POST";
-      const endpoint = editingNodeId
-        ? `http://localhost:8000/modificar_datos_nodo/${editingNodeId}`
-        : "http://localhost:8000/CrearNodo";
+      const method =
+        editingNodeId !== null && editingNodeId !== undefined ? "PUT" : "POST";
+      const endpoint =
+        editingNodeId !== null && editingNodeId !== undefined
+          ? `http://localhost:8000/modificar_datos_nodo/${editingNodeId}`
+          : "http://localhost:8000/CrearNodo";
 
       const response = await fetch(endpoint, {
         method,
@@ -176,22 +178,29 @@ const CrearNodo = () => {
 
       if (response.ok) {
         toast({
-          title: editingNodeId ? "Nodo modificado." : "Nodo creado.",
-          description: editingNodeId
-            ? "El nodo se ha modificado correctamente."
-            : "El nodo se ha creado correctamente.",
-            render: () => (
-              <Box 
-                color="white" 
-                bg="green.600" 
-                borderRadius="md" 
-                p={5} 
-                mb={4}
-                boxShadow="md"
-                fontSize="lg" 
-              >
-                Nodo {editingNodeId ? 'modificado' : 'creado'}
-              </Box>
+          title:
+            editingNodeId !== null && editingNodeId !== undefined
+              ? "Nodo modificado."
+              : "Nodo creado.",
+          description:
+            editingNodeId !== null && editingNodeId !== undefined
+              ? "El nodo se ha modificado correctamente."
+              : "El nodo se ha creado correctamente.",
+          render: () => (
+            <Box
+              color="white"
+              bg="green.600"
+              borderRadius="md"
+              p={5}
+              mb={4}
+              boxShadow="md"
+              fontSize="lg"
+            >
+              Nodo{" "}
+              {editingNodeId !== null && editingNodeId !== undefined
+                ? "modificado"
+                : "creado"}
+            </Box>
           ),
           status: "success",
           duration: 3000,
@@ -217,28 +226,20 @@ const CrearNodo = () => {
         duration: 3000,
         isClosable: true,
         render: () => (
-          <Box 
-              color="white" 
-              bg="red.600" 
-              borderRadius="md" 
-              p={5} 
-              mb={4}
-              boxShadow="md"
-              fontSize="lg"
+          <Box
+            color="white"
+            bg="red.600"
+            borderRadius="md"
+            p={5}
+            mb={4}
+            boxShadow="md"
+            fontSize="lg"
           >
             No se pudo conectar con la API.
           </Box>
-      ),
+        ),
       });
     }
-
-    setFormData({
-      id_nodo: "",
-      alias: "",
-      longitud: "",
-      latitud: "",
-      descripcion: "",
-    });
   };
 
   const handleCancel = () => {

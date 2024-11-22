@@ -84,6 +84,19 @@ const EstadoNodos = () => {
         title: "Error",
         description:
           "Este nodo ya está fuera de servicio y no se puede modificar.",
+        render: () => (
+          <Box
+            color="white"
+            bg="red.600"
+            borderRadius="md"
+            p={5}
+            mb={4}
+            boxShadow="md"
+            fontSize="lg"
+          >
+            Este nodo ya está fuera de servicio y no se puede modificar.
+          </Box>
+        ),
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -107,6 +120,19 @@ const EstadoNodos = () => {
         toast({
           title: "Estado actualizado.",
           description: `El estado del nodo ${id_nodo} ha sido actualizado a ${nuevoEstado}.`,
+          render: () => (
+            <Box
+              color="white"
+              bg="green.600"
+              borderRadius="md"
+              p={5}
+              mb={4}
+              boxShadow="md"
+              fontSize="lg"
+            >
+              Estado actualizado.
+            </Box>
+          ),
           status: "success",
           duration: 3000,
           isClosable: true,
@@ -124,7 +150,20 @@ const EstadoNodos = () => {
           title: "Error al actualizar estado.",
           description:
             data.message || "No se pudo actualizar el estado del nodo.",
-          status: "error",
+          render: () => (
+            <Box
+              color="white"
+              bg="green.600"
+              borderRadius="md"
+              p={5}
+              mb={4}
+              boxShadow="md"
+              fontSize="lg"
+            >
+              Error al actualizar estado.
+            </Box>
+          ),
+          status: "success",
           duration: 3000,
           isClosable: true,
         });
@@ -153,6 +192,7 @@ const EstadoNodos = () => {
     }
     setIsAlertOpen(false);
   };
+
   useEffect(() => {
     fetchNodos();
   }, []);
@@ -177,6 +217,36 @@ const EstadoNodos = () => {
   const startIndex = (currentPage - 1) * nodosPorPagina;
   const currentNodos = nodos.slice(startIndex, startIndex + nodosPorPagina);
   const totalPages = Math.ceil(nodos.length / nodosPorPagina);
+
+  const getColorAndStyledMessage = (estado) => {
+    console.log("CACACA", estado);
+    const highlightWord = (text, word, color) => {
+      const regex = new RegExp(`(${word})`, "gi");
+      return text.replace(
+        regex,
+        `<span style="color: ${color}; font-weight: bold;">$1</span>`
+      );
+    };
+
+    if (/ACTIVO/i.test(estado)) {
+      return {
+        styledTitulo: highlightWord(estado, "ACTIVO", "green"),
+      };
+    }
+    if (/MANTENIMIENTO/i.test(estado)) {
+      return {
+        styledTitulo: highlightWord(estado, "MANTENIMIENTO", "orange"),
+      };
+    }
+    if (/FUERA DE SERVICIO/i.test(estado)) {
+      return {
+        styledTitulo: highlightWord(estado, "FUERA DE SERVICIO", "red"),
+      };
+    }
+    return {
+      styledEstado: estado,
+    };
+  };
 
   return (
     <Box
@@ -235,35 +305,44 @@ const EstadoNodos = () => {
               </Tr>
             </Thead>
             <Tbody>
-              {currentNodos.map((nodo) => (
-                <Tr textAlign="center" key={nodo.id_nodo}>
-                  <Td textAlign="center">{nodo.id_nodo}</Td>
-                  <Td textAlign="center">{nodo.alias}</Td>
-                  <Td textAlign="center">{nodo.estado}</Td>
-                  <Td textAlign="center">
-                    {nodo.estado !== "FUERA DE SERVICIO" ? (
-                      <Select
-                        defaultValue={nodo.estado}
-                        onChange={(e) =>
-                          e.target.value === "FUERA DE SERVICIO"
-                            ? handleConfirmacion(nodo)
-                            : actualizarEstadoNodo(nodo.id_nodo, e.target.value)
-                        }
-                      >
-                        <option value="ACTIVO">Activo</option>
-                        <option value="MANTENIMIENTO">Mantenimiento</option>
-                        <option value="FUERA DE SERVICIO">
+              {currentNodos.map((nodo) => {
+                const { styledTitulo } = getColorAndStyledMessage(nodo.estado);
+                return (
+                  <Tr textAlign="center" key={nodo.id_nodo}>
+                    <Td textAlign="center">{nodo.id_nodo}</Td>
+                    <Td textAlign="center">{nodo.alias}</Td>
+                    <Td
+                      dangerouslySetInnerHTML={{ __html: styledTitulo }}
+                      textAlign="center"
+                    />
+                    <Td textAlign="center">
+                      {nodo.estado !== "FUERA DE SERVICIO" ? (
+                        <Select
+                          defaultValue={nodo.estado}
+                          onChange={(e) =>
+                            e.target.value === "FUERA DE SERVICIO"
+                              ? handleConfirmacion(nodo)
+                              : actualizarEstadoNodo(
+                                  nodo.id_nodo,
+                                  e.target.value
+                                )
+                          }
+                        >
+                          <option value="ACTIVO">Activo</option>
+                          <option value="MANTENIMIENTO">Mantenimiento</option>
+                          <option value="FUERA DE SERVICIO">
+                            Fuera de Servicio
+                          </option>
+                        </Select>
+                      ) : (
+                        <Text fontStyle="italic" color="red.500">
                           Fuera de Servicio
-                        </option>
-                      </Select>
-                    ) : (
-                      <Text fontStyle="italic" color="red.500">
-                        Fuera de Servicio
-                      </Text>
-                    )}
-                  </Td>
-                </Tr>
-              ))}
+                        </Text>
+                      )}
+                    </Td>
+                  </Tr>
+                );
+              })}
             </Tbody>
           </Table>
         </Box>

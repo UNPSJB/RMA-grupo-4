@@ -83,19 +83,19 @@ const DatosNodo = ({ idNodo }) => {
         <HStack>
           <Icon as={FaTemperatureHigh} boxSize={6} color="red.500" />
           <Text fontSize="lg" fontWeight="bold">
-            Temperatura: {nodeData?.last_temperature.toFixed(2) ?? "--"}
+            Temperatura: {nodeData?.last_temperature.toFixed(2) ?? "-"}
           </Text>
         </HStack>
         <HStack>
           <Icon as={FaTint} boxSize={6} color="blue.500" />
           <Text fontSize="lg" fontWeight="bold">
-            Humedad: {nodeData?.last_humidity.toFixed(2) ?? "--"}
+            Humedad: {nodeData?.last_humidity.toFixed(2) ?? "-"}
           </Text>
         </HStack>
         <HStack>
           <Icon as={FaWind} boxSize={6} color="green.500" />
           <Text fontSize="lg" fontWeight="bold">
-            Viento: {nodeData?.last_wind.toFixed(2) ?? "--"}
+            Viento: {nodeData?.last_wind.toFixed(2) ?? "-"}
           </Text>
         </HStack>
         <HStack>
@@ -104,7 +104,7 @@ const DatosNodo = ({ idNodo }) => {
             Fecha:{" "}
             {nodeData?.last_update
               ? new Date(nodeData.last_update).toLocaleString()
-              : "N/A"}
+              : "-"}
           </Text>
         </HStack>
         <HStack>
