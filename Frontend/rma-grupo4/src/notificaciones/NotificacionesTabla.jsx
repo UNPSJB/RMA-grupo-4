@@ -141,20 +141,40 @@ const NotificacionesTabla = () => {
     navigate(`/preferenciaNotificaciones`);
   };
   
-  const getColorAndIcon = (titulo, mensaje) => {
-    if (/verde/i.test(titulo) || /verde/i.test(mensaje)) {
-        return {  icon: '🟢' };
+  const getColorAndStyledMessage = (titulo) => {
+    const highlightWord = (text, word, color) => {
+        const regex = new RegExp(`(${word})`, 'gi');
+        return text.replace(regex, `<span style="color: ${color}; font-weight: bold;">$1</span>`);
+    };
+
+    if (/verde/i.test(titulo)) {
+        return {
+          icon: '🟢',
+          styledTitulo: highlightWord(titulo, 'verde', 'green'),
+        };
     }
-    if (/amarillo/i.test(titulo) || /amarillo/i.test(mensaje)) {
-        return {  icon: '🟡' };
+    if (/amarillo/i.test(titulo)) {
+        return {
+          icon: '🟡',
+          styledTitulo: highlightWord(titulo, 'amarillo', 'gold'),
+        };
     }
-    if (/naranja/i.test(titulo) || /naranja/i.test(mensaje)) {
-        return {  icon: '🟠' };
+    if (/naranja/i.test(titulo)) {
+        return {
+          icon: '🟠',
+          styledTitulo: highlightWord(titulo, 'naranja', 'orange'),
+        };
     }
-    if (/rojo/i.test(titulo) || /rojo/i.test(mensaje)) {
-        return {  icon: '🔴' };
+    if (/rojo/i.test(titulo)) {
+        return {
+          icon: '🔴',
+          styledTitulo: highlightWord(titulo, 'rojo', 'red'),
+        };
     }
-    return {  icon: '⚪' }; 
+    return {
+      icon: '⚪',
+      styledTitulo: titulo,
+    };
   };
 
   return (
@@ -221,7 +241,7 @@ const NotificacionesTabla = () => {
               </Thead>
               <Tbody>
                 {notificacionesPaginadas.map((notif) => {
-                  const { icon } = getColorAndIcon(notif.titulo, notif.mensaje);
+                  const { icon, styledTitulo } = getColorAndStyledMessage(notif.titulo);
                   return (
                     <Tr 
                       key={notif.id}
@@ -232,18 +252,18 @@ const NotificacionesTabla = () => {
                       <Td textAlign="center">
                         <span style={{ fontSize: '1.5rem' }}>{icon}</span>
                       </Td>
-                      <Td textAlign="center">{notif.titulo}</Td>
-                      <Td textAlign="center">{notif.mensaje}</Td>
-                      <Td textAlign="center">
-                        {notif.creada ? 
-                            new Intl.DateTimeFormat('es-AR', {
-                              year: 'numeric', 
-                              month: '2-digit', 
-                              day: '2-digit', 
-                              hour: '2-digit', 
-                              minute: '2-digit',
-                              hourCycle: 'h23'
-                            }).format(new Date(notif.creada)) : 'Sin fecha'}
+                    <Td dangerouslySetInnerHTML={{ __html: styledTitulo }}  textAlign="center" />
+                    <Td textAlign="center">{notif.mensaje}</Td>
+                    <Td textAlign="center">
+                      {notif.creada ? 
+                          new Intl.DateTimeFormat('es-AR', {
+                            year: 'numeric', 
+                            month: '2-digit', 
+                            day: '2-digit', 
+                            hour: '2-digit', 
+                            minute: '2-digit',
+                            hourCycle: 'h23'
+                          }).format(new Date(notif.creada)) : 'Sin fecha'}
                       </Td>
                       <Td textAlign="center">
                         {notif.estado_notificacion.estado ? 

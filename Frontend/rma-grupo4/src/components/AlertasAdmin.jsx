@@ -9,7 +9,7 @@ export default function AlertasAdmin() {
 
   const cards = [
     { id: 1, title: 'Suscripción a Alertas', route: '/suscripcion_alertas', icon: FaBell },
-    //{ id: 2, title: 'Personalización de Alertas', route: '/personalizacion-alertas', icon: FaCogs },
+    { id: 2, title: 'Personalización de Alertas', route: '/personalizacion_alertas', icon: FaCogs },
   ];
 
   return (

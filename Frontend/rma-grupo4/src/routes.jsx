@@ -26,6 +26,7 @@ import RangosVariables from './components/RangosVariables';
 import Notificaciones from './notificaciones/NotificacionesTabla';
 import EstadoNodos from "./components/EstadosNodo";
 import PreferenciasTabla from "./notificaciones/PreferenciasTabla";
+import PreferenciasAlertas from "./utils/PreferenciasAlertas";
 
 function AppRoutes() {
   return (
@@ -306,6 +307,18 @@ function AppRoutes() {
               </PrivateRoute>
             </App>
           } 
+        />
+        <Route
+          path="/personalizacion_alertas"
+          element={
+            <App>
+              <PrivateRoute
+                allowedRoles={["admin", "cooperativa", "profesional"]}
+              >
+                <PreferenciasAlertas />
+              </PrivateRoute>
+            </App>
+          }
         />
       </Routes>
     </Router>

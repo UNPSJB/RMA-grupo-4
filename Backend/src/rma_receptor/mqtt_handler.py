@@ -99,8 +99,8 @@ def analizar_notificacion(db: Session, variable, mensaje):
     # Crea notificación solo si hay usuarios interesados
     if usuarios_interesados:
         nueva_notificacion = Notificacion(
-            titulo=f"Alerta de {color_alerta.upper()} para la variable {nombre_variable}",
-            mensaje=f"Valor de {valor_variable}{unidad_variable} - Estado: {color_alerta}.",
+            titulo=f"Alerta {color_alerta.upper()} {nombre_variable}",
+            mensaje=f"Valor de {valor_variable}{unidad_variable}.",
             creada=datetime.now(),
             id_nodo=mensaje['id']
         )
