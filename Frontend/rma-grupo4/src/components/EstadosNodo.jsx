@@ -182,6 +182,7 @@ const EstadoNodos = () => {
   const handleConfirmacion = (nodo) => {
     setSelectedNodo(nodo);
     setIsAlertOpen(true);
+    fetchNodos();
   };
 
   const handleCambioEstado = (nuevoEstado) => {
@@ -190,6 +191,7 @@ const EstadoNodos = () => {
       setEstadoNodo(nuevoEstado); // Actualiza el estado local
       //window.location.reload(); // Refresca la página
     }
+    fetchNodos();
     setIsAlertOpen(false);
   };
 
@@ -327,6 +329,7 @@ const EstadoNodos = () => {
                                   e.target.value
                                 )
                           }
+
                         >
                           <option value="ACTIVO">Activo</option>
                           <option value="MANTENIMIENTO">Mantenimiento</option>
@@ -336,7 +339,6 @@ const EstadoNodos = () => {
                         </Select>
                       ) : (
                         <Text fontStyle="italic" color="red.500">
-                          Fuera de Servicio
                         </Text>
                       )}
                     </Td>

@@ -1,19 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Image, Box, Grid, GridItem, SimpleGrid, useColorMode, Heading, Text, Button, useColorModeValue } from '@chakra-ui/react';
+import { Image, Box, Grid, GridItem, SimpleGrid, useColorMode, Heading, Text, } from '@chakra-ui/react';
 import { useAuth } from '../components/AuthContext';
-import {FaCogs } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
 
 const GeneraQR = () => {
     const { userRole, token } = useAuth();
     const [qrImageCanal1, setQrImageCanal1] = useState(null); // QR para canal 1
     const [qrImageCanal2, setQrImageCanal2] = useState(null); // QR para canal 2
     const { colorMode } = useColorMode();
-    const navigate = useNavigate();
-    const buttonDefaultColor = useColorModeValue('gray.300', 'gray.600');
-    const buttonHoverColor = useColorModeValue('rgb(0, 31, 63)', 'rgb(255, 130, 37)');
-    const buttonShadow = useColorModeValue("5px 5px 3px #5a5a5a, -5px -5px 3px #ffffff", "2px 2px 3px rgba(0, 0, 0, 0.3)");
-  
     // Genera los QR según el nombre del rol del usuario
     const handleGenerateQR = async () => {
         if (!userRole) return;
@@ -56,10 +49,6 @@ const GeneraQR = () => {
     useEffect(() => {
         if (userRole) handleGenerateQR();
     }, [userRole]);
-
-    const handlePreferenciaNotificaciones = () => {
-        navigate(`/personalizacion_alertas`);
-      };
 
     return (
         <Box 
@@ -131,22 +120,6 @@ const GeneraQR = () => {
                         </SimpleGrid>
                     </GridItem>
                 )}
-                <Box textAlign="right" mb={4} >
-                    <Button
-                        leftIcon={<FaCogs />}
-                        aria-label="Personalizar Alertas"
-                        background={buttonDefaultColor}
-                        borderRadius="6px"
-                        boxShadow={buttonShadow}
-                        _hover={{
-                            background: buttonHoverColor,
-                            color: "lightgray",
-                        }}
-                        onClick={handlePreferenciaNotificaciones}
-                    >
-                        Personalizar Alertas
-                    </Button>
-                </Box>
             </Grid>
         </Box>
     );

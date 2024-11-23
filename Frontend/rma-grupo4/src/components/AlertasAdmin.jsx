@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, SimpleGrid, Text, VStack, Icon, useColorMode } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
-import { FaBell, FaCogs } from 'react-icons/fa';
+import { FaBell } from 'react-icons/fa';
 
 export default function AlertasAdmin() {
   const navigate = useNavigate();
@@ -9,7 +9,6 @@ export default function AlertasAdmin() {
 
   const cards = [
     { id: 1, title: 'Suscripción a Alertas', route: '/suscripcion_alertas', icon: FaBell },
-    { id: 2, title: 'Personalización de Alertas', route: '/personalizacion_alertas', icon: FaCogs },
   ];
 
   return (
