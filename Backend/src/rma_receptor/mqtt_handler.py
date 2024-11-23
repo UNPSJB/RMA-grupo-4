@@ -116,5 +116,12 @@ def analizar_notificacion(db: Session, variable, mensaje):
                 estado=False
             )
             db.add(estado_notificacion)
+            if usuario.chat_id:
+                mensaje_telegram = (
+                    f"⚠️ {nueva_notificacion.titulo}\n"
+                    f"{nueva_notificacion.mensaje}\n"
+                    f"Nodo: {mensaje['id']}")
+                    
+                #alerta_telegram(usuario.chat_id,mensaje_telegram) #en esta parte iria la funcion para mandar el mensaje. 
 
         db.commit()

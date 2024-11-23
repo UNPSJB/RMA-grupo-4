@@ -18,6 +18,7 @@ class Usuario(BaseModel):
     usuario = Column(String, unique=True, index=True)
     email = Column(String, unique=True, index=True)
     edad = Column(Integer)
+    chat_id = Column(Integer, unique= True)
     password = Column(String)
     rol_id = Column(Integer, ForeignKey("roles.id"), nullable=False)  # FK al rol
     rol = relationship("Rol", backref="usuarios")
