@@ -26,6 +26,7 @@ import RangosVariables from './components/RangosVariables';
 import Notificaciones from './notificaciones/NotificacionesTabla';
 import EstadoNodos from "./components/EstadosNodo";
 import PreferenciasTabla from "./notificaciones/PreferenciasTabla";
+import ValidarOTP from "./components/ValidarOTP";
 
 function AppRoutes() {
   return (
@@ -303,6 +304,16 @@ function AppRoutes() {
             <App>
               <PrivateRoute allowedRoles={["admin", "cooperativa", "profesional"]}>
                 <PreferenciasTabla />
+              </PrivateRoute>
+            </App>
+          } 
+        />
+        <Route 
+          path="/validar_otp" 
+          element={
+            <App>
+              <PrivateRoute allowedRoles={["admin", "cooperativa", "profesional"]}>
+                <ValidarOTP />
               </PrivateRoute>
             </App>
           } 

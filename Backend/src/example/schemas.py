@@ -75,6 +75,7 @@ class RespuestaPreferencia(BaseModel):
     id_variable: int
     alerta: str
     estado: bool 
+
     
 
 

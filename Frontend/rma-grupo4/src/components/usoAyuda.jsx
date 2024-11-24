@@ -26,7 +26,7 @@ const UsoAyuda = ( userRole ) => {
         label: 'Ayuda para gestion de nodos', 
         descripcion: [
           { title: 'Operaciones básicas', text: 'En la sección de gestión de nodos, puedes realizar operaciones básicas como agregar, editar o eliminar nodos.' },
-          { title: 'Agregar nodo', text: 'Usa el botón "+" para agregar un nuevo nodo ingresando los datos correspondientes.' },
+          { title: 'Agregar nodo', text: 'Usa el botón "+" para agregar un nuevo nodo ingresando los datos correspondientes. Para cargar logitud y latitud se puede seleccionar la zona en el mapa y de esta forma se completa estos dos campos' },
           { title: 'Editar nodo', text: 'El ícono del "lápiz" te permite editar la información de nodos existentes.' },
           { title: 'Eliminar nodo', text: 'El ícono del "tacho" elimina un nodo seleccionado de la lista.' }
         ]
@@ -98,6 +98,15 @@ const UsoAyuda = ( userRole ) => {
       },
     ],
     admin: [
+      { 
+        label: 'Ayuda para Gestion de Usuarios', 
+        descripcion: [
+          { title: 'Ver lista de usuarios', text: 'En la tabla de usuarios se muestran todos los usuarios registrados, incluyendo su nombre, correo electrónico, edad y el rol asignado actualmente. Que por defecto recibe el de "invitado" ' },
+          { title: 'Modificar roles', text: 'Al lado de cada usuario, encontrarás un botón con el ícono de un "lápiz"; Haz clic en este botón para abrir el selector de roles. Podrás asignar uno de los siguientes roles al usuario: Invitado (Es el rol por defecto al registrarse. Tiene acceso limitado) Universitario ( Acceso a funcionalidades específicas para estudiantes, trabaja con datos historicos). Profesional: (Acceso completo a las herramientas de análisis y datos actuales.) Cooperativa: (Acceso a funcionalidades diseñadas para grupos de trabajo.) Admin: (Acceso total al sistema, incluyendo la gestión de usuarios, gestion de variables).' },
+          { title: 'Importante', text: 'El rol asignado determina qué páginas y funcionalidades estarán disponibles para ese usuario.' },
+          { title: 'Eliminar usuario', text: 'Al lado de cada usuario, encontrarás un botón con el ícono de un "tachito". Al hacer clic, podrás eliminar al usuario seleccionado. Precaución: Esta acción es permanente y no se puede deshacer.' }
+        ]
+      },
       { 
         label: 'Ayuda para Gráficos de Análisis Actual', 
         descripcion: [

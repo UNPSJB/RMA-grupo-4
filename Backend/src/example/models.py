@@ -10,7 +10,6 @@ class Rol(BaseModel):
 
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String, unique=True, index=True)
-
 class Usuario(BaseModel):
     __tablename__ = "usuarios"
 
@@ -22,9 +21,6 @@ class Usuario(BaseModel):
     password = Column(String)
     rol_id = Column(Integer, ForeignKey("roles.id"), nullable=False)  # FK al rol
     rol = relationship("Rol", backref="usuarios")
-
-
-
 class Usuario_preferencias(BaseModel):
     __tablename__ = "preferencias"
 
@@ -33,5 +29,9 @@ class Usuario_preferencias(BaseModel):
     id_variable = Column(Integer, ForeignKey("variables.id"))
     alerta = Column(String, index=True)
     estado = Column(Boolean, default=True)
-
-
+class OTP(BaseModel):
+    __tablename__ = "otp_gen"
+    id = Column(Integer, primary_key=True, index=True)
+    otp = Column(Integer, nullable=False)
+    expiracion = Column(DateTime, nullable=False)
+    id_usuario = Column(Integer, ForeignKey("usuarios.id"), nullable=True)
