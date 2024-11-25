@@ -314,22 +314,41 @@ const PreferenciasTabla = () => {
     setFormModalOpen(false);
   };
   
-  const getColorAndIcon = (alerta) => {
-    if (/verde/i.test(alerta)) {
-        return {  icon: '🟢' };
-    }
-    if (/amarillo/i.test(alerta)) {
-        return {  icon: '🟡' };
-    }
-    if (/naranja/i.test(alerta)) {
-        return {  icon: '🟠' };
-    }
-    if (/rojo/i.test(alerta)) {
-        return {  icon: '🔴' };
-    }
-    return {  icon: '⚪' }; 
-  };
+  const getColorAndStyledMessage = (titulo) => {
+    const highlightWord = (text, word, color) => {
+        const regex = new RegExp(`(${word})`, 'gi');
+        return text.replace(regex, `<span style="color: ${color}; font-weight: bold;">$1</span>`);
+    };
 
+    if (/verde/i.test(titulo)) {
+        return {
+          icon: '🟢',
+          styledTitulo: highlightWord(titulo, 'verde', 'green'),
+        };
+    }
+    if (/amarillo/i.test(titulo)) {
+        return {
+          icon: '🟡',
+          styledTitulo: highlightWord(titulo, 'amarillo', 'gold'),
+        };
+    }
+    if (/naranja/i.test(titulo)) {
+        return {
+          icon: '🟠',
+          styledTitulo: highlightWord(titulo, 'naranja', 'orange'),
+        };
+    }
+    if (/rojo/i.test(titulo)) {
+        return {
+          icon: '🔴',
+          styledTitulo: highlightWord(titulo, 'rojo', 'red'),
+        };
+    }
+    return {
+      icon: '⚪',
+      styledTitulo: titulo,
+    };
+  };
   return (
     <Box bg={colorMode === 'light' ? 'gray.100' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'} borderRadius="md" boxShadow="md" width="100%" p={4}>
       <Heading as="h1" mb={7} textAlign="center">Mis Preferencias</Heading>
@@ -391,7 +410,7 @@ const PreferenciasTabla = () => {
               </Thead>
               <Tbody>
                 {preferenciasPaginadas.map((pref) => {
-                  const { icon } = getColorAndIcon(pref.alerta);
+                  const { icon, styledTitulo } = getColorAndStyledMessage(pref.alerta.toUpperCase());
                   return (
                   <Tr 
                     key={pref.id}
@@ -405,7 +424,7 @@ const PreferenciasTabla = () => {
                     <Td textAlign="center">
                       {variables.find((variable) => variable.id === pref.id_variable)?.nombre || "Nombre no encontrado"}
                     </Td>
-                    <Td textAlign="center">{pref.alerta}</Td>
+                    <Td dangerouslySetInnerHTML={{ __html: styledTitulo }}  textAlign="center" />
                     <Td textAlign="center">
                       <Badge colorScheme={pref.estado ? 'green' : 'red'}>
                         {pref.estado ? 'Activa' : 'Inactiva'}
