@@ -7,13 +7,14 @@ import os
 import time
 from sqlalchemy.orm import Session
 from sqlalchemy import text
-from database import get_db  # Asegúrate de que `get_db` esté correctamente importado desde tu archivo
+from src.database import get_db  # Asegúrate de que `get_db` esté correctamente importado desde tu archivo
+import asyncio
 
 # Cargar variables de entorno
 load_dotenv()
 
 # Cargar el token del archivo .env
-TOKEN = os.getenv("BOT_TOKEN")
+TOKEN = os.getenv("TELEGRAM_TOKEN")
 if not TOKEN:
     raise ValueError("La variable de entorno BOT_TOKEN no está configurada correctamente.")
 
@@ -69,13 +70,27 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     # Mostrar en la consola información del usuario y su OTP
     print(f"Usuario conectado: Nombre={user_first_name}, OTP={otp}")
 
-# Configuración principal del bot
-if __name__ == "__main__":
-    application = ApplicationBuilder().token(TOKEN).build()
 
-    # Añadimos el manejador para el comando /start
+# Iniciar el bot
+async def iniciar_bot():
+    application = ApplicationBuilder().token(TOKEN).build()
     application.add_handler(CommandHandler("start", start))
 
-    # Iniciamos el bot
-    print("Bot en ejecución...")
-    application.run_polling()
+    # Iniciar el bot con polling
+    await application.initialize()
+    await application.start()
+    print("Bot inicializado y ejecutándose...")
+
+    # Mantener el bot activo
+    await application.updater.start_polling()
+    await application.idle() 
+
+# Detener el bot
+async def detener_bot(application):
+    await application.stop()
+    await application.shutdown()
+    print("Bot detenido correctamente.")
+
+# Ejecutar el bot en el ciclo principal
+if __name__ == "__main__":
+    asyncio.run(iniciar_bot())

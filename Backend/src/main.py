@@ -1,4 +1,5 @@
 import os
+import asyncio
 from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI
@@ -9,9 +10,10 @@ from src.notificaciones.router import router as notificaciones_router
 from src.example.router import router as example_router
 from src.variables.router import router as variables_router
 from src.nodos.router import router as nodos_router
-from src.rma_receptor.mqtt_client import conectar_mqtt, detener_mqtt  # Importar las funciones de conexión y desconexión de MQTT
-from src.mensajes.router import router as mensajes_router # para endpoint que devuelve todos los mensajes de la base de datos como una lista de objetos JSON.
-from src.utils.router import router as qr
+from src.rma_receptor.mqtt_client import conectar_mqtt, detener_mqtt  # Conexión y desconexión MQTT
+from src.mensajes.router import router as mensajes_router  # Endpoint para devolver mensajes en JSON
+from src.utils.router import router as qr  # Funcionalidades varias
+from src.bot import iniciar_bot, detener_bot  # Funciones para manejar el bot de Telegram
 
 # Cargar variables de entorno desde el archivo .env
 load_dotenv()
@@ -26,11 +28,18 @@ async def app_lifespan(app: FastAPI):
     # Crear la base de datos y las tablas
     BaseModel.metadata.create_all(bind=engine)
     
-    # Conectar al broker MQTT al iniciar la aplicación
+    # Conectar al broker MQTT
     conectar_mqtt()
-    yield
-    # Desconectar del broker MQTT al cerrar la aplicación
+
+    # Iniciar el bot en un task separado
+    bot_task = asyncio.create_task(iniciar_bot())
+    app.state.bot_task = bot_task
+
+    yield  # Aquí la aplicación estará en ejecución
+
+    # Finalizar tareas al cerrar la aplicación
     detener_mqtt()
+    await detener_bot(app.state.bot_task)
 
 # Crear la aplicación FastAPI con el lifespan definido
 app = FastAPI(root_path=ROOT_PATH, lifespan=app_lifespan)
