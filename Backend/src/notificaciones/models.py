@@ -15,9 +15,13 @@ class Notificacion (BaseModel):
     titulo = Column(String, index=True)
     mensaje = Column(String, index=True)
     creada = Column(DateTime, index=True)
-    id_nodo = Column(Integer, ForeignKey("nodos.id"),index=True)
+    id_nodo = Column(Integer, ForeignKey("nodos.id_nodo"), index=True)
     #nodo?
-    nodo = relationship("Nodo")
+    nodo = relationship(
+        "Nodo",
+        primaryjoin="Notificacion.id_nodo == Nodo.id_nodo",
+        backref="notificaciones"
+    )
     
     
 class Estado_notificacion(BaseModel):

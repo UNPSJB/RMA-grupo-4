@@ -27,6 +27,7 @@ from src.mensajes.schemas import (
 from fastapi.responses import StreamingResponse
 from src.utils.qr_utils import obtener_enlace_invitacion, generar_qr
 from src.example.services import *
+from src.nodos.models import *
 
 # Inicializa el router para definir las rutas de este módulo
 router = APIRouter() 
@@ -723,18 +724,30 @@ def obtener_mensajes_auditoria(tipo_mensaje: str = None, db: Session = Depends(g
     return query.all()
 
 @router.get("/clima/nodos", response_model=List[int])
-def get_node_summary(db: Session = Depends(get_db), rol: str = Depends(verificar_rol("admin", "profesional", "cooperativa"))):
+def get_node_summary(
+    db: Session = Depends(get_db), 
+    rol: str = Depends(verificar_rol("admin", "profesional", "cooperativa"))
+):
     """
-    Endpoint para obtener todos los id_nodos únicos.
+    Endpoint para obtener todos los id_nodos únicos con estado ACTIVO.
     """
+    # Subquery para obtener los id_nodo únicos de los mensajes
     subquery = (
         db.query(Mensaje.id_nodo)
         .distinct(Mensaje.id_nodo)
         .subquery()
     )
 
-    results = db.query(subquery.c.id_nodo).order_by(subquery.c.id_nodo).all()
+    # Consulta principal con join a la tabla nodos para filtrar por estado
+    results = (
+        db.query(Nodo.id_nodo)
+        .join(subquery, subquery.c.id_nodo == Nodo.id_nodo)
+        .filter(Nodo.estado == EstadoNodo.ACTIVO)  # Filtrar nodos activos
+        .order_by(Nodo.id_nodo)
+        .all()
+    )
 
+    # Extraer los id_nodo del resultado
     node_ids = [result.id_nodo for result in results]
 
     return node_ids
