@@ -5,9 +5,9 @@ from datetime import datetime, timedelta
 from src.database import SessionLocal
 from src.models import Mensaje, Variable, Rango
 from src.notificaciones.models import Notificacion, Estado_notificacion
-from src.example.models import Usuario_preferencias, Usuario
+from src.example.models import Usuario_preferencias, Usuario,OTP
 from src.rma_receptor.validaciones import validar_mensaje, validar_fecha_hora_actual, validar_duplicado
-from src.rma_receptor.telegram_bot import analizar_alerta
+from src.rma_receptor.telegram_bot import analizar_alerta, enviar_mensaje_personal
 
 def mensaje_recibido(client, userdata, msg):
     """Callback para procesar los mensajes recibidos en los tópicos suscritos."""
@@ -116,12 +116,18 @@ def analizar_notificacion(db: Session, variable, mensaje):
                 estado=False
             )
             db.add(estado_notificacion)
-            if usuario.chat_id:
-                mensaje_telegram = (
+            for usuario in usuarios_interesados:
+                otp_telegram = db.query(OTP).filter(OTP.id_usuario == usuario.id).first()
+                if otp_telegram and otp_telegram.chat_id:
+                    mensaje_telegram = (
                     f"⚠️ {nueva_notificacion.titulo}\n"
                     f"{nueva_notificacion.mensaje}\n"
-                    f"Nodo: {mensaje['id']}")
+                    f"Nodo: {mensaje['id']}"
+                )
+
+                enviar_mensaje_personal(otp_telegram.chat_id,mensaje_telegram)
+            
                     
-                #alerta_telegram(usuario.chat_id,mensaje_telegram) #en esta parte iria la funcion para mandar el mensaje. 
+                
 
         db.commit()

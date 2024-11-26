@@ -6,7 +6,7 @@ from src.database import SessionLocal
 from src.models import Rango, Variable
 
 load_dotenv()
-
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 token = os.getenv('TELEGRAM_TOKEN')
 chat_ids = [int(os.getenv('TELEGRAM_CHAT_ID_1')), int(os.getenv('TELEGRAM_CHAT_ID_2'))]
 
@@ -36,6 +36,26 @@ def obtener_niveles_alerta(tipo):
         return [(rango.min_val, rango.max_val, rango.color) for rango in niveles]
     finally:
         session.close()
+
+def enviar_mensaje_personal(chat_id,mensaje):
+    token = BOT_TOKEN  # Asegúrate de que BOT_TOKEN esté definido correctamente.
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    print(f"este es el chat_id={chat_id}")
+    payload = {
+        "chat_id": chat_id,
+        "text": mensaje
+    }
+    
+    try:
+        # Realiza la solicitud POST a la API de Telegram
+        response = requests.post(url, json=payload)
+        if response.status_code == 200:
+            print(f"Mensaje enviado a chat_id={chat_id}")
+        else:
+            print(f"Error al enviar mensaje: {response.status_code} - {response.text}")
+    except Exception as e:
+        print(f"Error al intentar enviar mensaje a chat_id={chat_id}: {e}")
+
 
 def enviar_mensaje_telegram(mensaje, tipo_alerta):
     url = f'https://api.telegram.org/bot{token}/sendMessage'
