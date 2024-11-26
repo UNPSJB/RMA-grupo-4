@@ -7,7 +7,15 @@ from src.models import Mensaje, Variable, Rango
 from src.notificaciones.models import Notificacion, Estado_notificacion
 from src.example.models import Usuario_preferencias, Usuario,OTP
 from src.rma_receptor.validaciones import validar_mensaje, validar_fecha_hora_actual, validar_duplicado
-from src.rma_receptor.telegram_bot import analizar_alerta, enviar_mensaje_personal
+from telegram import Bot
+import os
+import requests
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 def mensaje_recibido(client, userdata, msg):
     """Callback para procesar los mensajes recibidos en los tópicos suscritos."""
@@ -58,9 +66,6 @@ def mensaje_recibido(client, userdata, msg):
             if tipo_mensaje in ['correcto']:
                 analizar_notificacion(db, variable.id, mensaje_json)
             
-            if nuevo_mensaje.type in ['Nivel de agua', 'Bateria']:
-                mensaje_telegram = mensaje_to_dict(nuevo_mensaje)  
-                analizar_alerta(mensaje_telegram)
 
         finally:
             db.close()
@@ -131,3 +136,23 @@ def analizar_notificacion(db: Session, variable, mensaje):
                 
 
         db.commit()
+
+def enviar_mensaje_personal(chat_id,mensaje):
+    token = BOT_TOKEN  # Asegúrate de que BOT_TOKEN esté definido correctamente.
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    print(f"este es el chat_id={chat_id}")
+    payload = {
+        "chat_id": chat_id,
+        "text": mensaje
+    }
+    
+    try:
+        # Realiza la solicitud POST a la API de Telegram
+        response = requests.post(url, json=payload)
+        if response.status_code == 200:
+            print(f"Mensaje enviado a chat_id={chat_id}")
+        else:
+            print(f"Error al enviar mensaje: {response.status_code} - {response.text}")
+    except Exception as e:
+        print(f"Error al intentar enviar mensaje a chat_id={chat_id}: {e}")
+
