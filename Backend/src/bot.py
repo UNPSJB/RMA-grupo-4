@@ -34,7 +34,7 @@ def generar_otp() -> int:
     return int(otp_completo)
 
 # Función para guardar el OTP en la base de datos
-def guardar_otp_db(otp: int):
+def guardar_otp_db(otp: int, chat_id: int):
     """Guarda el OTP generado en la base de datos con su fecha de expiración."""
     # expiracion = datetime.now() + timedelta(days=5)  # Expira en 5 días
     expiracion = datetime.now() + timedelta(minutes=1)
@@ -42,22 +42,23 @@ def guardar_otp_db(otp: int):
     with next(get_db()) as db:  # Utilizamos el generador de `get_db` para obtener la sesión
         db.execute(
             text("""
-            INSERT INTO otp_gen (otp, expiracion, id_usuario)
-            VALUES (:otp, :expiracion, :id_usuario);
+            INSERT INTO otp_gen (otp, expiracion, id_usuario, chat_id)
+            VALUES (:otp, :expiracion, :id_usuario, :chat_id);
             """),
-            {"otp": otp, "expiracion": expiracion, "id_usuario": id_usuario},
+            {"otp": otp, "expiracion": expiracion, "id_usuario": id_usuario,"chat_id": chat_id},
         )
         db.commit()
 
 # Función que maneja el comando /start
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_first_name = update.effective_user.first_name
+    chat_id = update.effective_user.id
 
     # Llamar al subalgoritmo para generar el OTP
     otp = generar_otp()
 
     # Guardar el OTP en la base de datos
-    guardar_otp_db(otp)
+    guardar_otp_db(otp,chat_id)
 
     # Mensaje de bienvenida
     await update.message.reply_text(f"¡Hola, {user_first_name}! Bienvenido a este bot.")
