@@ -10,7 +10,6 @@ import ModificarDatos from "./components/ModificarDatos";
 import ModificarPassword from "./components/ModificarPassword";
 import HelpModal from "./components/HelpModal";
 import PantallaComparativa from "./analisis/PantallaComparativa";
-import GeneraQR from "./utils/GeneraQR";
 import TablaDatosHistoricos from "./pages/TablaDatosHistoricos";
 import TablaAuditoria from "./pages/TablaAuditoria";
 import TablaNodo from "./components/TablaNodos";
@@ -207,7 +206,7 @@ function AppRoutes() {
               <PrivateRoute
                 allowedRoles={["admin", "cooperativa", "profesional"]}
               >
-                <GeneraQR />
+                <ValidarOTP />
               </PrivateRoute>
             </App>
           }
@@ -308,16 +307,7 @@ function AppRoutes() {
             </App>
           } 
         />
-        <Route 
-          path="/validar_otp" 
-          element={
-            <App>
-              <PrivateRoute allowedRoles={["admin", "cooperativa", "profesional"]}>
-                <ValidarOTP />
-              </PrivateRoute>
-            </App>
-          } 
-        />
+        
       </Routes>
     </Router>
   );

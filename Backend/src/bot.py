@@ -14,7 +14,7 @@ import asyncio
 load_dotenv()
 
 # Cargar el token del archivo .env
-TOKEN = os.getenv("TELEGRAM_TOKEN")
+TOKEN = os.getenv("BOT_TOKEN")
 if not TOKEN:
     raise ValueError("La variable de entorno BOT_TOKEN no está configurada correctamente.")
 
@@ -37,8 +37,8 @@ def generar_otp() -> int:
 # Función para guardar el OTP en la base de datos
 def guardar_otp_db(otp: int, chat_id: int):
     """Guarda el OTP generado en la base de datos con su fecha de expiración."""
-    # expiracion = datetime.now() + timedelta(days=5)  # Expira en 5 días
-    expiracion = datetime.now() + timedelta(minutes=1)
+    expiracion = datetime.now() + timedelta(days=5)  # Expira en 5 días
+    #expiracion = datetime.now() + timedelta(minutes=1)
     id_usuario = None  # Establecemos el id_usuario como NULL
     with next(get_db()) as db:  # Utilizamos el generador de `get_db` para obtener la sesión
         db.execute(

@@ -6,49 +6,13 @@ from datetime import datetime, time, timezone, timedelta
 from collections import defaultdict
 from src.database import get_db  
 from src.models import Mensaje
-from src.mensajes.schemas import (
-    TemperatureData, 
-    TemperatureResponse,
-    HumidityResponse,
-    HumidityData,
-    PressureResponse,
-    PressureData,
-    PrecipitationResponse,
-    WaterLevelData,
-    PrecipitationData,
-    WindResponse,
-    WindData,
-    NodeSummary,
-    NodeSummaryResponse,
-    WaterLevelResponse,
-    NodeHistoricalData,
-    HistoricalDataPoint,
-)
+from src.mensajes.schemas import (TemperatureData, TemperatureResponse,HumidityResponse,HumidityData,PressureResponse,PressureData,PrecipitationResponse,WaterLevelData,PrecipitationData,WindResponse,WindData,NodeSummary,NodeSummaryResponse,WaterLevelResponse,NodeHistoricalData,HistoricalDataPoint,)
 from fastapi.responses import StreamingResponse
-from src.utils.qr_utils import obtener_enlace_invitacion, generar_qr
 from src.example.services import *
 from src.nodos.models import *
 
 # Inicializa el router para definir las rutas de este módulo
 router = APIRouter() 
-
-@router.get("/generar_qr_telegram/{canal_id}")
-async def generar_qr_telegram(
-        canal_id: str,
-        db: Session = Depends(get_db),
-        rol: str = Depends(verificar_rol("admin","profesional","cooperativa"))
-    ):
-    """
-    Genera un código QR a partir del enlace de invitación del canal de Telegram especificado por canal_id.
-    """
-    try:
-        enlace_invitacion = obtener_enlace_invitacion(canal_id)  # Obtiene el enlace correcto
-        qr_image = generar_qr(enlace_invitacion)  # Genera el QR con el enlace
-
-        # Devuelve la imagen como respuesta en formato PNG
-        return StreamingResponse(qr_image, media_type="image/png")
-    except HTTPException as e:
-        raise HTTPException(status_code=e.status_code, detail=e.detail)
 
 @router.get("/clima/temperatura/", response_model=TemperatureResponse)
 def get_temperature_data(
