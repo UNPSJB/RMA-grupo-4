@@ -121,19 +121,20 @@ def analizar_notificacion(db: Session, variable, mensaje):
                 estado=False
             )
             db.add(estado_notificacion)
-            for usuario in usuarios_interesados:
-                otp_telegram = db.query(OTP).filter(OTP.id_usuario == usuario.id).first()
-                if otp_telegram and otp_telegram.chat_id:
-                    mensaje_telegram = (
-                    f"⚠️ {nueva_notificacion.titulo}\n"
-                    f"{nueva_notificacion.mensaje}\n"
-                    f"Nodo: {mensaje['id']}"
-                )
 
-                enviar_mensaje_personal(otp_telegram.chat_id,mensaje_telegram)
-            
-                    
-                
+        # Enviar mensajes a los usuarios interesados
+        for usuario in usuarios_interesados:
+            otp_telegram = db.query(OTP).filter(OTP.id_usuario == usuario.id).first()
+            if otp_telegram and otp_telegram.chat_id:
+                try:
+                    mensaje_telegram = (
+                        f"⚠️ {nueva_notificacion.titulo}\n"
+                        f"{nueva_notificacion.mensaje}\n"
+                        f"Nodo: {mensaje['id']}"
+                    )
+                    enviar_mensaje_personal(otp_telegram.chat_id, mensaje_telegram)
+                except Exception as e:
+                    print(f"Error al enviar mensaje a {usuario.id}: {e}")
 
         db.commit()
 

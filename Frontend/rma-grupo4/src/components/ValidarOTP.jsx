@@ -150,14 +150,14 @@ export default function ValidarOTP() {
   };
 
   return (
-    <Box p={5} textAlign="center">
+    <Box p={5} textAlign="center" bg={colorMode === 'light' ? 'white' : 'gray.900'} color={colorMode === 'light' ? 'black' : 'white'}>
     <VStack spacing={4} align="center">
       {/* Título y pasos */}
       <Heading size="lg">Suscripción a Alertas por Telegram</Heading>
       <Text textAlign="left" maxWidth="400px">
         Sigue los pasos para completar tu suscripción:
       </Text>
-      <List spacing={2} textAlign="left" maxWidth="400px">
+      <List spacing={2} textAlign="left" maxWidth="400px" >
         <ListItem>1. Para recibir alertas, asegúrate de tener Telegram en tu dispositivo.</ListItem>
         <ListItem>2. Escanea el QR proporcionado para obtener el bot.</ListItem>
         <ListItem>3. Para obtener el código OTP, inicia el bot con <b>/start</b>.</ListItem>

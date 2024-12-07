@@ -113,6 +113,7 @@ export default function Inicio() {
             <SelectorNodo onChange={(nodeId) => setSelectedNode(nodeId)} />
             <Select 
               placeholder="Selecciona un rango de tiempo" 
+              value={dateRange}
               onChange={handleRangeChange}
               size="md"  
               bg={colorMode === 'light' ? 'white' : 'gray.800'}
