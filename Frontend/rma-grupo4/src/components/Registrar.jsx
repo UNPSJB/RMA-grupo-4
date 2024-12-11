@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { Box, Input, Button, FormControl, FormLabel, Heading, Text, Select, useToast, useColorMode, Switch } from '@chakra-ui/react';
+import { Box, Input, Button, FormControl, FormLabel, Heading, useToast, useColorMode, } from '@chakra-ui/react';
 
 function Registrar() {
     const [usuario, setUsuario] = useState('');
@@ -42,15 +42,39 @@ function Registrar() {
         };
 
         fetchRolId();
-    }, []); // Solo se ejecuta al montar el componente
+    }, [toast]); // Solo se ejecuta al montar el componente
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const parsedEdad = parseInt(edad, 10);
+
+        if (isNaN(parsedEdad) || parsedEdad <= 0) {
+            toast({
+                render: () => (
+                    <Box
+                        color="white"
+                        bg="red.600"
+                        borderRadius="md"
+                        p={5}
+                        mb={4}
+                        boxShadow="md"
+                        fontSize="lg"
+                    >
+                        Por favor, ingresa una edad válida (número positivo).
+                    </Box>
+                ),
+                duration: 2000,
+                isClosable: true,
+            });
+            return;
+        }
+
         try {
             await axios.post('http://localhost:8000/registrar', {
                 usuario,
                 email,
-                edad: parseInt(edad),
+                edad: parsedEdad,
                 password,
                 rol_id: rolId
             });
@@ -164,7 +188,14 @@ function Registrar() {
                         <Input
                             type="number"
                             value={edad}
-                            onChange={(e) => setEdad(e.target.value)}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                if (!isNaN(value) && Number(value) > 0) {
+                                    setEdad(value); 
+                                } else if (value === '') {
+                                    setEdad(''); 
+                                }
+                            }}
                             bg={colorMode === 'light' ? "gray.100" : "gray.900"}
                             color={colorMode === 'light' ? "black" : "white"}
                             placeholder="Ingresa tu edad"
@@ -198,25 +229,6 @@ function Registrar() {
                             }}
                         />
                     </FormControl>
-
-                    {/* <FormControl id="rol" mb={6} isRequired>
-                        <FormLabel color={colorMode === 'light' ? "gray.800" : "gray.300"}>Rol</FormLabel>
-                        <Select
-                            value={rol}
-                            onChange={(e) => setRol(e.target.value)}
-                            bg={colorMode === 'light' ? "gray.100" : "gray.900"}
-                            color={colorMode === 'light' ? "black" : "white"}
-                            borderRadius="xl"
-                            boxShadow="inset 8px 8px 15px rgba(0,0,0,0.2), inset -8px -8px 15px rgba(255,255,255,0.1)"
-                            _focus={{
-                                boxShadow: 'inset 4px 4px 10px rgba(0,0,0,0.3), inset -4px -4px 10px rgba(255,255,255,0.1)',
-                                outline: 'none',
-                            }}
-                        >
-                            <option value="estudiante">Estudiante</option>
-                            <option value="profesional">Profesional</option>
-                        </Select>
-                    </FormControl> */}
 
                     <Button 
                         type="submit" 

@@ -39,8 +39,61 @@ const ModificarDatos = () => {
         }
     };
 
+    const validateForm = () => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (!emailRegex.test(userData.email)) {
+            toast({
+                render: () => (
+                    <Box
+                        color="white"
+                        bg="red.600"
+                        borderRadius="md"
+                        p={5}
+                        mb={4}
+                        boxShadow="md"
+                        fontSize="lg"
+                    >
+                        El email ingresado no es válido.
+                    </Box>
+                ),
+                duration: 2000,
+                isClosable: true,
+            });
+            return false;
+        }
+    
+        if (!userData.edad || isNaN(userData.edad) || userData.edad < 1 || userData.edad > 120) {
+            toast({
+                render: () => (
+                    <Box
+                        color="white"
+                        bg="red.600"
+                        borderRadius="md"
+                        p={5}
+                        mb={4}
+                        boxShadow="md"
+                        fontSize="lg"
+                    >
+                        La edad ingresada debe ser un número entre 1 y 120.
+                    </Box>
+                ),
+                duration: 2000,
+                isClosable: true,
+            });
+            return false;
+        }
+    
+        return true;
+    };  
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validateForm()) {
+            return; 
+        }
+
         try {
             const response = await fetch(`http://localhost:8000/modificar_datos_usuario/${user}`, {
                 method: 'PUT',
